@@ -38,19 +38,21 @@ function S.menu(side, cmd, player, member)
 		sndPlay(motif.Snd, 200, 1)   -- announcer: "Choose your Super Art"
 	end
 	if st.saWait < 12 then
+		-- hidden seventh colour, as in 3rd Strike: LP+MK+HP held together when the fighter is picked
+		if commandGetState(cmd, '/x') and commandGetState(cmd, '/b') and commandGetState(cmd, '/z') then
+			st.pal = 7
+		end
 		S.draw(side, arts, st.saCur, st.ref)
 		return 1
 	end
-	-- confirm with any attack button; which one sets the colour (LP MP HP LK MK HK = palettes 1-6), as in
-	-- 3rd Strike. Each button is checked on its own: reading a press uses it up.
+	-- confirm with any attack button. Each button is checked on its own: reading a press uses it up.
 	local pressed = nil
 	for i, btn in ipairs({'x', 'y', 'z', 'a', 'b', 'c'}) do
 		if getInput(cmd, btn) then pressed = i break end
 	end
 	if pressed then
 		st.saWait = nil
-		st.sa = st.saCur
-		st.pal = pressed
+		st.sa = st.saCur   -- (the colour was set by the button that picked the fighter)
 		sndPlay(motif.Snd, snd.done.snd[1], snd.done.snd[2])
 		return 3
 	elseif getInput(cmd, keys.cancel.key) then

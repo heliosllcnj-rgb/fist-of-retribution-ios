@@ -5,7 +5,7 @@ displayname = "Milo"
 versiondate = 11,18,2026
 mugenversion = 1.1
 author = "Scott Balcom / Claude (prototype)"
-pal.defaults = 1,2,3
+pal.defaults = 1,2,3,4,5,6
 localcoord = 320,240
 
 [Files]
@@ -17,9 +17,26 @@ sprite = milo.sff
 anim = milo.air
 sound = milo.snd
 movelist = movelist.dat
-pal1 = milo_sa1.act
-pal2 = milo_sa2.act
-pal3 = milo_sa3.act
-pal4 = milo_knicks_sa1.act
-pal5 = milo_knicks_sa2.act
-pal6 = milo_knicks_sa3.act
+pal1 = milo_default.act
+pal2 = milo_knicks.act
+pal3 = milo_yankees.act
+pal4 = milo_giants.act
+pal5 = milo_rangers.act
+pal6 = milo_andre.act
+pal7 = milo_gold.act
+
+; Colour select as in 3rd Strike: the button that picks the fighter picks the colour.
+; LP MP HP = colours 1-3, LK MK HK = colours 4-6; LP+MK+HP together, or START held with any button, = colour 7.
+[Palette Keymap]
+x = 1
+y = 2
+z = 3
+a = 4
+b = 5
+c = 6
+x2 = 7
+y2 = 7
+z2 = 7
+a2 = 7
+b2 = 7
+c2 = 7

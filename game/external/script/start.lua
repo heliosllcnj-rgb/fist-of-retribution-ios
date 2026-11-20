@@ -4081,11 +4081,11 @@ function start.f_selectMenu(side, cmd, player, member, selectState, demo)
 			end
 		-- selection menu
 		elseif selectState == 1 then
-			-- Fist of Retribution: characters with Super Arts pick one here instead of a palette; the button that
-			-- confirms the art picks the colour, as in 3rd Strike (external/script/forsa.lua)
+			-- Fist of Retribution: characters with Super Arts pick one here instead of a palette menu; the button that
+			-- picked the fighter has already set the colour, as in 3rd Strike (external/script/forsa.lua)
 			if main.forTrials then
 				selectState = 3   -- Combo Trials: no Super Art or colour pick (each trial sets its own art)
-				start.p[side].t_selTemp[member].pal = (side == 1) and 1 or 4   -- the dummy wears another colour
+				start.p[side].t_selTemp[member].pal = (side == 1) and 1 or 2   -- the dummy wears another colour
 			elseif motif.select_info.paletteselect and motif.select_info.paletteselect > 0
 				and forsa.wanted(side, start.p[side].t_selTemp[member].ref, demo) then
 				selectState = forsa.menu(side, cmd, player, member)
