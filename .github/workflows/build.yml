@@ -1,13 +1,18 @@
 # Builds the phone versions of Fist of Retribution: Project Zero on GitHub's runners.
 #   iOS      -> FistOfRetribution-unsigned.ipa  (install with Sideloadly or AltStore)
 #   Android  -> FistOfRetribution.apk           (open on the phone to install)
+#   Windows  -> FistOfRetribution-Windows.zip   (unzip, run FistOfRetribution.exe)
 # Both files are published on the repo's Releases page under "Phone builds (latest)" and replaced on every push.
 # How it works: the IKEMEN GO engine is fetched at a fixed commit, patches/engine.patch is applied
 # (picture at the top of a tall screen, portrait, our menus as the default), the game in game/ is copied
 # into the engine tree, and the engine's own build script packages it with the app shell in ios-wrapper/.
-name: Build phone apps
+name: Build the game
 on:
   workflow_dispatch:
+    inputs:
+      targets:
+        description: "Which versions to build (any of: ios android windows)"
+        default: "ios android windows"
   push:
     branches: [main]
     paths-ignore: ['README.md']
@@ -21,6 +26,7 @@ env:
 
 jobs:
   ios:
+    if: github.event_name == 'push' || contains(inputs.targets, 'ios')
     runs-on: macos-26
     timeout-minutes: 150
     steps:
@@ -84,6 +90,7 @@ jobs:
           gh release upload phone-builds FistOfRetribution-unsigned.ipa --clobber -R "$GITHUB_REPOSITORY"
 
   android:
+    if: github.event_name == 'push' || contains(inputs.targets, 'android')
     runs-on: ubuntu-24.04
     timeout-minutes: 150
     steps:
@@ -136,3 +143,98 @@ jobs:
             gh release create phone-builds -R "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "Phone builds (latest)" \
               --notes "Newest iPhone and Android builds of Fist of Retribution: Project Zero. Replaced on every push." || true
           gh release upload phone-builds FistOfRetribution.apk --clobber -R "$GITHUB_REPOSITORY"
+
+  windows:
+    if: github.event_name == 'push' || contains(inputs.targets, 'windows')
+    runs-on: windows-2022
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Fetch the engine and apply our patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git init -q engine
+          cd engine
+          git remote add origin "$ENGINE_REPO"
+          git fetch -q --depth 1 origin "$ENGINE_SHA"
+          git checkout -q FETCH_HEAD
+          git apply --verbose ../patches/engine.patch
+
+      - uses: actions/setup-go@v7
+        with:
+          go-version: '1.27.x'
+          cache: true
+          cache-dependency-path: engine/go.sum
+
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: UCRT64
+          update: true
+          path-type: inherit
+          install: >-
+            git
+            make
+            diffutils
+            mingw-w64-ucrt-x86_64-pkg-config
+            mingw-w64-ucrt-x86_64-toolchain
+            mingw-w64-ucrt-x86_64-bzip2
+            mingw-w64-ucrt-x86_64-nasm
+            mingw-w64-ucrt-x86_64-tools
+            mingw-w64-ucrt-x86_64-SDL2
+            mingw-w64-ucrt-x86_64-libxmp
+
+      - uses: humbletim/setup-vulkan-sdk@v1.2.1
+        with:
+          vulkan-query-version: 1.4.304.1
+          vulkan-components: Vulkan-Headers, Vulkan-Loader
+          vulkan-use-cache: true
+
+      - name: Build the engine
+        shell: 'msys2 {0}'
+        env:
+          BUILD_FFMPEG: "yes"
+          GOOS: windows
+          GOARCH: amd64
+          CGO_ENABLED: "1"
+        run: |
+          set -o pipefail
+          cd engine
+          go env -w GO111MODULE=on
+          go mod download
+          ./build/build.sh Win64 > ../build-windows.log 2>&1 || { grep -n -E "error:|ERROR|fatal" ../build-windows.log | tail -60; echo "----- last lines -----"; tail -n 150 ../build-windows.log; exit 1; }
+          tail -n 15 ../build-windows.log
+          ls -la Ikemen_GO.exe lib
+
+      - name: Put the game together
+        shell: bash
+        run: |
+          set -euo pipefail
+          out="deploy/FistOfRetribution"
+          mkdir -p "$out"
+          cp engine/Ikemen_GO.exe "$out/FistOfRetribution.exe"
+          cp -R engine/lib "$out/lib"
+          for d in data external font; do cp -R "engine/$d" "$out/$d"; done
+          for d in chars data external font sound stages; do
+            mkdir -p "$out/$d"
+            cp -R "game/$d/." "$out/$d/"
+          done
+          [ -f "$out/data/system.base.def" ] || cp engine/src/resources/defaultMotif.ini "$out/data/system.base.def"
+          [ -f "$out/external/gamecontrollerdb.txt" ] || curl -fsSL -o "$out/external/gamecontrollerdb.txt" \
+            "https://raw.githubusercontent.com/mdqinc/SDL_GameControllerDB/refs/heads/master/gamecontrollerdb.txt" || true
+          mkdir -p "$out/save"
+          cp engine/LICENCE.txt "$out/ENGINE-LICENCE.txt" || true
+          ( cd deploy && "/c/Program Files/7-Zip/7z.exe" a -tzip -mx=5 ../FistOfRetribution-Windows.zip FistOfRetribution > /dev/null )
+          ls -la FistOfRetribution-Windows.zip
+
+      - name: Publish on the Releases page
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view phone-builds -R "$GITHUB_REPOSITORY" >/dev/null 2>&1 || \
+            gh release create phone-builds -R "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "Phone builds (latest)" \
+              --notes "Newest builds of Fist of Retribution: Project Zero. Replaced on every push." || true
+          gh release upload phone-builds FistOfRetribution-Windows.zip --clobber -R "$GITHUB_REPOSITORY"
+
