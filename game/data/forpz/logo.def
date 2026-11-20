@@ -1,0 +1,34 @@
+; Startup splash: HELIOS presents
+[Info]
+localcoord = 1280,720
+
+[SceneDef]
+spr = helios.sff
+font1 = Open_Sans.def
+startscene = 0
+
+[Scene 0]
+clearcolor = 0,0,0
+fadein.time = 45
+fadein.col = 0,0,0
+fadeout.time = 45
+fadeout.col = 0,0,0
+end.time = 230
+layerall.pos = 640,330
+; sun glow
+layer0.spr = 1,0
+layer0.offset = 0,0
+layer0.scale = 1.1,1.1
+layer0.starttime = 0
+layer0.layerno = 0
+; HELIOS crest
+layer1.spr = 0,0
+layer1.offset = 0,0
+layer1.scale = 0.95,0.95
+layer1.starttime = 0
+; PRESENTS
+layer2.font = 1,0,0, 240,214,160, 255, -1
+layer2.text = P R E S E N T S
+layer2.offset = 0,330
+layer2.scale = 1.1,1.1
+layer2.starttime = 70

@@ -1,0 +1,12 @@
+; FoR_MenuDim: original Fist of Retribution font (made in ChatGPT, built by fonts/mkfont.py)
+[FNT v2]
+fntversion = 2,00
+name = "FoR_MenuDim"
+
+[Def]
+Type = bitmap
+BankType = palette
+Size = 30,40
+Spacing = -6,7
+Offset = 0,0
+File = FoR_MenuDim.sff

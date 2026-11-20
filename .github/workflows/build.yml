@@ -1,0 +1,81 @@
+# Builds the phone versions of Fist of Retribution: Project Zero on GitHub's runners.
+#   iOS      -> FistOfRetribution-unsigned.ipa  (install with Sideloadly or AltStore)
+# How it works: the IKEMEN GO engine is fetched at a fixed commit, patches/engine.patch is applied
+# (picture at the top of a tall screen, portrait, our menus as the default), the game in game/ is copied
+# into the engine tree, and the engine's own build script packages it with the app shell in ios-wrapper/.
+name: Build phone apps
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths-ignore: ['README.md']
+
+env:
+  ENGINE_REPO: https://github.com/ikemen-engine/ikemen-go.git
+  ENGINE_SHA: 54d4148a728153c2097a0fb899a06812b2d3e193
+
+jobs:
+  ios:
+    runs-on: macos-26
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Fetch the engine and apply our patch
+        run: |
+          set -euo pipefail
+          git init -q engine
+          cd engine
+          git remote add origin "$ENGINE_REPO"
+          git fetch -q --depth 1 origin "$ENGINE_SHA"
+          git checkout -q FETCH_HEAD
+          git apply --verbose ../patches/engine.patch
+
+      - uses: actions/setup-go@v7
+        with:
+          go-version: '1.27.x'
+          cache: true
+          cache-dependency-path: engine/go.sum
+
+      - name: Host tools
+        run: |
+          export HOMEBREW_NO_ANALYTICS=1 HOMEBREW_NO_AUTO_UPDATE=1
+          brew install --quiet pkg-config git nasm || true
+          xcodebuild -version
+
+      - name: Put the game into the engine tree
+        run: |
+          set -euo pipefail
+          for d in chars data external font sound stages; do
+            mkdir -p "engine/$d"
+            cp -R "game/$d/." "engine/$d/"
+          done
+          # every build re-unpacks the game on first launch
+          sed -i '' "s/FOR_BUILD_STAMP/${GITHUB_SHA:0:12}/" ios-wrapper/I.K.E.M.E.N-Go/ViewController.m
+          du -sh engine/chars engine/data engine/stages engine/sound
+
+      - name: Build the IPA (unsigned)
+        env:
+          BUILD_FFMPEG: "yes"
+          IOS_WRAPPER_DIR: ${{ github.workspace }}/ios-wrapper
+          IOS_BUILD_NUMBER: ${{ github.run_number }}
+          IOS_APP_VERSION: "0.1.0"
+        run: |
+          set -o pipefail
+          cd engine
+          chmod +x build/build.sh
+          ./build/build.sh iOS > ../build-ios.log 2>&1 || { grep -n -E "error:|ERROR|fatal" ../build-ios.log | tail -60; echo "----- last lines -----"; tail -n 120 ../build-ios.log; exit 1; }
+          tail -n 15 ../build-ios.log
+          cp bin/ikemen-go.ipa ../FistOfRetribution-unsigned.ipa
+          ls -la ../FistOfRetribution-unsigned.ipa
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: FistOfRetribution-iOS-unsigned
+          path: FistOfRetribution-unsigned.ipa
+
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: build-ios-log
+          path: build-ios.log

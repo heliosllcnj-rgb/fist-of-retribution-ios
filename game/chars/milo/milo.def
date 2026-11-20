@@ -1,0 +1,25 @@
+; Michael "Milo" Foster - Fist of Retribution: Project Zero (IKEMEN GO prototype)
+[Info]
+name = "Michael "Milo" Foster"
+displayname = "Milo"
+versiondate = 11,18,2026
+mugenversion = 1.1
+author = "Scott Balcom / Claude (prototype)"
+pal.defaults = 1,2,3
+localcoord = 320,240
+
+[Files]
+cmd = milo.cmd
+cns = milo.cns
+st = milo.cns
+stcommon = common1.cns
+sprite = milo.sff
+anim = milo.air
+sound = milo.snd
+movelist = movelist.dat
+pal1 = milo_sa1.act
+pal2 = milo_sa2.act
+pal3 = milo_sa3.act
+pal4 = milo_knicks_sa1.act
+pal5 = milo_knicks_sa2.act
+pal6 = milo_knicks_sa3.act

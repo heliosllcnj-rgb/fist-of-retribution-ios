@@ -1,0 +1,37 @@
+<#f0f000>:System:</>
+High / mid parry						_F <#bebebe>(tap)</>
+Low / mid parry						_D <#bebebe>(tap)</>
+Air parry							_AIR_F <#bebebe>(tap)</>
+Dash / Back dash						_F_F / _B_B
+Throw / Throw escape					^X_+^A
+Back throw						_B_+^X_+^A
+Universal Overhead					^Y_+^B
+Taunt								^Z_+^C
+
+<#f0f000>:Special Moves:</>
+Thunderline_EX							_QDF^P
+
+<#f0f000>:Normals:</>
+Flicker Jab						^X
+Marty's Straight						^Y
+Thunder Cross						^Z
+Shin Tap						^A
+Spear Kick						^B
+Cyclone Roundhouse						^C
+Crouching Jab						_D^X
+Body Straight						_D^Y
+Rising Hook						_D^Z
+Ankle Kick						_D^A
+Sweeping Shin Kick						_D^B
+Leg Reaper						_D^C
+Air Jab						_AIR^X
+Falling Hammer						_AIR^Y
+Thunder Hammer						_AIR^Z
+Air Knee						_AIR^A
+Switch Kick						_AIR^B
+Descending Roundhouse						_AIR^C
+Legacy Elbow						_F^Y
+Breaker Straight						_F^Z
+Marty's Step Kick						_F^B
+Turning Heel						_B^C
+Low Thunder Sweep						_DF^C

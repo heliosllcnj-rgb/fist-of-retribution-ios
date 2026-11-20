@@ -1,0 +1,96 @@
+diff --git a/src/resources/defaultConfig.ini b/src/resources/defaultConfig.ini
+index 0f55fc8..1dd8241 100644
+--- a/src/resources/defaultConfig.ini
++++ b/src/resources/defaultConfig.ini
+@@ -97,7 +97,7 @@ Turns.Recovery.Bonus  = 27.5
+ ; -------------------------------------------------------------------------------
+ [Config]
+ ; Motif to use. Motifs are themes that define the look and feel of Ikemen GO.
+-Motif               = data/ikemen1/system.def
++Motif               = data/forpz/system.def
+ ; Max amount of player-controlled characters (2-8)
+ Players             = 4
+ ; Preferred language (ISO 639-1), e.g. en, es, ja, etc.
+@@ -138,9 +138,9 @@ TurnsLoading        = 1
+ ; 2 = Immediate : enter menus and select screen immediately and load assets in the background.
+ BootLoadingMode     = 0
+ ; This is 1 the first time you run IKEMEN.
+-FirstRun            = 1
++FirstRun            = 0
+ ; Title of the application window.
+-WindowTitle         = Ikemen GO
++WindowTitle         = Fist of Retribution: Project Zero
+ ; Window icon. Define multiple sizes as an array with comma-separated values.
+ WindowIcon          = external/icons/IkemenCylia_256.png, external/icons/IkemenCylia_96.png, external/icons/IkemenCylia_48.png
+ ; Lua script file initializing motif and game mode logic loop.
+@@ -152,7 +152,7 @@ ScreenshotFolder    =
+ TrainingChar        = 
+ ; Path to stage automatically loadad in training mode. Leave it blank
+ ; to allow manual selection.
+-TrainingStage       = 
++TrainingStage       = stages/rooftop.def
+ ; Path to a database of game controller mappings.
+ GamepadMappings     = external/gamecontrollerdb.txt
+ ; Toggle legacy round timer behavior.
+diff --git a/src/sdl_ios.go b/src/sdl_ios.go
+index 3a2c3b9..9e6fb1b 100644
+--- a/src/sdl_ios.go
++++ b/src/sdl_ios.go
+@@ -20,5 +20,5 @@ func attachIOSMetalLayer(windowID uint32) {
+ }
+ 
+ func setOrientationHints() {
+-	sdl.SetHint(sdl.HINT_ORIENTATIONS, "LandscapeLeft LandscapeRight Portrait PortraitUpsideDown")
++	sdl.SetHint(sdl.HINT_ORIENTATIONS, "Portrait") // Fist of Retribution: picture on top, arcade panel below
+ }
+diff --git a/src/system_sdl.go b/src/system_sdl.go
+index 8eea3d3..59c46cb 100644
+--- a/src/system_sdl.go
++++ b/src/system_sdl.go
+@@ -6,6 +6,8 @@ import (
+ 	"image/draw"
+ 	"math"
+ 	"runtime"
++	"strconv"
++	"strings"
+ 
+ 	"github.com/veandco/go-sdl2/sdl"
+ )
+@@ -247,6 +249,19 @@ func (w *Window) GetScaledViewportSize() (int32, int32, int32, int32) {
+ 		resizedHeight = int32(float32(resizedWidth) / aspectGame)
+ 		x = 0
+ 		y = (int32(winHeight) - resizedHeight) / 2
++		// Fist of Retribution phone layout: the app shell sets the SDL hint FOR_VIEW_TOP to the number of
++		// pixels to leave above the picture (status bar / camera cut-out). The picture then sits at the top
++		// of the tall window and the shell draws its arcade stick and buttons in the space underneath.
++		if top, ok := forViewTop(); ok {
++			if top > int32(winHeight)-resizedHeight {
++				top = int32(winHeight) - resizedHeight
++			}
++			if strings.HasPrefix(sys.cfg.Video.RenderMode, "Vulkan") {
++				y = top // Vulkan viewports count from the top edge
++			} else {
++				y = int32(winHeight) - resizedHeight - top // OpenGL viewports count from the bottom edge
++			}
++		}
+ 	}
+ 
+ 	return x, y, resizedWidth, resizedHeight
+@@ -484,3 +499,17 @@ func (w *Window) Close() {
+ 	}
+ 	sdl.Quit()
+ }
++
++// forViewTop reads the FOR_VIEW_TOP hint (pixels to leave above the picture in a tall window).
++// It is re-read every frame so the shell can change it when the device is rotated, folded or unfolded.
++func forViewTop() (int32, bool) {
++	h := sdl.GetHint("FOR_VIEW_TOP")
++	if h == "" {
++		return 0, false
++	}
++	v, err := strconv.Atoi(strings.TrimSpace(h))
++	if err != nil || v < 0 {
++		return 0, false
++	}
++	return int32(v), true
++}

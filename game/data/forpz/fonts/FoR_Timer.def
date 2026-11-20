@@ -1,0 +1,12 @@
+; FoR_Timer: original Fist of Retribution round timer digits (made in ChatGPT, built by fonts/mkfont.py)
+[FNT v2]
+fntversion = 2,00
+name = "FoR_Timer"
+
+[Def]
+Type = bitmap
+BankType = palette
+Size = 54,52
+Spacing = -6,6
+Offset = 0,0
+File = FoR_Timer.sff

@@ -1,0 +1,12 @@
+; FoR_Display: original Fist of Retribution font (made in ChatGPT, built by fonts/mkfont.py)
+[FNT v2]
+fntversion = 2,00
+name = "FoR_Display"
+
+[Def]
+Type = bitmap
+BankType = palette
+Size = 22,30
+Spacing = -4,6
+Offset = 0,0
+File = FoR_Display.sff
