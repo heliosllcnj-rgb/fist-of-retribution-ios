@@ -5216,12 +5216,12 @@ pos = 36, 0
 [State 815, Lift]
 type = TargetBind
 trigger1 = Time >= 10 && Time < 20
-pos = 8, -70
+pos = 8, -48
 
 [State 815, Over]
 type = TargetBind
 trigger1 = Time >= 20 && Time < 30
-pos = -30, -50
+pos = -30, -30
 
 [State 815, Teched]
 type = ChangeState
@@ -5265,9 +5265,17 @@ movetype = H
 physics = N
 velset = 0,0
 
+; Held standing and doubled over in the clinch (it used the falling pose, which floated sideways in the air);
+; the falling pose is only for the back throw's overhead lift.
 [State 820, Anim]
 type = ChangeAnim
 trigger1 = Time = 0
+value = ifelse(SelfAnimExist(5010), 5010, 5000)
+
+[State 820, Lifted]
+type = ChangeAnim
+trigger1 = EnemyNear, StateNo = 815
+trigger1 = EnemyNear, Time = 10
 value = 5030
 
 [State 820, Tech]
@@ -5294,22 +5302,19 @@ type = ChangeAnim
 trigger1 = Time = 0
 value = ifelse(SelfAnimExist(5012), 5012, 5030)
 
-[State 823, Back to held]
-type = ChangeAnim
-trigger1 = Time = 10
-value = 5030
-
 [State 823, Safety]
 type = SelfState
 trigger1 = !gethitvar(isbound)
 value = 5050
 
-; Thrown forward (Ken's throw release, Damage_18000: blow-away 4, 36 frames back to release height)
+; Thrown forward. Ken's forward throw (ken_attr row 47, blow-away 4) sends the opponent forward at 1632/256 =
+; 6.375 px/f and drops them almost at once, about one body length away - not a long, high toss. Milo shoves from
+; a standing clinch, so the opponent takes a short low hop at that speed: 16 frames in the air.
 [Statedef 821]
 type = A
 movetype = H
 physics = N
-velset = -5.34,-7.79
+velset = -5.67,-3.56
 poweradd = 40
 
 [State 821, Gravity]
@@ -5340,18 +5345,16 @@ trigger1 = Vel Y > 0
 trigger1 = Pos Y >= 0
 value = 5100
 
-; Thrown backward (blow-away 5: 7 px/f gaining 32/256 per frame)
+; Thrown backward. Ken's back throw (ken_attr row 49, blow-away 5): 1904/256 = 7.44 px/f across, 2074/256 = 8.1 px/f
+; up, gravity 160/256 = 0.625 (all x0.89 for our size). Ken throws from a roll on the ground; Milo lets go from
+; shoulder height, so the upward speed is trimmed to keep the same low arc: the opponent stays on screen and
+; lands a little over half a screen away.
 [Statedef 822]
 type = A
 movetype = H
 physics = N
-velset = -6.23,-9.73
+velset = -7.0,-6.0
 poweradd = 40
-
-[State 822, Carry]
-type = VelAdd
-trigger1 = 1
-x = -0.111
 
 [State 822, Gravity]
 type = VelAdd
