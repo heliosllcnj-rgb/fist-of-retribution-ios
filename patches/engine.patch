@@ -44,7 +44,7 @@ index 3a2c3b9..9e6fb1b 100644
 +	sdl.SetHint(sdl.HINT_ORIENTATIONS, "Portrait") // Fist of Retribution: picture on top, arcade panel below
  }
 diff --git a/src/system_sdl.go b/src/system_sdl.go
-index 8eea3d3..59c46cb 100644
+index 8eea3d3..3e5201b 100644
 --- a/src/system_sdl.go
 +++ b/src/system_sdl.go
 @@ -6,6 +6,8 @@ import (
@@ -67,7 +67,7 @@ index 8eea3d3..59c46cb 100644
 +			if top > int32(winHeight)-resizedHeight {
 +				top = int32(winHeight) - resizedHeight
 +			}
-+			if strings.HasPrefix(sys.cfg.Video.RenderMode, "Vulkan") {
++			if gfx != nil && strings.HasPrefix(gfx.GetName(), "Vulkan") {
 +				y = top // Vulkan viewports count from the top edge
 +			} else {
 +				y = int32(winHeight) - resizedHeight - top // OpenGL viewports count from the bottom edge

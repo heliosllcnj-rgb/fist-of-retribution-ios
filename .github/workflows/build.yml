@@ -1,5 +1,7 @@
 # Builds the phone versions of Fist of Retribution: Project Zero on GitHub's runners.
 #   iOS      -> FistOfRetribution-unsigned.ipa  (install with Sideloadly or AltStore)
+#   Android  -> FistOfRetribution.apk           (open on the phone to install)
+# Both files are published on the repo's Releases page under "Phone builds (latest)" and replaced on every push.
 # How it works: the IKEMEN GO engine is fetched at a fixed commit, patches/engine.patch is applied
 # (picture at the top of a tall screen, portrait, our menus as the default), the game in game/ is copied
 # into the engine tree, and the engine's own build script packages it with the app shell in ios-wrapper/.
@@ -9,6 +11,9 @@ on:
   push:
     branches: [main]
     paths-ignore: ['README.md']
+
+permissions:
+  contents: write
 
 env:
   ENGINE_REPO: https://github.com/ikemen-engine/ikemen-go.git
@@ -69,13 +74,65 @@ jobs:
           cp bin/ikemen-go.ipa ../FistOfRetribution-unsigned.ipa
           ls -la ../FistOfRetribution-unsigned.ipa
 
-      - uses: actions/upload-artifact@v7
-        with:
-          name: FistOfRetribution-iOS-unsigned
-          path: FistOfRetribution-unsigned.ipa
+      - name: Publish on the Releases page
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view phone-builds -R "$GITHUB_REPOSITORY" >/dev/null 2>&1 || \
+            gh release create phone-builds -R "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "Phone builds (latest)" \
+              --notes "Newest iPhone and Android builds of Fist of Retribution: Project Zero. Replaced on every push." || true
+          gh release upload phone-builds FistOfRetribution-unsigned.ipa --clobber -R "$GITHUB_REPOSITORY"
 
-      - uses: actions/upload-artifact@v7
-        if: always()
-        with:
-          name: build-ios-log
-          path: build-ios.log
+  android:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Fetch the engine and apply our patch
+        run: |
+          set -euo pipefail
+          git init -q engine
+          cd engine
+          git remote add origin "$ENGINE_REPO"
+          git fetch -q --depth 1 origin "$ENGINE_SHA"
+          git checkout -q FETCH_HEAD
+          git apply --verbose ../patches/engine.patch
+
+      - name: Put the game and the app shell into the engine tree
+        run: |
+          set -euo pipefail
+          for d in chars data external font sound stages; do
+            mkdir -p "engine/$d"
+            cp -R "game/$d/." "engine/$d/"
+          done
+          mkdir -p engine/build/android-apk
+          cp -R android-wrapper engine/build/android-apk/ikemen-droid
+          # every build re-unpacks the game on first launch
+          sed -i "s/FOR_BUILD_STAMP/${GITHUB_SHA:0:12}/" engine/build/android-apk/ikemen-droid/app/src/main/java/org/libsdl/app/SDLActivity.java
+          # the app unpacks exactly the files listed here (one per line)
+          ( cd engine && { find chars data external font sound stages -type f; echo external/gamecontrollerdb.txt; echo data/system.base.def; } \
+              | grep -v ' ' | sort -u ) > engine/build/android-apk/ikemen-droid/app/src/main/assets/manifest.txt
+          wc -l engine/build/android-apk/ikemen-droid/app/src/main/assets/manifest.txt
+
+      - name: Build the APK
+        run: |
+          set -o pipefail
+          cd engine
+          DC="docker compose -f build/docker/android/docker-compose.yml"
+          show() { grep -n -E "error:|ERROR|FAILED|What went wrong" ../build-android.log | tail -60; echo "----- last lines -----"; tail -n 150 ../build-android.log; }
+          $DC build android-build > ../build-android.log 2>&1 || { show; exit 1; }
+          $DC run --rm -e ANDROID_APK_REPO=/work/build/android-apk/ikemen-droid android-build >> ../build-android.log 2>&1 || { show; exit 1; }
+          tail -n 15 ../build-android.log
+          cp bin/ikemen-go.apk ../FistOfRetribution.apk
+          ls -la ../FistOfRetribution.apk
+
+      - name: Publish on the Releases page
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          sleep 20
+          gh release view phone-builds -R "$GITHUB_REPOSITORY" >/dev/null 2>&1 || \
+            gh release create phone-builds -R "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "Phone builds (latest)" \
+              --notes "Newest iPhone and Android builds of Fist of Retribution: Project Zero. Replaced on every push." || true
+          gh release upload phone-builds FistOfRetribution.apk --clobber -R "$GITHUB_REPOSITORY"
