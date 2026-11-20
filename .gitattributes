@@ -1,0 +1,2 @@
+# Never convert line endings: the game files and patches must reach every build machine byte for byte
+* -text
