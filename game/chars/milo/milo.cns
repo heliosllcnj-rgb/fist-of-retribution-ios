@@ -538,6 +538,13 @@ value = S21, 2
 channel = 0
 ignorehitpause = 1
 
+[State -2, Voice Fist of Retribution]
+type = PlaySnd
+trigger1 = Time = 1 && stateno = 3300
+value = S21, 3
+channel = 0
+ignorehitpause = 1
+
 [State -2, Voice hurt]
 type = PlaySnd
 trigger1 = Alive && Time = 0 && Random < 650 && (stateno = 5000 || stateno = 5010 || stateno = 5020 || stateno = 5070)
