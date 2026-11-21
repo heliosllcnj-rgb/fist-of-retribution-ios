@@ -10423,7 +10423,6 @@ type = BGPalFX
 trigger1 = Time = 0
 time = 45
 mul = 170, 90, 90
-sinadd = 30, 10, 10, 12
 
 [State 3300, Freeze flash]
 type = PalFX
@@ -10445,6 +10444,60 @@ ownpal = 1
 supermovetime = 33
 bindtime = -1
 removetime = -2
+ignorehitpause = 1
+
+[State 3300, FX sky strike]
+type = Explod
+trigger1 = Time = 0
+anim = 6052
+postype = p1
+pos = 0, 0
+scale = .34, .34
+sprpriority = -3
+ownpal = 1
+bindtime = -1
+ignorehitpause = 1
+supermovetime = 33
+removetime = -2
+[State 3300, FX charge arcs]
+type = Explod
+trigger1 = Time = 4
+anim = 6050
+postype = p1
+pos = 6, -50
+scale = .34, .34
+sprpriority = 7
+ownpal = 1
+bindtime = -1
+ignorehitpause = 1
+supermovetime = 33
+removetime = 41
+[State 3300, FX ground arcs]
+type = Explod
+trigger1 = Time = 2
+anim = 6054
+postype = p1
+pos = 0, 0
+scale = .34, .34
+sprpriority = -2
+ownpal = 1
+bindtime = -1
+ignorehitpause = 1
+supermovetime = 33
+removetime = 67
+[State 3300, FX strike shake]
+type = EnvShake
+trigger1 = Time = 1
+time = 12
+ampl = 5
+freq = 110
+ignorehitpause = 1
+
+[State 3300, FX strike thunder]
+type = PlaySnd
+trigger1 = Time = 1
+value = S1, 1
+channel = 4
 ignorehitpause = 1
 
 [State 3300, Charge crackle 1]
@@ -10593,6 +10646,34 @@ removetime = -2
 ignorehitpause = 1
 pausemovetime = 14
 
+[State 3301, FX impact burst]
+type = Explod
+trigger1 = MoveHit = 1 && NumExplod(6053) = 0
+id = 6053
+anim = 6053
+postype = p1
+pos = 98.67, -54.33
+scale = .34, .34
+sprpriority = 7
+ownpal = 1
+bindtime = 1
+ignorehitpause = 1
+removetime = -2
+pausemovetime = 14
+[State 3301, FX impact strike]
+type = Explod
+trigger1 = MoveHit = 1 && NumExplod(6052) = 0
+id = 6052
+anim = 6052
+postype = p1
+pos = 116.67, 0
+scale = .34, .34
+sprpriority = -3
+ownpal = 1
+bindtime = 1
+ignorehitpause = 1
+removetime = -2
+pausemovetime = 14
 [State 3301, Impact flash]
 type = PalFX
 trigger1 = MoveHit = 1
@@ -10637,12 +10718,35 @@ trigger1 = 1
 value = SCA
 time = 1
 
+[State 3303, FX drill stream]
+type = Explod
+trigger1 = Time = 0
+anim = 6055
+postype = p1
+pos = 126.33, -55.67
+scale = .34, .34
+sprpriority = 7
+ownpal = 1
+bindtime = -1
+ignorehitpause = 1
+removetime = 53
+[State 3303, FX drill ground]
+type = Explod
+trigger1 = Time = 0
+anim = 6054
+postype = p1
+pos = 130.33, 0
+scale = .34, .34
+sprpriority = -2
+ownpal = 1
+bindtime = -1
+ignorehitpause = 1
+removetime = 63
 [State 3303, Sky]
 type = BGPalFX
 trigger1 = Time = 0
 time = 59
 mul = 110, 120, 170
-sinadd = 30, 40, 70, 6
 
 [State 3303, Drill hit 1]
 type = HitDef
@@ -11038,6 +11142,43 @@ ownpal = 1
 bindtime = 1
 removetime = -2
 
+[State 3303, FX final burst]
+type = Explod
+trigger1 = Time = 53
+anim = 6053
+postype = p1
+pos = 154.33, -55.67
+scale = .46, .46
+sprpriority = 7
+ownpal = 1
+bindtime = 1
+ignorehitpause = 1
+removetime = -2
+[State 3303, FX final strike]
+type = Explod
+trigger1 = Time = 53
+anim = 6052
+postype = p1
+pos = 160.33, 0
+scale = .46, .46
+sprpriority = -3
+ownpal = 1
+bindtime = 1
+ignorehitpause = 1
+removetime = -2
+[State 3303, FX final strike 2]
+type = Explod
+trigger1 = Time = 58
+anim = 6052
+postype = p1
+pos = 190.33, 0
+scale = .34, .34
+sprpriority = -3
+ownpal = 1
+bindtime = 1
+ignorehitpause = 1
+removetime = -2
+facing = -1
 [State 3303, Final sound]
 type = PlaySnd
 trigger1 = Time = 53
@@ -11048,8 +11189,7 @@ channel = 3
 type = BGPalFX
 trigger1 = Time = 53
 time = 20
-mul = 140, 150, 200
-sinadd = 60, 70, 110, 20
+mul = 300, 310, 400
 
 [State 3303, End]
 type = ChangeState
