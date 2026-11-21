@@ -216,21 +216,9 @@ if !const(Default.Enable.Dizzy) || isHelper || teamSide = 0 {
 		if getHitVar(frame) && getHitVar(dizzyPoints) <= 0 {
 			dizzyPointsSet{value: 1}
 		} else if (moveType = H || stateNo = const(StateDownedGetHit_gettingUp)) && !inCustomState {
-			# Change get hit properties when becoming dizzy
+			# 3rd Strike: a stun does not knock the character down; they finish the hit's reaction and then
+			# stand dizzy (a launching/knockdown hit still knocks down and the stun starts after getting up).
 			dizzySet{value: 1}
-			getHitVarSet{
-				xvel: getHitVar(air.velocity.x) + const(velocity.air.gethit.ko.add.y) * facing;
-				yvel: min(getHitVar(air.velocity.y), const(velocity.air.gethit.ko.ymin));
-				fall.recover: 0;
-				down.recover: 0;
-				down.recovertime: 30;
-			}
-			if !hitfall {
-				hitFallSet{value: 1}
-				if anim = [const(AnimCrouchHit_light), const(AnimCrouchHit_hard)] {
-					changeAnim{value: const(AnimStandOrAirHitBack)}
-				}
-			}
 		}
 	}
 
@@ -265,14 +253,6 @@ if !const(Default.Enable.Dizzy) || isHelper || teamSide = 0 {
 
 		# Special effects
 		if !numHelper(const(StateDizzyBirdsHelper)) {
-			# Red screen
-			if palFxVar(bg.time) = 0 {
-				bgPalFx{
-					time: 30;
-					sincolor: -255, 60;
-					sinmul: 0, -255, -255, 60;
-				}
-			}
 			# Dizzy birds
 			helper{
 				id: const(StateDizzyBirdsHelper);

@@ -34,8 +34,8 @@ leftbound = -1000
 rightbound = 1000
 
 [Bound]
-screenleft = 15
-screenright = 15
+screenleft = 72
+screenright = 72
 
 [StageInfo]
 zoffset = 660

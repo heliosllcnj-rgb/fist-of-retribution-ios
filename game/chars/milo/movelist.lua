@@ -177,35 +177,6 @@ return {
 					note = "Medium: press any kick during the dash",
 					scale = 0.5,
 				}, {
-					name = "Air Flashstep",
-					cmd = "_QDB^K",
-					desc = {"In the air: a lightning hover, then a fast dive down and", "forward that changes where his jump lands. Light just", "dives, Medium can be followed by a dive kick, Heavy", "dives into the kick (overhead). EX is strike-invincible", "and passes through the opponent."},
-					anim = "0,0, 0,0, 10\n1210,0, 0,0, 2\n1210,1, 0,0, 2\n1210,2, 0,0, 2\n1211,0, 22,0, 1\n1211,0, 43,0, 1\n1211,0, 65,0, 1\n1211,1, 86,0, 1\n1211,1, 108,0, 1\n1211,1, 130,0, 1\n1211,1, 130,0, 34",
-					cols = {{
-							label = "L",
-							hits = 0,
-							total = 8,
-						}, {
-							label = "M",
-							hits = 0,
-							total = 9,
-						}, {
-							label = "H",
-							startup = 7,
-							active = 6,
-							recovery = 0,
-							damage = 85,
-							hits = 1,
-							total = 12,
-						}, {
-							label = "EX",
-							hits = 0,
-							total = 7,
-						}},
-					kind = "Movement",
-					note = "In the air. Medium: press any kick during the dive",
-					scale = 0.5,
-				}, {
 					name = "Static Breaker",
 					cmd = "_QDB^P",
 					desc = {"Charged body blow. Medium staggers on counter-hit, Heavy", "knocks down and pushes far on block. EX hits twice and", "crumples on counter-hit."},

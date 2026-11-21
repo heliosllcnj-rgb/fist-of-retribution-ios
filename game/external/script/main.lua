@@ -1047,7 +1047,7 @@ function main.f_commandLine()
 		tag = {gameOption('Options.Tag.Match.Wins'), gameOption('Options.Tag.Match.Wins')},
 	}
 	local roundTime = gameOption('Options.Time')
-	setFightScreenElements({guardbar = gameOption('Options.GuardBreak'), stunbar = gameOption('Options.Dizzy'), redlifebar = gameOption('Options.RedLife')})
+	setFightScreenElements({guardbar = gameOption('Options.GuardBreak'), stunbar = true, redlifebar = gameOption('Options.RedLife')})
 	local frames = fightScreenVar("time.framespercount")
 	local t = {}
 	local t_assignedPals = {}
@@ -2088,7 +2088,7 @@ function main.f_default()
 		p2wincount = false,
 		timer = false,
 		guardbar = gameOption('Options.GuardBreak'),
-		stunbar = gameOption('Options.Dizzy'),
+		stunbar = true,
 		redlifebar = gameOption('Options.RedLife'),
 	}
 	main.defaultLuaPath = 'external/script/default.lua'

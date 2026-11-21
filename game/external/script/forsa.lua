@@ -111,9 +111,10 @@ function S.draw(side, arts, cur, ref)
 	-- banner: slanted gold bar with the title
 	local bx, by = 470, 62
 	U.slant(X(bx - 30, 800), by, 800, 70, 30, 0, 0, 0, 200)
-	U.slant(X(bx - 20, 790), by + 6, 790, 58, 24, U.GOLD[1], 140, 20, 255)
-	U.slant(X(bx - 20, 790), by + 6, 790, 8, 3, 255, 236, 150, 255)
-	U.btext('SUPER ART SELECT', X(bx + 10, 0), by + 52, 'FoR_Menu', 1.05, L and 1 or -1)
+	U.slant(X(bx - 20, 790), by + 6, 790, 58, 24, 14, 20, 52, 255)
+	U.slant(X(bx - 20, 790), by + 6, 790, 4, 2, U.GOLD[1], 170, 40, 255)
+	U.slant(X(bx - 20, 790), by + 60, 790, 4, 2, U.GOLD[1], 170, 40, 255)
+	U.spr('data/forpz/hudfx.sff', 3, L and 0 or 1, X(bx + 6, 0), by + 35, 0.92)
 	-- three slanted cards; the chosen one slides out and crackles
 	local cx, cy, cw, ch, gap = 560, 150, 640, 98, 10
 	for i, a in ipairs(arts) do

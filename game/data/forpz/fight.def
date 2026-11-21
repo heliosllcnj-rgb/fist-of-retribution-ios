@@ -2029,7 +2029,7 @@ p2.warn.layerno = 1
 ;-----------------------------------------------------------
 [Stunbar]
 ;Player 1
-p1.pos = 585, 64
+p1.pos = -3000, -3000
 p1.top.spr = 96, 0
 p1.top.layerno = 0
 p1.bg1.spr = 95, 0
@@ -2046,10 +2046,10 @@ p1.warn.palfx.sinmul = 0, 128, 128, 5
 p1.warn.offset = 0, 0
 p1.warn.layerno = 1
 p1.warn.scale = 1,1
-p1.range.x = 0, -260
+p1.range.x = 0, -214
 
 ;Player 2
-p2.pos = 695, 64
+p2.pos = -3000, -3000
 p2.top.spr = 96, 0
 p2.top.layerno = 0
 p2.top.facing = -1
@@ -2069,7 +2069,7 @@ p2.warn.palfx.sinmul = 0, 128, 128, 5
 p2.warn.offset = 0, 0
 p2.warn.layerno = 1
 p2.warn.scale = 1,1
-p2.range.x = 0, 260
+p2.range.x = 0, 214
 
 [Simul Stunbar]
 [Simul_3P Stunbar]
@@ -2947,6 +2947,126 @@ team2.displaytime = 60
 team2.showspeed = 2
 team2.hidespeed = 8
 
+;---------- 3rd Strike-style round calls (ChatGPT wordmarks, wordmarks.py)
+[Begin Action 701]
+700,1, 0,0, 7, , AS64D192, 2.6,2.6
+Interpolate Scale
+Interpolate Blend
+700,1, 0,0, 2, , AS256D0, 0.94,0.94
+Interpolate Scale
+700,1, 0,0, 48, , AS256D0, 1,1
+700,1, 0,0, 6, , AS256D0, 1,1
+Interpolate Scale
+Interpolate Blend
+700,1, 0,0, 1, , AS0D256, 1.7,0.08
+700,1, 0,0, -1, , AS0D256, 1,1
+
+[Begin Action 702]
+700,2, 0,0, 7, , AS64D192, 2.6,2.6
+Interpolate Scale
+Interpolate Blend
+700,2, 0,0, 2, , AS256D0, 0.94,0.94
+Interpolate Scale
+700,2, 0,0, 48, , AS256D0, 1,1
+700,2, 0,0, 6, , AS256D0, 1,1
+Interpolate Scale
+Interpolate Blend
+700,2, 0,0, 1, , AS0D256, 1.7,0.08
+700,2, 0,0, -1, , AS0D256, 1,1
+
+[Begin Action 703]
+700,3, 0,0, 7, , AS64D192, 2.6,2.6
+Interpolate Scale
+Interpolate Blend
+700,3, 0,0, 2, , AS256D0, 0.94,0.94
+Interpolate Scale
+700,3, 0,0, 48, , AS256D0, 1,1
+700,3, 0,0, 6, , AS256D0, 1,1
+Interpolate Scale
+Interpolate Blend
+700,3, 0,0, 1, , AS0D256, 1.7,0.08
+700,3, 0,0, -1, , AS0D256, 1,1
+
+[Begin Action 704]
+700,4, 0,0, 7, , AS64D192, 2.6,2.6
+Interpolate Scale
+Interpolate Blend
+700,4, 0,0, 2, , AS256D0, 0.94,0.94
+Interpolate Scale
+700,4, 0,0, 48, , AS256D0, 1,1
+700,4, 0,0, 6, , AS256D0, 1,1
+Interpolate Scale
+Interpolate Blend
+700,4, 0,0, 1, , AS0D256, 1.7,0.08
+700,4, 0,0, -1, , AS0D256, 1,1
+
+[Begin Action 710]
+710,0, 0,0, 7, , AS64D192, 2.2,2.2
+Interpolate Scale
+Interpolate Blend
+710,0, 0,0, 2, , AS256D0, 0.94,0.94
+Interpolate Scale
+710,0, 0,0, 34, , AS256D0, 1,1
+710,0, 0,0, 6, , AS256D0, 1,1
+Interpolate Scale
+Interpolate Blend
+710,0, 0,0, 1, , AS0D256, 1.7,0.08
+710,0, 0,0, -1, , AS0D256, 1,1
+
+[Begin Action 720]
+720,0, 0,0, 7, , AS64D192, 3.0,3.0
+Interpolate Scale
+Interpolate Blend
+720,0, 0,0, 2, , AS256D0, 0.94,0.94
+Interpolate Scale
+720,0, 0,0, 140, , AS256D0, 1,1
+720,0, 0,0, -1, , AS0D256, 1,1
+
+[Begin Action 721]
+721,0, 0,0, 7, , AS64D192, 3.0,3.0
+Interpolate Scale
+Interpolate Blend
+721,0, 0,0, 2, , AS256D0, 0.94,0.94
+Interpolate Scale
+721,0, 0,0, 110, , AS256D0, 1,1
+721,0, 0,0, -1, , AS0D256, 1,1
+
+[Begin Action 722]
+722,0, 0,0, 7, , AS64D192, 2.6,2.6
+Interpolate Scale
+Interpolate Blend
+722,0, 0,0, 2, , AS256D0, 0.94,0.94
+Interpolate Scale
+722,0, 0,0, 70, , AS256D0, 1,1
+722,0, 0,0, -1, , AS0D256, 1,1
+
+[Begin Action 723]
+723,0, 0,0, 7, , AS64D192, 2.6,2.6
+Interpolate Scale
+Interpolate Blend
+723,0, 0,0, 2, , AS256D0, 0.94,0.94
+Interpolate Scale
+723,0, 0,0, 70, , AS256D0, 1,1
+723,0, 0,0, -1, , AS0D256, 1,1
+
+[Begin Action 724]
+724,0, 0,0, 7, , AS64D192, 2.0,2.0
+Interpolate Scale
+Interpolate Blend
+724,0, 0,0, 2, , AS256D0, 0.94,0.94
+Interpolate Scale
+724,0, 0,0, 110, , AS256D0, 1,1
+724,0, 0,0, -1, , AS0D256, 1,1
+
+[Begin Action 725]
+725,0, 0,0, 7, , AS64D192, 2.0,2.0
+Interpolate Scale
+Interpolate Blend
+725,0, 0,0, 2, , AS256D0, 0.94,0.94
+Interpolate Scale
+725,0, 0,0, 150, , AS256D0, 1,1
+725,0, 0,0, -1, , AS0D256, 1,1
+
 [Begin Action 400]
 400,0, 0,0, -1, , AS80D128
 
@@ -2961,14 +3081,12 @@ pos = 0,0
 
 ; ROUND X
 round.time = 0              ;Time to show round display
-;round.default.offset = 680, 380    ;Offset for anim
-round.default.offset = 630, 480
+round.default.offset = 640, 330
 ; Default component to show for each round. Text can include a %i to
 ; the round number. Use "round.default.anim" for animation instead of
 ; text.
-round.default.text = "R   %i"
-;round.default.anim = 500
-round.default.font = 9,0,0
+round.default.text = ""
+;round.default.anim = 704
 round.default.displaytime = 66
 round.default.scale = 1,1
 round.default.snd = 0, 11
@@ -2985,38 +3103,31 @@ round9.snd = 0,9
 round.sndtime = 0           ;Time to play the sounds
 ; Components to show for each round (optional, specify up to round 9)
 ; Uncomment to use
-round1.offset = 640, 380
-;round1.anim = 501
-round2.offset = 640, 380
-;round2.anim = 502
-round3.offset = 640, 380
-;round3.anim = 503
-round4.offset = 640, 380
-;round4.anim = 504
-round5.offset = 640, 380
-;round5.anim = 505
-round6.offset = 640, 380
-;round6.anim = 506
-round7.offset = 640, 380
-;round7.anim = 507
-round8.offset = 640, 380
-;round8.anim = 508
-round9.offset = 640, 380
-;round9.anim = 509
-
-
-round.single.offset = 640, 480
-round.single.font = 9, 0, 0
-round.single.text = "G   r"
+round1.offset = 640, 330
+round1.anim = 701
+round2.offset = 640, 330
+round2.anim = 702
+round3.offset = 640, 330
+round3.anim = 703
+round4.offset = 640, 330
+round4.anim = 704
+round5.offset = 640, 330
+round5.anim = 704
+round6.offset = 640, 330
+round6.anim = 704
+round7.offset = 640, 330
+round7.anim = 704
+round8.offset = 640, 330
+round8.anim = 704
+round9.offset = 640, 330
+round9.anim = 704
+round.single.offset = 640, 330
 round.single.displaytime = 55
+round.single.anim = 704
 round.single.scale = 1, 1
 round.single.snd = 0, 11
-
-round.final.offset = 640, 480
-round.final.font = 9, 0, 0
-round.final.text = "F   R"
-round.final.text = " "
-;round.final.anim = 510
+round.final.offset = 640, 330
+round.final.anim = 704
 ;round.final.bg0.anim = 511
 ;round.final.bg0.offset = 640, 380
 round.final.displaytime = 66
@@ -3025,14 +3136,8 @@ round.final.snd = 0, 3
 
 ; FIGHT
 fight.time = 0              ;Time to show FIGHT component
-fight.offset = 640, 400     ;Component for FIGHT display
-fight.anim = 520
-fight.bg1.offset = 640, 400
-fight.bg1.anim = 521
-fight.bg2.offset = 640, 400 
-fight.bg2.anim = 522
-fight.bg3.offset = 640, 400
-fight.bg3.anim = 523     
+fight.offset = 640, 330
+fight.anim = 710
 fight.snd = 1,0             ;Sound to play
 fight.sndtime = 5           ;Time to play sound
 
@@ -3041,33 +3146,20 @@ ctrl.time = 62              ;Time players get control after starting fight
 
 ; KO
 KO.time    = 0              ;Time to show KO component
-KO.offset  = 540, 400       ;Component for KO display
-KO.anim    = 529 		;Dummy Animation to let bg play out
-KO.bg0.anim = 533
-KO.bg0.offset  = 830, 400
-KO.bg1.anim = 532
-KO.bg1.offset  = 430, 400
-KO.bg2.anim = 531
-KO.bg2.offset  = 830, 400      
-KO.bg3.anim = 530
-KO.bg3.offset  = 430, 400          
+KO.offset = 640, 330
+KO.anim = 720
+KO.displaytime = 150
 KO.snd     = 2,0            ;Sound to play for KO announcement
 
 ; Double KO
-DKO.offset = 640, 400
-DKO.anim    = 534		;Dummy animation to let bg play out
-DKO.bg0.anim = 535
-DKO.bg0.offset  = 640, 400
-DKO.bg1.anim = 536
-DKO.bg1.offset  = 640, 400
+DKO.offset = 640, 330
+DKO.anim = 721
 DKO.displaytime = 120
 DKO.snd    = 2,1
 
 ; Time Over
-TO.offset  = 640, 400
-TO.anim = 540
-TO.bg1.anim = 541
-TO.bg1.offset  = 640, 400
+TO.offset = 640, 330
+TO.anim = 722
 TO.displaytime = 70
 TO.snd     = 2,2
 KO.sndtime = 0           ;Time to play sound for KO, DKO and TO.
@@ -3226,17 +3318,13 @@ ai.lose4.anim = 582
 ai.lose4.snd     = 2,3
 
 ; Draw text
-draw.offset  = 640, 400
-draw.anim = 544
-draw.bg0.anim = 545
-draw.bg0.offset  = 640, 400
-draw.bg1.anim = 546
-draw.bg1.offset  = 640, 400
+draw.offset = 640, 330
+draw.anim = 723
 draw.displaytime = 80
 draw.snd     = 2,5
 ; Perfect text
 p1.perfect.pos = 640, 380
-p1.perfect.bg.anim = 550
+p1.perfect.bg.anim = 724
 p1.perfect.bg.layerno = 1
 p1.perfect.time = 86
 p1.perfect.displaytime = 125
@@ -3244,7 +3332,7 @@ p1.perfect.snd = 2, 6
 p1.perfect.sndtime = 125
 
 p2.perfect.pos = 640, 380
-p2.perfect.bg.anim = 550
+p2.perfect.bg.anim = 724
 p2.perfect.bg.layerno = 1
 p2.perfect.time = 86
 p2.perfect.displaytime = 125
@@ -3779,19 +3867,19 @@ enabled.timechallenge = 1
 
 ;-----------------------------------------------------------
 [Score]
-p1.pos = 586,24
+p1.pos = 92,22
 ;p1.bg.spr = 
-p1.text.font = 8,0, -1
-p1.text.text = %s
+p1.text.font = 3,0, 1
+p1.text.text = 1P  %s
 
-p2.pos = 696,24
+p2.pos = 1188,22
 ;p2.bg.spr = 
-p2.text.font = 8,0, 1
-p2.text.text = %s
+p2.text.font = 3,0, -1
+p2.text.text = %s  2P
 
 score.min = 0
 score.max = 999999999
-format.integer.pad = 1
+format.integer.pad = 8
 format.integer.separator = 
 format.decimal.places = 0
 format.decimal.separator = .
@@ -3806,7 +3894,7 @@ p1.enabled.training = 1
 
 ;-----------------------------------------------------------
 [Match]
-pos = 200,24
+pos = -9999,-9999
 ;bg.spr = 
 text.font = 8,0, 1
 text.text = STAGE %s
@@ -3825,13 +3913,13 @@ enabled.vs100kumite = 1
 
 ;-----------------------------------------------------------
 [AILevel]
-p1.pos = 586,24
+p1.pos = -9999,-9999
 ;p1.bg.spr = 
 p1.text.font = 8,0, -1
 ; %s = integer value, %p = percentage
 p1.text.text = CPU-%s
 
-p2.pos = 696,24
+p2.pos = -9999,-9999
 ;p2.bg.spr = 
 p2.text.font = 8,0, 1
 p2.text.text = CPU-%s

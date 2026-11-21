@@ -268,21 +268,18 @@ window = 0,0, 1279,959
 mask = 1
 
 
-[TitleBG Background Black Bars]
+[TitleBG Background Vignette]
 type = normal
 spriteno = 100,1
 layerno = 0
 start = -640,0
-trans = add1
 mask = 1
 
-
-[TitleBG Background Black Menu Bars]
+[TitleBG Background Menu Shade]
 type = normal
 spriteno = 98,0
 layerno = 0
-start = 640,282
-trans = add1
+start = -60,0
 mask = 1
 
 [TitleBG Title Logo]

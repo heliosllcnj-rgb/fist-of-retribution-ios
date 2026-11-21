@@ -1,7 +1,16 @@
 diff --git a/src/resources/defaultConfig.ini b/src/resources/defaultConfig.ini
-index 0f55fc8..1dd8241 100644
+index 0f55fc8..da87ce4 100644
 --- a/src/resources/defaultConfig.ini
 +++ b/src/resources/defaultConfig.ini
+@@ -54,7 +54,7 @@ AutoGuard             = 0
+ ; Enables guard break mechanics and fight.def [Guardbar] rendering
+ GuardBreak            = 0
+ ; Enables dizzy mechanics and fight.def [Stunbar] rendering
+-Dizzy                 = 0
++Dizzy                 = 1
+ ; Enables red life mechanics and fight.def [Lifebar] red element rendering
+ RedLife               = 1
+ ; Team-only options
 @@ -97,7 +97,7 @@ Turns.Recovery.Bonus  = 27.5
  ; -------------------------------------------------------------------------------
  [Config]

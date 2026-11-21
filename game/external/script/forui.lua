@@ -94,6 +94,24 @@ function U.btext(str, x, y, def, scale, align, a)
 	textImgDraw(ts)
 end
 
+-- a sprite from a small sff (cached), drawn at (x, y) in 1280x720 space
+local sprCache = {}
+function U.spr(path, g, i, x, y, sx, sy)
+	local key = path .. ':' .. g .. ',' .. i
+	local a = sprCache[key]
+	if a == nil then
+		sprCache[path] = sprCache[path] or sffNew(path)
+		a = animNew(sprCache[path], g .. ',' .. i .. ', 0,0, -1')
+		animSetLocalcoord(a, U.LW, U.LH)
+		animSetLayerno(a, U.LAYER)
+		sprCache[key] = a
+	end
+	animSetScale(a, sx or 1, sy or sx or 1)
+	animSetPos(a, x, y)
+	animUpdate(a)
+	animDraw(a)
+end
+
 -- a slanted bar (parallelogram leaning right by `lean` px over its height), drawn as thin strips
 function U.slant(x, y, w, h, lean, r, g, b, a, step)
 	step = step or 3

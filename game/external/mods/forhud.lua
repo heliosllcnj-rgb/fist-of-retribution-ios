@@ -63,6 +63,48 @@ local function drawGauge(side, sa, stocks, maxStocks, frac, len, frame, left, ri
 	end
 end
 
+-- 3rd Strike stun gauge: a short bar under each life bar, next to the timer, that FILLS as stun builds
+-- (64 points for Milo's class of character; the engine keeps dizzy points counting down, so it is drawn inverted).
+local STUN_W, STUN_H, STUN_Y = 214, 9, 60
+local hudSff, stunAnim = nil, nil
+local function stunSprite()
+	if stunAnim == nil then
+		hudSff = sffNew('data/forpz/hudfx.sff')
+		stunAnim = animNew(hudSff, '1,0, 0,0, -1')
+		animSetLocalcoord(stunAnim, U.LW, U.LH)
+		animSetLayerno(stunAnim, U.LAYER)
+	end
+	return stunAnim
+end
+
+local function drawStun(side, frac, isDizzy, frame)
+	local x = (side == 1) and (572 - STUN_W) or 708
+	U.box(x - 2, STUN_Y - 2, STUN_W + 4, STUN_H + 4, 235, 235, 245, 230)
+	U.box(x, STUN_Y, STUN_W, STUN_H, 14, 10, 24, 255)
+	local fw = math.floor(STUN_W * math.max(0, math.min(1, frac)) + 0.5)
+	if isDizzy then fw = STUN_W end
+	if fw > 0 then
+		local fx = (side == 1) and (x + STUN_W - fw) or x
+		local r, g, b, hr, hg, hb = 255, 122, 20, 255, 214, 96
+		if isDizzy then
+			if math.floor(frame / 4) % 2 == 0 then r, g, b, hr, hg, hb = 255, 255, 255, 255, 255, 255
+			else r, g, b, hr, hg, hb = 230, 30, 20, 255, 120, 100 end
+		elseif frac >= 0.75 then
+			r, g, b, hr, hg, hb = 232, 40, 24, 255, 136, 110
+		end
+		U.box(fx, STUN_Y, fw, STUN_H, r, g, b, 255)
+		U.box(fx, STUN_Y, fw, 3, hr, hg, hb, 255)
+	end
+	if isDizzy then
+		local a = stunSprite()
+		local s = 1 + 0.06 * math.sin(frame / 3)
+		animSetScale(a, s, s)
+		animSetPos(a, x + STUN_W / 2, STUN_Y + 34)
+		animUpdate(a)
+		animDraw(a)
+	end
+end
+
 local frame = 0
 hook.add("loop", "forhud", function()
 	frame = frame + 1
@@ -88,6 +130,10 @@ hook.add("loop", "forhud", function()
 				local left = (U.LW - visW) / 2
 				local inst = map('harmony') or 0
 				drawGauge(teamSide(), sa, stocks, maxStocks, frac, len, frame, left, U.LW - left, inst)
+			end
+			local dmax = dizzyPointsMax()
+			if dmax > 0 and roundState() >= 1 then
+				drawStun(teamSide(), 1 - dizzyPoints() / dmax, dizzy(), frame)
 			end
 		end
 	end

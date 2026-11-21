@@ -3371,6 +3371,24 @@ triggerall = AILevel > 0
 trigger1 = var(40) = 1 && var(60) = 14 && var(43) = 1 && stateno != 195 && ctrl
 var(43) = -1
 
+[State -2, CPU stun mode]
+type = VarSet
+triggerall = AILevel > 0
+trigger1 = enemynear, dizzy && enemynear, stateno = 6565300 && ctrl && statetype != A && RoundState = 2
+var(40) = 0
+
+[State -2, CPU stun walk]
+type = VarSet
+triggerall = AILevel > 0
+trigger1 = enemynear, dizzy && enemynear, stateno = 6565300 && ctrl && statetype != A && RoundState = 2 && (p2dist x / 0.89) > 52
+var(44) = 4
+
+[State -2, CPU stun hit]
+type = VarSet
+triggerall = AILevel > 0
+trigger1 = enemynear, dizzy && enemynear, stateno = 6565300 && ctrl && statetype != A && RoundState = 2 && (p2dist x / 0.89) <= 52
+var(44) = 64
+
 [State -2, CPU in U]
 type = AssertInput
 triggerall = AILevel > 0
@@ -3668,6 +3686,7 @@ air.velocity = -3, -3
 fall.envshake.time = 1
 ground.cornerpush.veloff = -4.27
 guard.cornerpush.veloff = -4.27
+dizzypoints = 62
 
 [State 200, End]
 type = ChangeState
@@ -3713,6 +3732,7 @@ air.velocity = -3.5, -3.5
 fall.envshake.time = 3
 ground.cornerpush.veloff = -8.01
 guard.cornerpush.veloff = -8.01
+dizzypoints = 125
 
 [State 210, End]
 type = ChangeState
@@ -3758,6 +3778,7 @@ air.velocity = -4, -4
 fall.envshake.time = 4
 ground.cornerpush.veloff = -9.61
 guard.cornerpush.veloff = -9.61
+dizzypoints = 219
 
 [State 220, End]
 type = ChangeState
@@ -3803,6 +3824,7 @@ air.velocity = -3, -3
 fall.envshake.time = 1
 ground.cornerpush.veloff = -4.27
 guard.cornerpush.veloff = -4.27
+dizzypoints = 62
 
 [State 230, End]
 type = ChangeState
@@ -3848,6 +3870,7 @@ air.velocity = -3.5, -3.5
 fall.envshake.time = 3
 ground.cornerpush.veloff = -8.01
 guard.cornerpush.veloff = -8.01
+dizzypoints = 141
 
 [State 240, End]
 type = ChangeState
@@ -3893,6 +3916,7 @@ air.velocity = -4, -4
 fall.envshake.time = 4
 ground.cornerpush.veloff = -9.61
 guard.cornerpush.veloff = -9.61
+dizzypoints = 219
 
 [State 250, End]
 type = ChangeState
@@ -3938,6 +3962,7 @@ air.velocity = -3, -3
 fall.envshake.time = 1
 ground.cornerpush.veloff = -4.27
 guard.cornerpush.veloff = -4.27
+dizzypoints = 47
 
 [State 400, End]
 type = ChangeState
@@ -3983,6 +4008,7 @@ air.velocity = -3.5, -3.5
 fall.envshake.time = 3
 ground.cornerpush.veloff = -8.01
 guard.cornerpush.veloff = -8.01
+dizzypoints = 125
 
 [State 410, End]
 type = ChangeState
@@ -4029,6 +4055,7 @@ fall.envshake.time = 4
 ground.cornerpush.veloff = -9.61
 guard.cornerpush.veloff = -9.61
 air.juggle = 3
+dizzypoints = 203
 
 [State 420, End]
 type = ChangeState
@@ -4074,6 +4101,7 @@ air.velocity = -3, -3
 fall.envshake.time = 1
 ground.cornerpush.veloff = -4.27
 guard.cornerpush.veloff = -4.27
+dizzypoints = 47
 
 [State 430, End]
 type = ChangeState
@@ -4119,6 +4147,7 @@ air.velocity = -3.5, -3.5
 fall.envshake.time = 3
 ground.cornerpush.veloff = -8.01
 guard.cornerpush.veloff = -8.01
+dizzypoints = 125
 
 [State 440, End]
 type = ChangeState
@@ -4163,6 +4192,7 @@ guard.velocity = -6
 air.velocity = -4, -4
 fall = 1
 yaccel = 1.335
+dizzypoints = 188
 
 [State 450, End]
 type = ChangeState
@@ -4211,6 +4241,7 @@ guard.cornerpush.veloff = -4.27
 
 ;---------------------------------------------------------------------------
 ; jMP - Falling Hammer (5f startup, 6 active, until land recovery)
+dizzypoints = 62
 [Statedef 610]
 type = A
 movetype = A
@@ -4250,6 +4281,7 @@ guard.cornerpush.veloff = -8.01
 
 ;---------------------------------------------------------------------------
 ; jHP - Thunder Hammer (7f startup, 5 active, until land recovery)
+dizzypoints = 125
 [Statedef 620]
 type = A
 movetype = A
@@ -4289,6 +4321,7 @@ guard.cornerpush.veloff = -9.61
 
 ;---------------------------------------------------------------------------
 ; jLK - Air Knee (4f startup, 8 active, until land recovery)
+dizzypoints = 203
 [Statedef 630]
 type = A
 movetype = A
@@ -4328,6 +4361,7 @@ guard.cornerpush.veloff = -4.27
 
 ;---------------------------------------------------------------------------
 ; jMK - Switch Kick (6f startup, 6 active, until land recovery)
+dizzypoints = 62
 [Statedef 640]
 type = A
 movetype = A
@@ -4367,6 +4401,7 @@ guard.cornerpush.veloff = -8.01
 
 ;---------------------------------------------------------------------------
 ; jHK - Descending Roundhouse (8f startup, 6 active, until land recovery)
+dizzypoints = 125
 [Statedef 650]
 type = A
 movetype = A
@@ -4406,6 +4441,7 @@ guard.cornerpush.veloff = -9.61
 
 ;---------------------------------------------------------------------------
 ; OH - Universal Overhead (18f startup, 3 active, 14 recovery)
+dizzypoints = 203
 [Statedef 260]
 type = S
 movetype = A
@@ -4442,6 +4478,7 @@ air.velocity = -3.5, -3.5
 fall.envshake.time = 3
 ground.cornerpush.veloff = -8.01
 guard.cornerpush.veloff = -8.01
+dizzypoints = 125
 
 [State 260, End]
 type = ChangeState
@@ -4487,6 +4524,7 @@ air.velocity = -3.5, -3.5
 fall.envshake.time = 3
 ground.cornerpush.veloff = -8.01
 guard.cornerpush.veloff = -8.01
+dizzypoints = 141
 
 [State 300, Step in]
 type = VelSet
@@ -4542,6 +4580,7 @@ air.velocity = -4, -4
 fall.envshake.time = 4
 ground.cornerpush.veloff = -9.61
 guard.cornerpush.veloff = -9.61
+dizzypoints = 234
 
 [State 310, End]
 type = ChangeState
@@ -4587,6 +4626,7 @@ air.velocity = -3.5, -3.5
 fall.envshake.time = 3
 ground.cornerpush.veloff = -8.01
 guard.cornerpush.veloff = -8.01
+dizzypoints = 156
 
 [State 320, Hop]
 type = VelSet
@@ -4642,6 +4682,7 @@ air.velocity = -4, -4
 fall.envshake.time = 4
 ground.cornerpush.veloff = -9.61
 guard.cornerpush.veloff = -9.61
+dizzypoints = 219
 
 [State 330, Retreat]
 type = VelSet
@@ -4696,6 +4737,7 @@ guard.velocity = -6
 air.velocity = -4, -4
 fall = 1
 yaccel = 1.335
+dizzypoints = 219
 
 [State 340, End]
 type = ChangeState
@@ -5446,7 +5488,7 @@ palfx.time = 14
 palfx.add = 0, 24, 60
 palfx.sinadd = 36, 60, 90, 6
 palfx.mul = 235, 240, 256
-
+dizzypoints = 156
 
 [State 1000, Shock burst]
 type = Explod
@@ -5543,7 +5585,7 @@ palfx.time = 18
 palfx.add = 0, 24, 60
 palfx.sinadd = 36, 60, 90, 6
 palfx.mul = 235, 240, 256
-
+dizzypoints = 188
 
 [State 1001, Shock burst]
 type = Explod
@@ -5647,7 +5689,7 @@ palfx.time = 26
 palfx.add = 0, 24, 60
 palfx.sinadd = 36, 60, 90, 6
 palfx.mul = 235, 240, 256
-
+dizzypoints = 234
 
 [State 1002, Shock burst]
 type = Explod
@@ -5773,7 +5815,7 @@ palfx.time = 16
 palfx.add = 50, 36, 0
 palfx.sinadd = 70, 55, 10, 6
 palfx.mul = 235, 240, 256
-
+dizzypoints = 141
 
 [State 1003, Shock burst]
 type = Explod
@@ -5853,7 +5895,7 @@ palfx.time = 16
 palfx.add = 50, 36, 0
 palfx.sinadd = 70, 55, 10, 6
 palfx.mul = 235, 240, 256
-
+dizzypoints = 141
 
 [State 1003, Hit 2 corner]
 type = HitDef
@@ -5887,7 +5929,7 @@ palfx.time = 16
 palfx.add = 50, 36, 0
 palfx.sinadd = 70, 55, 10, 6
 palfx.mul = 235, 240, 256
-
+dizzypoints = 141
 
 [State 1003, Lightning 2]
 type = Explod
@@ -6073,6 +6115,7 @@ palfx.time = 12
 palfx.add = 0, 24, 60
 palfx.sinadd = 36, 60, 90, 6
 palfx.mul = 235, 240, 256
+dizzypoints = 234
 
 [State 1100, Shock burst 1]
 type = Explod
@@ -6216,6 +6259,7 @@ palfx.time = 12
 palfx.add = 0, 24, 60
 palfx.sinadd = 36, 60, 90, 6
 palfx.mul = 235, 240, 256
+dizzypoints = 281
 
 [State 1101, Shock burst 1]
 type = Explod
@@ -6358,6 +6402,7 @@ palfx.time = 12
 palfx.add = 0, 24, 60
 palfx.sinadd = 36, 60, 90, 6
 palfx.mul = 235, 240, 256
+dizzypoints = 125
 
 [State 1102, Shock burst 1]
 type = Explod
@@ -6404,6 +6449,7 @@ palfx.time = 12
 palfx.add = 0, 24, 60
 palfx.sinadd = 36, 60, 90, 6
 palfx.mul = 235, 240, 256
+dizzypoints = 94
 
 [State 1102, Shock burst 2]
 type = Explod
@@ -6451,6 +6497,7 @@ palfx.time = 12
 palfx.add = 0, 24, 60
 palfx.sinadd = 36, 60, 90, 6
 palfx.mul = 235, 240, 256
+dizzypoints = 141
 
 [State 1102, Shock burst 3]
 type = Explod
@@ -6620,6 +6667,7 @@ palfx.time = 12
 palfx.add = 50, 36, 0
 palfx.sinadd = 70, 55, 10, 6
 palfx.mul = 235, 240, 256
+dizzypoints = 94
 
 [State 1103, Shock burst 1]
 type = Explod
@@ -6666,6 +6714,7 @@ palfx.time = 12
 palfx.add = 50, 36, 0
 palfx.sinadd = 70, 55, 10, 6
 palfx.mul = 235, 240, 256
+dizzypoints = 94
 
 [State 1103, Shock burst 2]
 type = Explod
@@ -6712,6 +6761,7 @@ palfx.time = 12
 palfx.add = 50, 36, 0
 palfx.sinadd = 70, 55, 10, 6
 palfx.mul = 235, 240, 256
+dizzypoints = 94
 
 [State 1103, Shock burst 3]
 type = Explod
@@ -6761,6 +6811,7 @@ palfx.time = 12
 palfx.add = 50, 36, 0
 palfx.sinadd = 70, 55, 10, 6
 palfx.mul = 235, 240, 256
+dizzypoints = 156
 
 [State 1103, Shock burst 4]
 type = Explod
@@ -7077,6 +7128,7 @@ palfx.time = 12
 palfx.add = 0, 24, 60
 palfx.sinadd = 36, 60, 90, 6
 palfx.mul = 235, 240, 256
+dizzypoints = 250
 
 [State 1202, Shock burst]
 type = Explod
@@ -7235,6 +7287,7 @@ palfx.time = 12
 palfx.add = 0, 24, 60
 palfx.sinadd = 36, 60, 90, 6
 palfx.mul = 235, 240, 256
+dizzypoints = 219
 
 [State 1205, Shock burst]
 type = Explod
@@ -7540,6 +7593,7 @@ guard.cornerpush.veloff = -9.61
 palfx.time = 10
 palfx.add = 0, 24, 60
 palfx.sinadd = 36, 60, 90, 5
+dizzypoints = 203
 
 [State 1252, Shock burst]
 type = Explod
@@ -7727,6 +7781,7 @@ guard.cornerpush.veloff = -8.01
 palfx.time = 10
 palfx.add = 0, 24, 60
 palfx.sinadd = 36, 60, 90, 5
+dizzypoints = 156
 
 [State 1255, Shock burst]
 type = Explod
@@ -7893,6 +7948,7 @@ palfx.time = 16
 palfx.add = 0, 24, 60
 palfx.sinadd = 36, 60, 90, 6
 palfx.mul = 235, 240, 256
+dizzypoints = 219
 
 [State 1300, Shock burst]
 type = Explod
@@ -8001,6 +8057,7 @@ palfx.time = 16
 palfx.add = 0, 24, 60
 palfx.sinadd = 36, 60, 90, 6
 palfx.mul = 235, 240, 256
+dizzypoints = 250
 
 [State 1301, Shock burst]
 type = Explod
@@ -8125,6 +8182,7 @@ palfx.time = 16
 palfx.add = 0, 24, 60
 palfx.sinadd = 36, 60, 90, 6
 palfx.mul = 235, 240, 256
+dizzypoints = 328
 
 [State 1302, Shock burst]
 type = Explod
@@ -8258,6 +8316,7 @@ palfx.time = 16
 palfx.add = 50, 36, 0
 palfx.sinadd = 70, 55, 10, 6
 palfx.mul = 235, 240, 256
+dizzypoints = 156
 
 [State 1303, Shock burst 1]
 type = Explod
@@ -8312,6 +8371,7 @@ palfx.time = 16
 palfx.add = 50, 36, 0
 palfx.sinadd = 70, 55, 10, 6
 palfx.mul = 235, 240, 256
+dizzypoints = 219
 
 [State 1303, Counter-hit crumple]
 type = TargetState
@@ -8447,6 +8507,7 @@ guard.hittime = 8
 ground.velocity = -5.5
 guard.velocity = -5.5
 air.velocity = -3.5, -3.5
+dizzypoints = 188
 [State 1400, End]
 type = ChangeState
 trigger1 = AnimTime = 0
@@ -8498,6 +8559,7 @@ guard.hittime = 16
 ground.velocity = -1.2
 guard.velocity = -1.2
 air.velocity = -1.5, -3
+dizzypoints = 125
 [State 1401, Step 2]
 type = VelSet
 trigger1 = Time >= 14 && Time < 19
@@ -8531,6 +8593,7 @@ guard.hittime = 10
 ground.velocity = -6.5
 guard.velocity = -6
 air.velocity = -3.5, -3.5
+dizzypoints = 156
 [State 1401, End]
 type = ChangeState
 trigger1 = AnimTime = 0
@@ -8582,6 +8645,7 @@ guard.hittime = 16
 ground.velocity = -1.2
 guard.velocity = -1.2
 air.velocity = -1.5, -3
+dizzypoints = 94
 [State 1402, Step 2]
 type = VelSet
 trigger1 = Time >= 14 && Time < 19
@@ -8615,6 +8679,7 @@ guard.hittime = 21
 ground.velocity = -1.2
 guard.velocity = -1.2
 air.velocity = -1.5, -3
+dizzypoints = 125
 [State 1402, Step 3]
 type = VelSet
 trigger1 = Time >= 33 && Time < 38
@@ -8654,6 +8719,7 @@ palfx.time = 16
 palfx.add = 0, 24, 60
 palfx.sinadd = 36, 60, 90, 6
 palfx.mul = 235, 240, 256
+dizzypoints = 219
 
 [State 1402, Leg arcs 3]
 type = Explod
@@ -8784,6 +8850,7 @@ guard.hittime = 12
 ground.velocity = -1.2
 guard.velocity = -1.2
 air.velocity = -1.5, -3
+dizzypoints = 94
 [State 1403, Step 2]
 type = VelSet
 trigger1 = Time >= 10 && Time < 15
@@ -8825,6 +8892,7 @@ palfx.time = 16
 palfx.add = 50, 36, 0
 palfx.sinadd = 70, 55, 10, 6
 palfx.mul = 235, 240, 256
+dizzypoints = 125
 
 [State 1403, Leg arcs 2]
 type = Explod
@@ -8920,6 +8988,7 @@ palfx.time = 16
 palfx.add = 50, 36, 0
 palfx.sinadd = 70, 55, 10, 6
 palfx.mul = 235, 240, 256
+dizzypoints = 188
 
 [State 1403, Leg arcs 3]
 type = Explod
@@ -9278,6 +9347,7 @@ palfx.time = 18
 palfx.add = 0, 24, 60
 palfx.sinadd = 36, 60, 90, 6
 palfx.mul = 235, 240, 256
+dizzypoints = 328
 
 [State 1510, Lightning]
 type = Explod
@@ -9418,6 +9488,7 @@ palfx.time = 18
 palfx.add = 50, 36, 0
 palfx.sinadd = 70, 55, 10, 6
 palfx.mul = 235, 240, 256
+dizzypoints = 375
 
 [State 1511, Lightning]
 type = Explod
@@ -9818,6 +9889,7 @@ guard.velocity = -5
 ground.type = High
 ground.hittime = 20
 fall = 0
+dizzypoints = 0
 
 [State 3100, Impact freeze sky]
 type = BGPalFX
@@ -9924,6 +9996,7 @@ ground.type = Low
 ground.hittime = 20
 palfx.time = 6
 palfx.add = 0, 20, 50
+dizzypoints = 0
 
 [State 3101, Spark 1]
 type = Explod
@@ -9953,6 +10026,7 @@ ground.type = High
 ground.hittime = 20
 palfx.time = 6
 palfx.add = 0, 20, 50
+dizzypoints = 0
 
 [State 3101, Spark 2]
 type = Explod
@@ -9982,6 +10056,7 @@ ground.type = High
 ground.hittime = 20
 palfx.time = 6
 palfx.add = 0, 20, 50
+dizzypoints = 0
 
 [State 3101, Spark 3]
 type = Explod
@@ -10011,6 +10086,7 @@ ground.type = High
 ground.hittime = 20
 palfx.time = 6
 palfx.add = 0, 20, 50
+dizzypoints = 0
 
 [State 3101, Spark 4]
 type = Explod
@@ -10040,6 +10116,7 @@ ground.type = Low
 ground.hittime = 20
 palfx.time = 6
 palfx.add = 0, 20, 50
+dizzypoints = 0
 
 [State 3101, Spark 5]
 type = Explod
@@ -10069,6 +10146,7 @@ ground.type = Low
 ground.hittime = 20
 palfx.time = 6
 palfx.add = 0, 20, 50
+dizzypoints = 0
 
 [State 3101, Spark 6]
 type = Explod
@@ -10106,6 +10184,7 @@ palfx.time = 26
 palfx.add = 0, 30, 80
 palfx.sinadd = 60, 90, 140, 6
 palfx.mul = 220, 230, 256
+dizzypoints = 0
 
 [State 3101, Spark 7]
 type = Explod
@@ -10491,6 +10570,7 @@ guard.velocity = -9
 ground.type = High
 ground.hittime = 30
 fall = 0
+dizzypoints = 0
 
 [State 3301, Impact burst]
 type = Explod
@@ -10573,6 +10653,7 @@ ground.type = High
 ground.hittime = 30
 palfx.time = 5
 palfx.add = 40, 70, 140
+dizzypoints = 0
 
 [State 3303, Drill spark 1]
 type = Explod
@@ -10615,6 +10696,7 @@ ground.type = High
 ground.hittime = 30
 palfx.time = 5
 palfx.add = 40, 70, 140
+dizzypoints = 0
 
 [State 3303, Drill spark 2]
 type = Explod
@@ -10657,6 +10739,7 @@ ground.type = High
 ground.hittime = 30
 palfx.time = 5
 palfx.add = 40, 70, 140
+dizzypoints = 0
 
 [State 3303, Drill spark 3]
 type = Explod
@@ -10699,6 +10782,7 @@ ground.type = High
 ground.hittime = 30
 palfx.time = 5
 palfx.add = 40, 70, 140
+dizzypoints = 0
 
 [State 3303, Drill spark 4]
 type = Explod
@@ -10741,6 +10825,7 @@ ground.type = High
 ground.hittime = 30
 palfx.time = 5
 palfx.add = 40, 70, 140
+dizzypoints = 0
 
 [State 3303, Drill spark 5]
 type = Explod
@@ -10783,6 +10868,7 @@ ground.type = High
 ground.hittime = 30
 palfx.time = 5
 palfx.add = 40, 70, 140
+dizzypoints = 0
 
 [State 3303, Drill spark 6]
 type = Explod
@@ -10825,6 +10911,7 @@ ground.type = High
 ground.hittime = 30
 palfx.time = 5
 palfx.add = 40, 70, 140
+dizzypoints = 0
 
 [State 3303, Drill spark 7]
 type = Explod
@@ -10867,6 +10954,7 @@ ground.type = High
 ground.hittime = 30
 palfx.time = 5
 palfx.add = 40, 70, 140
+dizzypoints = 0
 
 [State 3303, Drill spark 8]
 type = Explod
@@ -10917,6 +11005,7 @@ palfx.time = 30
 palfx.add = 0, 40, 100
 palfx.sinadd = 70, 100, 160, 6
 palfx.mul = 220, 230, 256
+dizzypoints = 0
 
 [State 3303, Final burst]
 type = Explod
