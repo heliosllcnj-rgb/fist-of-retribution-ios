@@ -429,7 +429,98 @@ public class ControllerOverlay extends RelativeLayout {
     private final float[] btnX = new float[6], btnY = new float[6];
     private float btnR, stickX, stickY, stickR, panelTop, topPad;
     private final android.graphics.RectF startRect = new android.graphics.RectF(), menuRect = new android.graphics.RectF();
+    private final android.graphics.RectF viewRect = new android.graphics.RectF();   // landscape: FULL / PANEL switch
+    private final android.graphics.RectF gameRect = new android.graphics.RectF();   // landscape: where the picture is
+    private boolean landscape = false, fullScreen = false;
     private int laidW = -1, laidH = -1, laidInset = -1;
+    private boolean laidFull = false;
+
+    private android.content.SharedPreferences prefs() {
+        return getContext().getSharedPreferences("for_layout", Context.MODE_PRIVATE);
+    }
+
+    private void toggleFullScreen() {
+        prefs().edit().putBoolean("fullscreen", !prefs().getBoolean("fullscreen", false)).apply();
+        laidW = -1;
+        arcadeLayout();
+        if (arcadeView != null) arcadeView.invalidate();
+    }
+
+    private void setEnv(String k, String v) {
+        try {
+            SDLActivity.nativeSetenv(k, v);
+        } catch (Throwable t) {
+            android.util.Log.e("ControllerOverlay", "could not pass " + k, t);
+        }
+    }
+
+    private int[] sideInsetsPx() {
+        int l = 0, r = 0, b = 0;
+        if (android.os.Build.VERSION.SDK_INT >= 28) {
+            android.view.WindowInsets wi = getRootWindowInsets();
+            if (wi != null && wi.getDisplayCutout() != null) {
+                l = wi.getDisplayCutout().getSafeInsetLeft();
+                r = wi.getDisplayCutout().getSafeInsetRight();
+                b = wi.getDisplayCutout().getSafeInsetBottom();
+            }
+        }
+        return new int[]{l, r, b};
+    }
+
+    // Landscape: picture in the middle, stick on the left, buttons on the right, MENU / START / FULL under the
+    // picture. Full screen: the picture as tall as the screen and see-through controls over its lower corners.
+    private void landscapeLayout(int w, int h, float dp) {
+        int[] si = sideInsetsPx();
+        float bottom = h - Math.max(si[2], 6 * dp);
+        if (fullScreen) {
+            float gh = h, gw = (float) Math.floor(gh * 16.0 / 9.0);
+            if (gw > w) { gw = w; gh = (float) Math.floor(gw * 9.0 / 16.0); }
+            gameRect.set((w - gw) / 2f, (h - gh) / 2f, (w + gw) / 2f, (h + gh) / 2f);
+        } else {
+            float side = Math.max(165 * dp, w * 0.175f);
+            float band = 46 * dp + 4 * dp;
+            float gw = w - side * 2f, gh = (float) Math.floor(gw * 9.0 / 16.0);
+            if (gh > h - band) { gh = h - band; gw = (float) Math.floor(gh * 16.0 / 9.0); }
+            gameRect.set((w - gw) / 2f, 0, (w + gw) / 2f, gh);
+        }
+        setEnv("FOR_VIEW_TOP", "");
+        setEnv("FOR_VIEW_RECT", Math.round(gameRect.left) + "," + Math.round(gameRect.top) + "," + Math.round(gameRect.width()) + "," + Math.round(gameRect.height()));
+        panelTop = 0; topPad = 0;
+        float leftClear = Math.max(si[0], 6 * dp), rightClear = Math.max(si[1], 6 * dp);
+        float pw = 72 * dp, ph = 28 * dp, cx;
+        float py;
+        if (fullScreen) {
+            stickR = Math.min(h * 0.20f, 92 * dp);
+            stickX = leftClear + stickR + 8 * dp;
+            stickY = bottom - stickR - 18 * dp;
+            btnR = Math.min(h * 0.068f, 31 * dp);
+            float step = btnR * 2.25f, x0 = w - rightClear - step * 3f + btnR * 0.2f, cy = bottom - btnR * 2.6f;
+            for (int i = 0; i < 6; i++) {
+                int c = i % 3, r = i / 3;
+                btnX[i] = x0 + step * (c + 0.5f) + (r == 1 ? -btnR * 0.35f : 0);
+                btnY[i] = cy + (r == 0 ? -btnR * 1.2f : btnR * 1.2f) - c * btnR * 0.25f;
+            }
+            pw = 64 * dp; ph = 26 * dp; py = bottom - ph - 2 * dp; cx = w / 2f;
+        } else {
+            float leftW = gameRect.left, rightX = gameRect.right, rightW = w - rightX;
+            stickR = Math.min((leftW - leftClear) * 0.42f, h * 0.22f);
+            stickX = leftClear + (leftW - leftClear) / 2f;
+            stickY = Math.min(h * 0.64f, bottom - stickR - 6 * dp);
+            float usableW = rightW - rightClear - 4 * dp, step = usableW / 3f;
+            btnR = Math.min(step * 0.44f, h * 0.075f);
+            for (int i = 0; i < 6; i++) {
+                int c = i % 3, r = i / 3;
+                btnX[i] = rightX + 4 * dp + step * (c + 0.5f) + (r == 1 ? -btnR * 0.25f : btnR * 0.1f);
+                btnY[i] = stickY + (r == 0 ? -btnR * 1.25f : btnR * 1.25f) - c * btnR * 0.22f;
+            }
+            py = gameRect.bottom + Math.max(6 * dp, (bottom - gameRect.bottom - ph) / 2f);
+            cx = gameRect.centerX();
+        }
+        float g = 10 * dp;
+        menuRect.set(cx - pw * 1.5f - g, py, cx - pw * 0.5f - g, py + ph);
+        startRect.set(cx - pw * 0.5f, py, cx + pw * 0.5f, py + ph);
+        viewRect.set(cx + pw * 0.5f + g, py, cx + pw * 1.5f + g, py + ph);
+    }
 
     private int topInsetPx() {
         if (android.os.Build.VERSION.SDK_INT >= 28) {
@@ -444,11 +535,20 @@ public class ControllerOverlay extends RelativeLayout {
     private void arcadeLayout() {
         int w = getWidth(), h = getHeight();
         int inset = topInsetPx();
-        if (w <= 0 || h <= 0 || (w == laidW && h == laidH && inset == laidInset)) {
+        boolean full = prefs().getBoolean("fullscreen", false);
+        if (w <= 0 || h <= 0 || (w == laidW && h == laidH && inset == laidInset && full == laidFull)) {
             return;
         }
-        laidW = w; laidH = h; laidInset = inset;
+        laidW = w; laidH = h; laidInset = inset; laidFull = full;
         float dp = getContext().getResources().getDisplayMetrics().density;
+        landscape = w > h * 1.15f;
+        fullScreen = landscape && full;
+        if (landscape) {
+            landscapeLayout(w, h, dp);
+            return;
+        }
+        viewRect.setEmpty();
+        setEnv("FOR_VIEW_RECT", "");
         float picture = (float) Math.floor(w * 9.0 / 16.0);
         float top = inset;
         if (top + picture > h * 0.7f) {
@@ -504,7 +604,11 @@ public class ControllerOverlay extends RelativeLayout {
         if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_POINTER_DOWN) {
             float x = event.getX(index), y = event.getY(index);
             // A finger that lands on the stick side takes the stick, and keeps it wherever it slides
-            if (stickPointer == -1 && x < getWidth() * 0.47f && y > panelTop + topPad) {
+            float sl = 10 * dp;
+            boolean onPill = startRect.contains(x, y) || menuRect.contains(x, y) ||
+                    (!viewRect.isEmpty() && x >= viewRect.left - sl && x <= viewRect.right + sl && y >= viewRect.top - sl && y <= viewRect.bottom + sl);
+            boolean stickSide = landscape ? (x < getWidth() * 0.40f && !onPill) : (x < getWidth() * 0.47f && y > panelTop + topPad);
+            if (stickPointer == -1 && stickSide) {
                 stickPointer = event.getPointerId(index);
             }
         }
@@ -536,6 +640,7 @@ public class ControllerOverlay extends RelativeLayout {
                 }
                 if (x >= startRect.left - slop && x <= startRect.right + slop && y >= startRect.top - slop && y <= startRect.bottom + slop) mask |= (1 << 6);
                 if (x >= menuRect.left - slop && x <= menuRect.right + slop && y >= menuRect.top - slop && y <= menuRect.bottom + slop) mask |= (1 << 7);
+                if (!viewRect.isEmpty() && x >= viewRect.left - slop && x <= viewRect.right + slop && y >= viewRect.top - slop && y <= viewRect.bottom + slop) mask |= (1 << 8);
             }
         }
         if (!stickAlive) {
@@ -548,6 +653,9 @@ public class ControllerOverlay extends RelativeLayout {
             SDLControllerManager.onNativeHat(virtualDeviceId, 0, hatX, hatY);
         }
         int diff = mask ^ arcadeMask;
+        if ((diff & (1 << 8)) != 0 && (mask & (1 << 8)) == 0) {
+            post(this::toggleFullScreen);   // FULL / PANEL released: switch layouts (not a game button)
+        }
         if (diff != 0) {
             boolean anyDown = false;
             for (int i = 0; i < 8; i++) {
@@ -623,6 +731,37 @@ public class ControllerOverlay extends RelativeLayout {
             if (w <= 0 || h <= 0) return;
             float dp = getContext().getResources().getDisplayMetrics().density;
 
+            int ctlLayer = -1;
+            if (landscape) {
+                android.graphics.Bitmap lb = art("for_panel");
+                if (!fullScreen) {
+                    c.save();
+                    if (android.os.Build.VERSION.SDK_INT >= 26) {
+                        c.clipOutRect(gameRect);
+                    } else {
+                        c.clipRect(gameRect, android.graphics.Region.Op.DIFFERENCE);
+                    }
+                    if (lb != null) {
+                        float sc = Math.max(w / (float) lb.getWidth(), h / (float) lb.getHeight());
+                        int sw = Math.round(w / sc), sh = Math.round(h / sc);
+                        int sx0 = (lb.getWidth() - sw) / 2, sy0 = (lb.getHeight() - sh) / 2;
+                        srcR.set(sx0, sy0, sx0 + sw, sy0 + sh);
+                        dst.set(0, 0, w, h);
+                        c.drawBitmap(lb, srcR, dst, bmpPaint);
+                    } else {
+                        paint.setStyle(android.graphics.Paint.Style.FILL);
+                        paint.setColor(0xFF211F26);
+                        c.drawRect(0, 0, w, h, paint);
+                    }
+                    paint.setStyle(android.graphics.Paint.Style.STROKE);
+                    paint.setStrokeWidth(6 * dp);
+                    paint.setColor(0x8C000000);
+                    c.drawRect(gameRect.left - 3 * dp, gameRect.top - 3 * dp, gameRect.right + 3 * dp, gameRect.bottom + 3 * dp, paint);
+                    c.restore();
+                } else {
+                    ctlLayer = c.saveLayerAlpha(0, 0, w, h, 140);
+                }
+            } else {
             // Panel: dark metal with a slash of orange (everything above panelTop is left clear for the game)
             android.graphics.Bitmap pb = art("for_panel");
             if (pb != null) {
@@ -650,6 +789,7 @@ public class ControllerOverlay extends RelativeLayout {
                 slash.close();
                 paint.setColor(0xFFC74A14);
                 c.drawPath(slash, paint);
+            }
             }
 
             // Stick: base plate, then the ball pushed toward where it is held
@@ -706,6 +846,12 @@ public class ControllerOverlay extends RelativeLayout {
             // START and MENU
             drawPill(c, startRect, "START", (arcadeMask & (1 << 6)) != 0, dp);
             drawPill(c, menuRect, "MENU", (arcadeMask & (1 << 7)) != 0, dp);
+            if (!viewRect.isEmpty()) {
+                drawPill(c, viewRect, fullScreen ? "PANEL" : "FULL", (arcadeMask & (1 << 8)) != 0, dp);
+            }
+            if (ctlLayer >= 0) {
+                c.restoreToCount(ctlLayer);
+            }
         }
 
         private void drawPill(android.graphics.Canvas c, android.graphics.RectF r, String title, boolean down, float dp) {

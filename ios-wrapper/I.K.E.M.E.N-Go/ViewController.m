@@ -76,7 +76,13 @@ static NSString * const RestartFolderPickKey = @"ShouldDisplayRestartFolderPicke
 }
 
 - (UIInterfaceOrientationMask)supportedInterfaceOrientations {
-    return UIInterfaceOrientationMaskPortrait; // Fist of Retribution: picture on top, arcade panel below
+    // Fist of Retribution: portrait (picture on top, arcade panel below) or landscape (controls either side).
+    // The engine's Metal view can't follow a rotation once the game is running, so the way the phone is held
+    // when the app opens is kept until it is closed.
+    if (IkemenOrientationIsLocked()) {
+        return IkemenLockedOrientationMask();
+    }
+    return UIInterfaceOrientationMaskPortrait | UIInterfaceOrientationMaskLandscape;
 }
 
 - (BOOL)shouldAutorotate {

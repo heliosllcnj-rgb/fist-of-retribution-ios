@@ -76,21 +76,52 @@ static SDL_Joystick *virtualJoystick;
     CGSize screen = win.bounds.size;
     UIEdgeInsets safe = win.safeAreaInsets;
     CGFloat scale = win.screen.nativeScale;
-    CGFloat top = safe.top;
-    CGFloat pictureHeight = floor(screen.width * 9.0 / 16.0);
-    if (top + pictureHeight > screen.height * 0.7) {
-        top = 0; // not a tall screen (should not happen while the app is portrait-only)
-    }
-    char px[16];
-    snprintf(px, sizeof(px), "%d", (int)lround(top * scale));
-    SDL_SetHint("FOR_VIEW_TOP", px);
+    BOOL landscape = screen.width > screen.height * 1.15;
+    BOOL full = [[NSUserDefaults standardUserDefaults] boolForKey:@"for_fullscreen"];
+    CGRect inWindow;
+    CGRect game;   // where the picture goes, in window points
 
-    CGFloat panelTop = top + pictureHeight;
-    // A big, squarer screen is a fold-open phone (or a tablet): keep the panel in the lower half, clear of the fold
-    if (screen.width >= 600.0 && panelTop < screen.height * 0.5 + 20.0) {
-        panelTop = screen.height * 0.5 + 20.0;
+    if (landscape) {
+        // Landscape: the picture in the middle, the stick on the left, the buttons on the right, MENU and START
+        // under the picture. Full screen: the picture as tall as the screen, see-through controls on top.
+        CGFloat H = screen.height, W = screen.width;
+        if (full) {
+            CGFloat gh = H, gw = floor(gh * 16.0 / 9.0);
+            if (gw > W) { gw = W; gh = floor(gw * 9.0 / 16.0); }
+            game = CGRectMake(floor((W - gw) / 2.0), floor((H - gh) / 2.0), gw, gh);
+        } else {
+            CGFloat side = MAX(165.0, W * 0.175);
+            CGFloat band = 46.0 + MAX(safe.bottom, 4.0);
+            CGFloat gw = W - side * 2.0;
+            CGFloat gh = floor(gw * 9.0 / 16.0);
+            if (gh > H - band) { gh = H - band; gw = floor(gh * 16.0 / 9.0); }
+            game = CGRectMake(floor((W - gw) / 2.0), MAX(safe.top, 0.0), gw, gh);
+        }
+        inWindow = CGRectMake(0, 0, W, H);
+        char rect[64];
+        snprintf(rect, sizeof(rect), "%d,%d,%d,%d", (int)lround(game.origin.x * scale), (int)lround(game.origin.y * scale),
+                 (int)lround(game.size.width * scale), (int)lround(game.size.height * scale));
+        SDL_SetHint("FOR_VIEW_TOP", "");
+        SDL_SetHint("FOR_VIEW_RECT", rect);
+    } else {
+        // Portrait: picture on top (below the status bar / camera cut-out), arcade panel underneath
+        CGFloat top = safe.top;
+        CGFloat pictureHeight = floor(screen.width * 9.0 / 16.0);
+        if (top + pictureHeight > screen.height * 0.7) {
+            top = 0;
+        }
+        char px[16];
+        snprintf(px, sizeof(px), "%d", (int)lround(top * scale));
+        SDL_SetHint("FOR_VIEW_RECT", "");
+        SDL_SetHint("FOR_VIEW_TOP", px);
+        CGFloat panelTop = top + pictureHeight;
+        // A big, squarer screen is a fold-open phone (or a tablet): keep the panel in the lower half, clear of the fold
+        if (screen.width >= 600.0 && panelTop < screen.height * 0.5 + 20.0) {
+            panelTop = screen.height * 0.5 + 20.0;
+        }
+        game = CGRectMake(0, top, screen.width, pictureHeight);
+        inWindow = CGRectMake(0, panelTop, screen.width, screen.height - panelTop);
     }
-    CGRect inWindow = CGRectMake(0, panelTop, screen.width, screen.height - panelTop);
     CGRect frame = [self convertRect:inWindow fromView:nil];
 
     if (self.arcadePanel == nil) {
@@ -98,12 +129,27 @@ static SDL_Joystick *virtualJoystick;
         self.arcadePanel.overlay = self;
         [self addSubview:self.arcadePanel];
     }
-    self.arcadePanel.bottomInset = safe.bottom;
-    if (!CGRectEqualToRect(self.arcadePanel.frame, frame)) {
-        self.arcadePanel.frame = frame;
-        [self.arcadePanel setNeedsDisplay];
+    ArcadePanelView *p = self.arcadePanel;
+    CGRect gameInPanel = CGRectOffset(game, -inWindow.origin.x, -inWindow.origin.y);
+    BOOL changed = !CGRectEqualToRect(p.frame, frame) || p.landscape != landscape || p.fullScreen != (landscape && full) ||
+                   !CGRectEqualToRect(p.gameRect, gameInPanel);
+    p.landscape = landscape;
+    p.fullScreen = landscape && full;
+    p.gameRect = gameInPanel;
+    p.sideInsets = safe;
+    p.bottomInset = safe.bottom;
+    if (changed) {
+        p.frame = frame;
+        [p relayout];
     }
-    [self bringSubviewToFront:self.arcadePanel];
+    [self bringSubviewToFront:p];
+}
+
+- (void)toggleFullScreen {
+    NSUserDefaults *d = [NSUserDefaults standardUserDefaults];
+    [d setBool:![d boolForKey:@"for_fullscreen"] forKey:@"for_fullscreen"];
+    [self setNeedsLayout];
+    [self layoutIfNeeded];
 }
 
 - (void)didMoveToWindow {
@@ -462,7 +508,16 @@ typedef struct {
     CGFloat _stickRadius;
     CGRect _startRect;
     CGRect _menuRect;
+    CGRect _viewRect;     // landscape only: switches between side controls and full screen
     CGSize _laidOutFor;
+}
+
+- (void)relayout {
+    _laidOutFor = CGSizeZero;
+    self.opaque = !self.landscape;
+    self.backgroundColor = self.landscape ? [UIColor clearColor]
+                                          : [UIColor colorWithRed:0.09 green:0.08 blue:0.11 alpha:1.0];
+    [self setNeedsDisplay];
 }
 
 - (instancetype)initWithFrame:(CGRect)frame {
@@ -493,6 +548,11 @@ typedef struct {
         return;
     }
     _laidOutFor = size;
+    if (self.landscape) {
+        [self computeLandscapeLayout:size];
+        return;
+    }
+    _viewRect = CGRectZero;
     CGFloat w = size.width;
     CGFloat topPad = 46.0;                          // row for START / MENU
     CGFloat bottom = size.height - MAX(_bottomInset, 10.0);
@@ -522,12 +582,98 @@ typedef struct {
     _menuRect = CGRectMake(w - 84.0 - 80.0, 9.0, 72.0, 28.0);
 }
 
+- (void)computeLandscapeLayout:(CGSize)size {
+    CGFloat W = size.width, H = size.height;
+    CGRect g = self.gameRect;
+    UIEdgeInsets si = self.sideInsets;
+    CGFloat bottom = H - MAX(self.bottomInset, 8.0);
+    NSInteger tags[6] = {4, 5, 6, 1, 2, 3};
+    if (self.fullScreen) {
+        // see-through controls in the lower corners, over the picture
+        _stickRadius = MIN(H * 0.20, 92.0);
+        _stickCenter = CGPointMake(MAX(si.left, 12.0) + _stickRadius + 8.0, bottom - _stickRadius - 18.0);
+        CGFloat r = MIN(H * 0.068, 31.0);
+        CGFloat step = r * 2.25;
+        CGFloat x0 = W - MAX(si.right, 12.0) - step * 3.0 + r * 0.2;
+        CGFloat cy = bottom - r * 2.6;
+        for (int i = 0; i < 6; i++) {
+            int col = i % 3, row = i / 3;
+            _buttons[i].center = CGPointMake(x0 + step * (col + 0.5) + (row == 1 ? -r * 0.35 : 0), cy + (row == 0 ? -r * 1.2 : r * 1.2) - col * r * 0.25);
+            _buttons[i].radius = r;
+            _buttons[i].tag = tags[i];
+            _buttons[i].kick = (row == 1);
+        }
+        CGFloat pw = 64.0, ph = 26.0, py = bottom - ph - 2.0, cx = W / 2.0;
+        _menuRect = CGRectMake(cx - pw * 1.5 - 8.0, py, pw, ph);
+        _startRect = CGRectMake(cx - pw * 0.5, py, pw, ph);
+        _viewRect = CGRectMake(cx + pw * 0.5 + 8.0, py, pw, ph);
+        return;
+    }
+    // side controls: stick centred in the left strip, buttons in the right strip, a little below the middle
+    CGFloat leftW = g.origin.x, rightX = CGRectGetMaxX(g), rightW = W - rightX;
+    CGFloat leftClear = MAX(si.left, 6.0), rightClear = MAX(si.right, 6.0);
+    _stickRadius = MIN((leftW - leftClear) * 0.42, H * 0.22);
+    _stickCenter = CGPointMake(leftClear + (leftW - leftClear) / 2.0, MIN(H * 0.64, bottom - _stickRadius - 6.0));
+    CGFloat usableW = rightW - rightClear - 4.0;
+    CGFloat r = MIN(usableW / 3.0 * 0.44, H * 0.075);
+    CGFloat step = usableW / 3.0;
+    CGFloat cy = _stickCenter.y;
+    for (int i = 0; i < 6; i++) {
+        int col = i % 3, row = i / 3;
+        _buttons[i].center = CGPointMake(rightX + 4.0 + step * (col + 0.5) + (row == 1 ? -r * 0.25 : r * 0.1),
+                                         cy + (row == 0 ? -r * 1.25 : r * 1.25) - col * r * 0.22);
+        _buttons[i].radius = r;
+        _buttons[i].tag = tags[i];
+        _buttons[i].kick = (row == 1);
+    }
+    CGFloat pw = 72.0, ph = 28.0;
+    CGFloat py = CGRectGetMaxY(g) + MAX(6.0, (bottom - CGRectGetMaxY(g) - ph) / 2.0);
+    CGFloat cx = CGRectGetMidX(g);
+    _menuRect = CGRectMake(cx - pw * 1.5 - 10.0, py, pw, ph);
+    _startRect = CGRectMake(cx - pw * 0.5, py, pw, ph);
+    _viewRect = CGRectMake(cx + pw * 0.5 + 10.0, py, pw, ph);
+}
+
 #pragma mark Drawing
 
 - (void)drawRect:(CGRect)rect {
     [self computeLayout];
     CGContextRef ctx = UIGraphicsGetCurrentContext();
     CGSize size = self.bounds.size;
+
+    // Landscape: the panel art around the picture (none at all in full screen), the picture's area left clear
+    CGFloat ctlAlpha = 1.0;
+    if (self.landscape) {
+        CGContextClearRect(ctx, self.bounds);
+        if (self.fullScreen) {
+            ctlAlpha = 0.55;
+        } else {
+            CGContextSaveGState(ctx);
+            UIBezierPath *around = [UIBezierPath bezierPathWithRect:self.bounds];
+            [around appendPath:[UIBezierPath bezierPathWithRect:self.gameRect]];
+            around.usesEvenOddFillRule = YES;
+            [around addClip];
+            UIImage *art = [UIImage imageNamed:@"for_panel"];
+            if (art != nil) {
+                CGFloat s2 = MAX(size.width / art.size.width, size.height / art.size.height);
+                CGSize as = CGSizeMake(art.size.width * s2, art.size.height * s2);
+                [art drawInRect:CGRectMake((size.width - as.width) / 2.0, (size.height - as.height) / 2.0, as.width, as.height)];
+            } else {
+                [[UIColor colorWithRed:0.13 green:0.12 blue:0.15 alpha:1.0] setFill];
+                CGContextFillRect(ctx, self.bounds);
+            }
+            // a soft shadow round the picture
+            [[UIColor colorWithWhite:0.0 alpha:0.55] setStroke];
+            CGContextSetLineWidth(ctx, 6.0);
+            CGContextStrokeRect(ctx, CGRectInset(self.gameRect, -3.0, -3.0));
+            CGContextRestoreGState(ctx);
+        }
+        CGContextBeginTransparencyLayer(ctx, NULL);
+        CGContextSetAlpha(ctx, ctlAlpha);
+        [self drawControls:ctx];
+        CGContextEndTransparencyLayer(ctx);
+        return;
+    }
 
     // Panel: dark metal with a slash of orange, or the painted panel when the app carries one
     UIImage *panel = [UIImage imageNamed:@"for_panel"];
@@ -556,7 +702,10 @@ typedef struct {
     }
     [[UIColor colorWithWhite:0.0 alpha:0.55] setFill];
     CGContextFillRect(ctx, CGRectMake(0, 0, size.width, 2.0));
+    [self drawControls:ctx];
+}
 
+- (void)drawControls:(CGContextRef)ctx {
     // Stick: base plate, then the ball pushed toward where it is held
     CGFloat R = _stickRadius;
     CGRect base = CGRectMake(_stickCenter.x - R, _stickCenter.y - R, R * 2.0, R * 2.0);
@@ -629,6 +778,9 @@ typedef struct {
     // START and MENU
     [self drawPill:_startRect title:@"START" down:(_pressedMask & (1u << 6)) != 0];
     [self drawPill:_menuRect title:@"MENU" down:(_pressedMask & (1u << 7)) != 0];
+    if (!CGRectIsEmpty(_viewRect)) {
+        [self drawPill:_viewRect title:(self.fullScreen ? @"PANEL" : @"FULL") down:(_pressedMask & (1u << 8)) != 0];
+    }
 }
 
 - (void)drawPill:(CGRect)r title:(NSString *)title down:(BOOL)down {
@@ -648,7 +800,11 @@ typedef struct {
     for (UITouch *t in touches) {
         CGPoint p = [t locationInView:self];
         // A finger that lands on the stick side below the top row takes the stick, and keeps it wherever it slides
-        if (self.stickTouch == nil && p.x < self.bounds.size.width * 0.47 && p.y > 46.0) {
+        BOOL onPill = CGRectContainsPoint(CGRectInset(_startRect, -10, -10), p) || CGRectContainsPoint(CGRectInset(_menuRect, -10, -10), p) ||
+                      CGRectContainsPoint(CGRectInset(_viewRect, -10, -10), p);
+        BOOL stickSide = self.landscape ? (p.x < self.bounds.size.width * 0.40 && !onPill)
+                                        : (p.x < self.bounds.size.width * 0.47 && p.y > 46.0);
+        if (self.stickTouch == nil && stickSide) {
             self.stickTouch = t;
         }
     }
@@ -705,6 +861,7 @@ typedef struct {
         }
         if (CGRectContainsPoint(CGRectInset(_startRect, -slop, -slop), p)) mask |= (1u << 6);
         if (CGRectContainsPoint(CGRectInset(_menuRect, -slop, -slop), p))  mask |= (1u << 7);
+        if (!CGRectIsEmpty(_viewRect) && CGRectContainsPoint(CGRectInset(_viewRect, -slop, -slop), p)) mask |= (1u << 8);
     }
     if (!stickAlive) {
         self.stickTouch = nil;
@@ -719,6 +876,10 @@ typedef struct {
     if (mask != _pressedMask) {
         uint32_t diff = mask ^ _pressedMask;
         BOOL anyDown = NO;
+        if ((diff & (1u << 8)) && !(mask & (1u << 8))) {
+            // FULL / PANEL released: switch layouts (not a game button)
+            dispatch_async(dispatch_get_main_queue(), ^{ [self.overlay toggleFullScreen]; });
+        }
         for (int i = 0; i < 8; i++) {
             if (diff & (1u << i)) {
                 BOOL down = (mask & (1u << i)) != 0;

@@ -33,6 +33,7 @@
 - (void)arcadeButton:(NSInteger)tag pressed:(BOOL)pressed;
 - (void)arcadeDirection:(DPadDirection)direction;
 
+- (void)toggleFullScreen;
 @end
 
 // The arcade stick and buttons drawn under the game picture (portrait phones, and a folded-open phone stood up
@@ -40,4 +41,11 @@
 @interface ArcadePanelView : UIView
 @property (nonatomic, weak) TouchOverlayView *overlay;
 @property (nonatomic, assign) CGFloat bottomInset;   // home-indicator space to keep clear
+// Landscape: the panel covers the whole screen and leaves gameRect (its own coordinates) clear for the picture.
+// fullScreen: the picture fills the height and the controls are drawn see-through on top of it.
+@property (nonatomic, assign) BOOL landscape;
+@property (nonatomic, assign) BOOL fullScreen;
+@property (nonatomic, assign) CGRect gameRect;
+@property (nonatomic, assign) UIEdgeInsets sideInsets; // safe-area insets (camera cut-out side)
+- (void)relayout;
 @end

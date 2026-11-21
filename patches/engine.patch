@@ -42,7 +42,7 @@ index 0f55fc8..da87ce4 100644
  GamepadMappings     = external/gamecontrollerdb.txt
  ; Toggle legacy round timer behavior.
 diff --git a/src/sdl_ios.go b/src/sdl_ios.go
-index 3a2c3b9..9e6fb1b 100644
+index 3a2c3b9..22f5e92 100644
 --- a/src/sdl_ios.go
 +++ b/src/sdl_ios.go
 @@ -20,5 +20,5 @@ func attachIOSMetalLayer(windowID uint32) {
@@ -50,10 +50,10 @@ index 3a2c3b9..9e6fb1b 100644
  
  func setOrientationHints() {
 -	sdl.SetHint(sdl.HINT_ORIENTATIONS, "LandscapeLeft LandscapeRight Portrait PortraitUpsideDown")
-+	sdl.SetHint(sdl.HINT_ORIENTATIONS, "Portrait") // Fist of Retribution: picture on top, arcade panel below
++	sdl.SetHint(sdl.HINT_ORIENTATIONS, "LandscapeLeft LandscapeRight Portrait") // Fist of Retribution: portrait (picture over the panel) or landscape (controls either side)
  }
 diff --git a/src/system_sdl.go b/src/system_sdl.go
-index 8eea3d3..3e5201b 100644
+index 8eea3d3..b7a26d4 100644
 --- a/src/system_sdl.go
 +++ b/src/system_sdl.go
 @@ -6,6 +6,8 @@ import (
@@ -65,7 +65,33 @@ index 8eea3d3..3e5201b 100644
  
  	"github.com/veandco/go-sdl2/sdl"
  )
-@@ -247,6 +249,19 @@ func (w *Window) GetScaledViewportSize() (int32, int32, int32, int32) {
+@@ -232,6 +234,25 @@ func (w *Window) GetScaledViewportSize() (int32, int32, int32, int32) {
+ 
+ 	// Select stage or default aspect ratio
+ 	aspectGame := sys.getCurrentAspect()
++
++	// Fist of Retribution phone layouts: the app shell can name the rectangle the picture must fit in
++	// (FOR_VIEW_RECT = "x,y,w,h" in drawable pixels, measured from the top-left corner). The picture is
++	// scaled to fit it, keeping its shape, and centred in it; the shell draws its controls around it.
++	if rx, ry, rw, rh, ok := forViewRect(int32(winWidth), int32(winHeight)); ok {
++		resizedWidth, resizedHeight = rw, int32(float32(rw)/aspectGame)
++		if resizedHeight > rh {
++			resizedHeight = rh
++			resizedWidth = int32(float32(rh) * aspectGame)
++		}
++		x = rx + (rw-resizedWidth)/2
++		top := ry + (rh-resizedHeight)/2
++		if gfx != nil && strings.HasPrefix(gfx.GetName(), "Vulkan") {
++			y = top // Vulkan viewports count from the top edge
++		} else {
++			y = int32(winHeight) - resizedHeight - top // OpenGL viewports count from the bottom edge
++		}
++		return x, y, resizedWidth, resizedHeight
++	}
+ 	aspectWindow := float32(winWidth) / float32(winHeight)
+ 
+ 	// Keep aspect ratio
+@@ -247,6 +268,19 @@ func (w *Window) GetScaledViewportSize() (int32, int32, int32, int32) {
  		resizedHeight = int32(float32(resizedWidth) / aspectGame)
  		x = 0
  		y = (int32(winHeight) - resizedHeight) / 2
@@ -85,7 +111,7 @@ index 8eea3d3..3e5201b 100644
  	}
  
  	return x, y, resizedWidth, resizedHeight
-@@ -484,3 +499,17 @@ func (w *Window) Close() {
+@@ -484,3 +518,55 @@ func (w *Window) Close() {
  	}
  	sdl.Quit()
  }
@@ -102,4 +128,42 @@ index 8eea3d3..3e5201b 100644
 +		return 0, false
 +	}
 +	return int32(v), true
++}
++
++// forViewRect reads the FOR_VIEW_RECT hint ("x,y,w,h" in drawable pixels from the top-left corner),
++// clamped to the window. It is re-read every frame so the shell can change it on rotation or a layout switch.
++func forViewRect(winW, winH int32) (int32, int32, int32, int32, bool) {
++	h := strings.TrimSpace(sdl.GetHint("FOR_VIEW_RECT"))
++	if h == "" {
++		return 0, 0, 0, 0, false
++	}
++	f := strings.FieldsFunc(h, func(r rune) bool { return r == ',' || r == ' ' })
++	if len(f) != 4 {
++		return 0, 0, 0, 0, false
++	}
++	var v [4]int32
++	for i, s := range f {
++		n, err := strconv.Atoi(s)
++		if err != nil {
++			return 0, 0, 0, 0, false
++		}
++		v[i] = int32(n)
++	}
++	x, y, w, hh := v[0], v[1], v[2], v[3]
++	if x < 0 {
++		x = 0
++	}
++	if y < 0 {
++		y = 0
++	}
++	if x+w > winW {
++		w = winW - x
++	}
++	if y+hh > winH {
++		hh = winH - y
++	}
++	if w < 16 || hh < 16 {
++		return 0, 0, 0, 0, false
++	}
++	return x, y, w, hh, true
 +}
