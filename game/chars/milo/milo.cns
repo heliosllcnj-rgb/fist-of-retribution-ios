@@ -361,26 +361,26 @@ ignorehitpause = 1
 [State -2, Gain start class 12]
 type = PowerAdd
 triggerall = Map(harmony) <= 0
-trigger1 = Time = 1 && (stateno = 1200 || stateno = 1201 || stateno = 1202 || stateno = 1300 || stateno = 1301 || stateno = 1302 || stateno = 1400 || stateno = 1401 || stateno = 1402)
+trigger1 = Time = 1 && (stateno = 1200 || stateno = 1201 || stateno = 1202 || stateno = 1250 || stateno = 1251 || stateno = 1252 || stateno = 1300 || stateno = 1301 || stateno = 1302 || stateno = 1400 || stateno = 1401 || stateno = 1402)
 value = floor((3) * 1.2 * 1000 / ifelse(Map(sa) = 2, 128, ifelse(Map(sa) = 3, 80, 112)) + .5)
 
 [State -2, Gain hit class 12]
 type = PowerAdd
 triggerall = Map(harmony) <= 0
-trigger1 = HitCount > var(36) && (stateno = 1200 || stateno = 1201 || stateno = 1202 || stateno = 1300 || stateno = 1301 || stateno = 1302 || stateno = 1400 || stateno = 1401 || stateno = 1402)
+trigger1 = HitCount > var(36) && (stateno = 1200 || stateno = 1201 || stateno = 1202 || stateno = 1250 || stateno = 1251 || stateno = 1252 || stateno = 1300 || stateno = 1301 || stateno = 1302 || stateno = 1400 || stateno = 1401 || stateno = 1402)
 value = floor((ifelse(HitCount = 1, 13, 2) * ifelse(ComboCount <= 1, 32, ifelse(ComboCount >= 16, 1, 32 - (ComboCount - 1) * 2)) / 32.0) * 1.2 * 1000 / ifelse(Map(sa) = 2, 128, ifelse(Map(sa) = 3, 80, 112)) + .5)
 ignorehitpause = 1
 
 [State -2, Gain hit class 12 (defender)]
 type = TargetPowerAdd
-trigger1 = HitCount > var(36) && numtarget && (stateno = 1200 || stateno = 1201 || stateno = 1202 || stateno = 1300 || stateno = 1301 || stateno = 1302 || stateno = 1400 || stateno = 1401 || stateno = 1402)
+trigger1 = HitCount > var(36) && numtarget && (stateno = 1200 || stateno = 1201 || stateno = 1202 || stateno = 1250 || stateno = 1251 || stateno = 1252 || stateno = 1300 || stateno = 1301 || stateno = 1302 || stateno = 1400 || stateno = 1401 || stateno = 1402)
 value = floor(ifelse(HitCount = 1, 13, 2) / 3 * 1.2 * 1000 / ifelse((target, Map(sagl)) > 0, (target, Map(sagl)), 112) + .5)
 ignorehitpause = 1
 
 [State -2, Gain guard class 12]
 type = PowerAdd
 triggerall = Map(harmony) <= 0
-trigger1 = MoveGuarded && var(37) = 0 && (stateno = 1200 || stateno = 1201 || stateno = 1202 || stateno = 1300 || stateno = 1301 || stateno = 1302 || stateno = 1400 || stateno = 1401 || stateno = 1402)
+trigger1 = MoveGuarded && var(37) = 0 && (stateno = 1200 || stateno = 1201 || stateno = 1202 || stateno = 1250 || stateno = 1251 || stateno = 1252 || stateno = 1300 || stateno = 1301 || stateno = 1302 || stateno = 1400 || stateno = 1401 || stateno = 1402)
 value = floor((8) * 1.2 * 1000 / ifelse(Map(sa) = 2, 128, ifelse(Map(sa) = 3, 80, 112)) + .5)
 ignorehitpause = 1
 
@@ -7253,6 +7253,642 @@ persistent = 0
 [State 1205, End]
 type = ChangeState
 trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;===========================================================================
+; Special move: Air Flashstep (j.214+K) - a lightning dive down and forward
+;---------------------------------------------------------------------------
+; Air Flashstep L - hover 4f, dive 5.0 per axis, 60 dmg
+[Statedef 1250]
+type = A
+movetype = A
+physics = N
+anim = 1250
+ctrl = 0
+sprpriority = 2
+velset = 0,0
+
+[State 1250, Landing recovery]
+type = MapSet
+trigger1 = Time = 0
+map = "afl"
+value = 12
+
+[State 1250, Hover]
+type = VelSet
+trigger1 = Time < 4
+x = 0
+y = 0
+
+[State 1250, Dive]
+type = VelSet
+trigger1 = Time >= 4
+x = 5
+y = 5
+
+[State 1250, Flash]
+type = PalFX
+trigger1 = Time = 0
+time = 6
+add = 40, 80, 160
+sinadd = -40, -80, -160, 6
+
+[State 1250, Voice]
+type = PlaySnd
+trigger1 = Time = 0 && Random < 700
+value = S20, 2
+channel = 0
+
+[State 1250, Zap]
+type = PlaySnd
+trigger1 = Time = 0
+value = S1, 0
+channel = 3
+
+[State 1250, Whoosh]
+type = PlaySnd
+trigger1 = Time = 4
+value = S0, 2
+
+[State 1250, Trail]
+type = AfterImage
+trigger1 = Time = 5
+time = 20
+length = 5
+timegap = 1
+framegap = 1
+palcolor = 0
+paladd = 20, 90, 200
+palmul = .3, .5, .9
+trans = add
+
+[State 1250, Crackle]
+type = Explod
+trigger1 = Time = 0
+anim = 6030
+postype = p1
+pos = 0, -45
+scale = .22, .22
+sprpriority = 5
+ownpal = 1
+bindtime = -1
+removetime = 24
+removeongethit = 1
+ignorehitpause = 1
+
+[State 1250, Dive kick]
+type = HitDef
+trigger1 = Time = 4
+attr = A, SA
+damage = 60, 8
+animtype = Medium
+guardflag = HA
+hitflag = MAF
+priority = 4, Hit
+pausetime = 9, 9
+sparkno = -1
+guard.sparkno = 40
+sparkxy = -8, -10
+hitsound = 5, 1
+guardsound = 6, 0
+ground.type = High
+ground.slidetime = 10
+ground.hittime = 18
+guard.slidetime = 10
+guard.hittime = 12
+ground.velocity = 0
+guard.velocity = 0
+air.velocity = -3.5, -3.5
+fall.envshake.time = 3
+ground.cornerpush.veloff = -8.01
+guard.cornerpush.veloff = -8.01
+palfx.time = 10
+palfx.add = 0, 24, 60
+palfx.sinadd = 36, 60, 90, 5
+
+[State 1250, Shock burst]
+type = Explod
+trigger1 = MoveHit = 1
+anim = 6020
+postype = p2
+pos = 0, -60
+scale = .18, .18
+sprpriority = 6
+ownpal = 1
+bindtime = 1
+removetime = -2
+ignorehitpause = 1
+persistent = 0
+
+[State 1250, Trail stop on contact]
+type = AfterImageTime
+trigger1 = MoveContact
+time = 0
+ignorehitpause = 1
+
+[State 1250, Contact]
+type = ChangeState
+trigger1 = MoveContact
+value = 1256
+
+[State 1250, Landed]
+type = ChangeState
+trigger1 = Time >= 4 && Pos Y >= 0
+value = 1257
+
+;---------------------------------------------------------------------------
+; Air Flashstep M - hover 5f, dive 6.0 per axis, 70 dmg
+[Statedef 1251]
+type = A
+movetype = A
+physics = N
+anim = 1251
+ctrl = 0
+sprpriority = 2
+velset = 0,0
+
+[State 1251, Landing recovery]
+type = MapSet
+trigger1 = Time = 0
+map = "afl"
+value = 14
+
+[State 1251, Hover]
+type = VelSet
+trigger1 = Time < 5
+x = 0
+y = 0
+
+[State 1251, Dive]
+type = VelSet
+trigger1 = Time >= 5
+x = 6
+y = 6
+
+[State 1251, Flash]
+type = PalFX
+trigger1 = Time = 0
+time = 6
+add = 40, 80, 160
+sinadd = -40, -80, -160, 6
+
+[State 1251, Voice]
+type = PlaySnd
+trigger1 = Time = 0 && Random < 700
+value = S20, 2
+channel = 0
+
+[State 1251, Zap]
+type = PlaySnd
+trigger1 = Time = 0
+value = S1, 0
+channel = 3
+
+[State 1251, Whoosh]
+type = PlaySnd
+trigger1 = Time = 5
+value = S0, 2
+
+[State 1251, Trail]
+type = AfterImage
+trigger1 = Time = 6
+time = 20
+length = 5
+timegap = 1
+framegap = 1
+palcolor = 0
+paladd = 20, 90, 200
+palmul = .3, .5, .9
+trans = add
+
+[State 1251, Crackle]
+type = Explod
+trigger1 = Time = 0
+anim = 6030
+postype = p1
+pos = 0, -45
+scale = .22, .22
+sprpriority = 5
+ownpal = 1
+bindtime = -1
+removetime = 24
+removeongethit = 1
+ignorehitpause = 1
+
+[State 1251, Dive kick]
+type = HitDef
+trigger1 = Time = 5
+attr = A, SA
+damage = 70, 9
+animtype = Medium
+guardflag = HA
+hitflag = MAF
+priority = 4, Hit
+pausetime = 9, 9
+sparkno = -1
+guard.sparkno = 40
+sparkxy = -8, -10
+hitsound = 5, 1
+guardsound = 6, 0
+ground.type = High
+ground.slidetime = 10
+ground.hittime = 18
+guard.slidetime = 10
+guard.hittime = 12
+ground.velocity = 0
+guard.velocity = 0
+air.velocity = -3.5, -3.5
+fall.envshake.time = 3
+ground.cornerpush.veloff = -8.01
+guard.cornerpush.veloff = -8.01
+palfx.time = 10
+palfx.add = 0, 24, 60
+palfx.sinadd = 36, 60, 90, 5
+
+[State 1251, Shock burst]
+type = Explod
+trigger1 = MoveHit = 1
+anim = 6020
+postype = p2
+pos = 0, -60
+scale = .18, .18
+sprpriority = 6
+ownpal = 1
+bindtime = 1
+removetime = -2
+ignorehitpause = 1
+persistent = 0
+
+[State 1251, Trail stop on contact]
+type = AfterImageTime
+trigger1 = MoveContact
+time = 0
+ignorehitpause = 1
+
+[State 1251, Contact]
+type = ChangeState
+trigger1 = MoveContact
+value = 1256
+
+[State 1251, Landed]
+type = ChangeState
+trigger1 = Time >= 5 && Pos Y >= 0
+value = 1257
+
+;---------------------------------------------------------------------------
+; Air Flashstep H - hover 6f, dive 7.2 per axis, 85 dmg
+[Statedef 1252]
+type = A
+movetype = A
+physics = N
+anim = 1252
+ctrl = 0
+sprpriority = 2
+velset = 0,0
+
+[State 1252, Landing recovery]
+type = MapSet
+trigger1 = Time = 0
+map = "afl"
+value = 16
+
+[State 1252, Hover]
+type = VelSet
+trigger1 = Time < 6
+x = 0
+y = 0
+
+[State 1252, Dive]
+type = VelSet
+trigger1 = Time >= 6
+x = 7.2
+y = 7.2
+
+[State 1252, Flash]
+type = PalFX
+trigger1 = Time = 0
+time = 6
+add = 40, 80, 160
+sinadd = -40, -80, -160, 6
+
+[State 1252, Voice]
+type = PlaySnd
+trigger1 = Time = 0 && Random < 700
+value = S20, 2
+channel = 0
+
+[State 1252, Zap]
+type = PlaySnd
+trigger1 = Time = 0
+value = S1, 0
+channel = 3
+
+[State 1252, Whoosh]
+type = PlaySnd
+trigger1 = Time = 6
+value = S0, 2
+
+[State 1252, Trail]
+type = AfterImage
+trigger1 = Time = 7
+time = 20
+length = 5
+timegap = 1
+framegap = 1
+palcolor = 0
+paladd = 20, 90, 200
+palmul = .3, .5, .9
+trans = add
+
+[State 1252, Crackle]
+type = Explod
+trigger1 = Time = 0
+anim = 6030
+postype = p1
+pos = 0, -45
+scale = .22, .22
+sprpriority = 5
+ownpal = 1
+bindtime = -1
+removetime = 24
+removeongethit = 1
+ignorehitpause = 1
+
+[State 1252, Dive kick]
+type = HitDef
+trigger1 = Time = 6
+attr = A, SA
+damage = 85, 11
+animtype = Hard
+guardflag = HA
+hitflag = MAF
+priority = 5, Hit
+pausetime = 11, 11
+sparkno = -1
+guard.sparkno = 40
+sparkxy = -8, -10
+hitsound = 5, 2
+guardsound = 6, 0
+ground.type = High
+ground.slidetime = 10
+ground.hittime = 18
+guard.slidetime = 10
+guard.hittime = 12
+ground.velocity = 0
+guard.velocity = 0
+air.velocity = -4, -4
+fall.envshake.time = 4
+ground.cornerpush.veloff = -9.61
+guard.cornerpush.veloff = -9.61
+palfx.time = 10
+palfx.add = 0, 24, 60
+palfx.sinadd = 36, 60, 90, 5
+
+[State 1252, Shock burst]
+type = Explod
+trigger1 = MoveHit = 1
+anim = 6020
+postype = p2
+pos = 0, -60
+scale = .18, .18
+sprpriority = 6
+ownpal = 1
+bindtime = 1
+removetime = -2
+ignorehitpause = 1
+persistent = 0
+
+[State 1252, Trail stop on contact]
+type = AfterImageTime
+trigger1 = MoveContact
+time = 0
+ignorehitpause = 1
+
+[State 1252, Contact]
+type = ChangeState
+trigger1 = MoveContact
+value = 1256
+
+[State 1252, Landed]
+type = ChangeState
+trigger1 = Time >= 6 && Pos Y >= 0
+value = 1257
+
+;---------------------------------------------------------------------------
+; Air Flashstep EX - hover 3f, dive 8.5 per axis, 100 dmg
+[Statedef 1253]
+type = A
+movetype = A
+physics = N
+anim = 1253
+ctrl = 0
+sprpriority = 2
+velset = 0,0
+
+[State 1253, Meter]
+type = PowerAdd
+trigger1 = Time = 0
+value = -ceil(40000.0 / ifelse(Map(sa) = 2, 128, ifelse(Map(sa) = 3, 80, 112)))
+
+[State 1253, Strike invincible]
+type = NotHitBy
+trigger1 = Time < 15
+value = SCA, NA, SA, HA, NP, SP, HP
+time = 1
+
+[State 1253, Landing recovery]
+type = MapSet
+trigger1 = Time = 0
+map = "afl"
+value = 14
+
+[State 1253, Hover]
+type = VelSet
+trigger1 = Time < 3
+x = 0
+y = 0
+
+[State 1253, Dive]
+type = VelSet
+trigger1 = Time >= 3
+x = 8.5
+y = 8.5
+
+[State 1253, Flash]
+type = PalFX
+trigger1 = Time = 0
+time = 6
+add = 110, 90, 20
+sinadd = -110, -90, -20, 6
+
+[State 1253, Voice]
+type = PlaySnd
+trigger1 = Time = 0 && Random < 700
+value = S20, 2
+channel = 0
+
+[State 1253, Zap]
+type = PlaySnd
+trigger1 = Time = 0
+value = S1, 0
+channel = 3
+
+[State 1253, Whoosh]
+type = PlaySnd
+trigger1 = Time = 3
+value = S0, 2
+
+[State 1253, Trail]
+type = AfterImage
+trigger1 = Time = 4
+time = 20
+length = 5
+timegap = 1
+framegap = 1
+palcolor = 0
+paladd = 120, 90, 0
+palmul = .6, .5, .2
+trans = add
+
+[State 1253, Crackle]
+type = Explod
+trigger1 = Time = 0
+anim = 6031
+postype = p1
+pos = 0, -45
+scale = .22, .22
+sprpriority = 5
+ownpal = 1
+bindtime = -1
+removetime = 24
+removeongethit = 1
+ignorehitpause = 1
+
+[State 1253, Dive kick]
+type = HitDef
+trigger1 = Time = 3
+attr = A, SA
+damage = 100, 12
+animtype = Hard
+guardflag = HA
+hitflag = MAF
+priority = 5, Hit
+pausetime = 11, 11
+sparkno = -1
+guard.sparkno = 40
+sparkxy = -8, -10
+hitsound = 5, 2
+guardsound = 6, 0
+ground.type = High
+ground.slidetime = 10
+ground.hittime = 20
+guard.slidetime = 10
+guard.hittime = 12
+ground.velocity = -3.5, -5
+guard.velocity = -4
+air.velocity = -3.5, -5
+fall = 1
+fall.recover = 0
+palfx.time = 10
+palfx.add = 0, 24, 60
+palfx.sinadd = 36, 60, 90, 5
+
+[State 1253, Shock burst]
+type = Explod
+trigger1 = MoveHit = 1
+anim = 6020
+postype = p2
+pos = 0, -60
+scale = .18, .18
+sprpriority = 6
+ownpal = 1
+bindtime = 1
+removetime = -2
+ignorehitpause = 1
+persistent = 0
+
+[State 1253, Trail stop on contact]
+type = AfterImageTime
+trigger1 = MoveContact
+time = 0
+ignorehitpause = 1
+
+[State 1253, Contact]
+type = ChangeState
+trigger1 = MoveContact
+value = 1256
+
+[State 1253, Landed]
+type = ChangeState
+trigger1 = Time >= 3 && Pos Y >= 0
+value = 1257
+
+;---------------------------------------------------------------------------
+; Air Flashstep: after the kick connects (hit or block) he drops straight down; the engine lands him (state 52)
+[Statedef 1256]
+type = A
+movetype = I
+physics = A
+anim = 41
+ctrl = 0
+velset = .8, 2.2
+sprpriority = 2
+
+[State 1256, Trail off]
+type = AfterImageTime
+trigger1 = Time <= 1
+time = 0
+ignorehitpause = 1
+
+;---------------------------------------------------------------------------
+; Air Flashstep: landing after a whiff (recovery set by the strength, map "afl")
+[Statedef 1257]
+type = S
+movetype = I
+physics = S
+anim = 47
+ctrl = 0
+velset = 0, 0
+sprpriority = 2
+
+[State 1257, Floor]
+type = PosSet
+trigger1 = Time = 0
+y = 0
+
+[State 1257, Trail off]
+type = AfterImageTime
+trigger1 = Time <= 1
+time = 0
+ignorehitpause = 1
+
+[State 1257, Spark]
+type = Explod
+trigger1 = Time = 0
+anim = 6020
+postype = p1
+pos = 14, -4
+scale = .12, .08
+sprpriority = 4
+ownpal = 1
+bindtime = 1
+removetime = -2
+
+[State 1257, Scuff]
+type = PlaySnd
+trigger1 = Time = 0
+value = S4, 0
+
+[State 1257, Hold]
+type = ChangeAnim
+trigger1 = AnimTime = 0 && Time < Map(afl)
+value = 47
+elem = 3
+
+[State 1257, End]
+type = ChangeState
+trigger1 = Time >= Map(afl)
 value = 0
 ctrl = 1
 

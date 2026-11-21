@@ -546,6 +546,54 @@ trigger2 = movecontact
 trigger2 = stateno = 200 || stateno = 210 || stateno = 230 || stateno = 400 || stateno = 410 || stateno = 430 || stateno = 440
 trigger3 = Map(harmony) > 0 && statetype != A && movetype = A && ((stateno >= 200 && stateno < 500) || (movecontact && stateno >= 1000 && stateno < 1600 && floor(stateno / 100) != 13))
 
+[State -1, Air Flashstep EX]
+type = ChangeState
+value = 1253
+triggerall = command = "QCB_KK"
+triggerall = power >= ceil(40000.0 / ifelse(Map(sa) = 2, 128, ifelse(Map(sa) = 3, 80, 112)))
+triggerall = statetype = A && Pos Y < -18
+triggerall = AILevel = 0
+trigger1 = ctrl
+trigger2 = movecontact && (stateno = [600, 659])
+trigger3 = Map(harmony) > 0 && statetype != A && movetype = A && ((stateno >= 200 && stateno < 500) || (movecontact && stateno >= 1000 && stateno < 1600 && floor(stateno / 100) != 12))
+
+[State -1, Air Flashstep HK]
+type = ChangeState
+value = 1252
+triggerall = command = "QCB_c"
+triggerall = statetype = A && Pos Y < -18
+triggerall = AILevel = 0
+trigger1 = ctrl
+trigger2 = movecontact && (stateno = [600, 659])
+trigger3 = Map(harmony) > 0 && statetype != A && movetype = A && ((stateno >= 200 && stateno < 500) || (movecontact && stateno >= 1000 && stateno < 1600 && floor(stateno / 100) != 12))
+
+[State -1, Air Flashstep MK]
+type = ChangeState
+value = 1251
+triggerall = command = "QCB_b"
+triggerall = statetype = A && Pos Y < -18
+triggerall = AILevel = 0
+trigger1 = ctrl
+trigger2 = movecontact && (stateno = [600, 659])
+trigger3 = Map(harmony) > 0 && statetype != A && movetype = A && ((stateno >= 200 && stateno < 500) || (movecontact && stateno >= 1000 && stateno < 1600 && floor(stateno / 100) != 12))
+
+[State -1, Air Flashstep LK]
+type = ChangeState
+value = 1250
+triggerall = command = "QCB_a"
+triggerall = statetype = A && Pos Y < -18
+triggerall = AILevel = 0
+trigger1 = ctrl
+trigger2 = movecontact && (stateno = [600, 659])
+trigger3 = Map(harmony) > 0 && statetype != A && movetype = A && ((stateno >= 200 && stateno < 500) || (movecontact && stateno >= 1000 && stateno < 1600 && floor(stateno / 100) != 12))
+
+[State -1, Air Flashstep (CPU)]
+type = ChangeState
+value = ifelse(Random < 400, 1252, 1251)
+triggerall = AILevel > 0 && statetype = A && ctrl && Pos Y < -40 && Vel Y > -2
+triggerall = P2BodyDist X > 15 && P2BodyDist X < 100 && P2StateType != A && P2StateType != L
+trigger1 = Random < AILevel * 4
+
 [State -1, Flashstep EX]
 type = ChangeState
 value = 1203
