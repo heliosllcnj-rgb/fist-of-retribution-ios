@@ -51,7 +51,7 @@ if map(birdState) <= 0 {
 	# Do note that dizzy bird anims and sounds are called from gofx.def, not fightfx.air/common.snd
 	if numExplod < 4 {
 		explod{
-			anim: GO const(FxDizzyEffect) + map(birdType);
+			anim: F 950;
 			postype: p1;
 			ownpal: 1;
 			vel: 0, 0;
@@ -83,7 +83,7 @@ for i = 0; numExplod-1; 1 {
 	modifyExplod{
 		id: -1;
 		index: $i;
-		anim: GO const(FxDizzyEffect) + map(birdType);
+		anim: F 950;
 		postype: p1;
 		pos: sin($circleTime) * map(birdRadius), $circleHeight + $fadeTime * const240p(-1);
 		angle: 15 * cos($circleTime * 3);
