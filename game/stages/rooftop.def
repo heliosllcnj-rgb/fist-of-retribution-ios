@@ -80,6 +80,56 @@ start = 0, -80
 delta = .6, .75
 mask = 1
 
+;FX-BEGIN
+[BG FX light 0]
+type = anim
+actionno = 410
+layerno = 0
+start = 242, 229
+delta = .6, .75
+trans = add
+
+[BG FX light 1]
+type = anim
+actionno = 411
+layerno = 0
+start = 263, 231
+delta = .6, .75
+trans = add
+
+[BG FX light 2]
+type = anim
+actionno = 412
+layerno = 0
+start = 344, 327
+delta = .6, .75
+trans = add
+
+[BG FX light 3]
+type = anim
+actionno = 413
+layerno = 0
+start = 468, 324
+delta = .6, .75
+trans = add
+
+[BG FX billboard glow]
+type = anim
+actionno = 420
+layerno = 0
+start = 438, 414
+delta = .6, .75
+trans = add
+
+[BG FX billboard flicker]
+type = anim
+actionno = 421
+layerno = 0
+start = 416, 372
+delta = .6, .75
+mask = 1
+
+;FX-END
 [BG Floor]
 type = normal
 spriteno = 3, 0
@@ -88,6 +138,24 @@ start = 0, -80
 delta = 1, 1
 mask = 1
 
+;FX-BEGIN
+[BG FX puddle right]
+type = anim
+actionno = 430
+layerno = 0
+start = 377, 588
+delta = 1, 1
+trans = add
+
+[BG FX puddle left]
+type = anim
+actionno = 431
+layerno = 0
+start = -488, 588
+delta = 1, 1
+trans = add
+
+;FX-END
 [BG Structures]
 type = normal
 spriteno = 4, 0
@@ -96,6 +164,16 @@ start = 0, -80
 delta = 1, 1
 mask = 1
 
+;FX-BEGIN
+[BG FX chimney smoke]
+type = anim
+actionno = 400
+layerno = 0
+start = -874, 86
+delta = 1, 1
+mask = 1
+
+;FX-END
 [BG Flag]
 type = anim
 actionno = 10
@@ -625,3 +703,134 @@ trans = add
 30,0, 0,0, 140
 30,1, 0,0, 3
 30,0, 0,0, 60
+
+;FX-BEGIN
+[Begin Action 400]
+40,0, 0,0, 3
+40,1, 0,0, 3
+40,2, 0,0, 3
+40,3, 0,0, 3
+40,4, 0,0, 3
+40,5, 0,0, 3
+40,6, 0,0, 3
+40,7, 0,0, 3
+40,8, 0,0, 3
+40,9, 0,0, 3
+40,10, 0,0, 3
+40,11, 0,0, 3
+40,12, 0,0, 3
+40,13, 0,0, 3
+40,14, 0,0, 3
+40,15, 0,0, 3
+40,16, 0,0, 3
+40,17, 0,0, 3
+40,18, 0,0, 3
+40,19, 0,0, 3
+40,20, 0,0, 3
+40,21, 0,0, 3
+40,22, 0,0, 3
+40,23, 0,0, 3
+40,24, 0,0, 3
+40,25, 0,0, 3
+40,26, 0,0, 3
+40,27, 0,0, 3
+40,28, 0,0, 3
+40,29, 0,0, 3
+40,30, 0,0, 3
+40,31, 0,0, 3
+40,32, 0,0, 3
+40,33, 0,0, 3
+40,34, 0,0, 3
+40,35, 0,0, 3
+40,36, 0,0, 3
+40,37, 0,0, 3
+40,38, 0,0, 3
+40,39, 0,0, 3
+40,40, 0,0, 3
+40,41, 0,0, 3
+40,42, 0,0, 3
+40,43, 0,0, 3
+40,44, 0,0, 3
+40,45, 0,0, 3
+40,46, 0,0, 3
+40,47, 0,0, 3
+
+[Begin Action 410]
+41,1, 0,0, 3
+41,0, 0,0, 8
+41,1, 0,0, 4
+-1,-1, 0,0, 70
+Loopstart
+41,1, 0,0, 3
+41,0, 0,0, 8
+41,1, 0,0, 4
+-1,-1, 0,0, 70
+
+[Begin Action 411]
+-1,-1, 0,0, 25
+41,1, 0,0, 3
+41,0, 0,0, 8
+41,1, 0,0, 4
+-1,-1, 0,0, 45
+Loopstart
+41,1, 0,0, 3
+41,0, 0,0, 8
+41,1, 0,0, 4
+-1,-1, 0,0, 70
+
+[Begin Action 412]
+-1,-1, 0,0, 50
+41,1, 0,0, 3
+41,0, 0,0, 8
+41,1, 0,0, 4
+-1,-1, 0,0, 20
+Loopstart
+41,1, 0,0, 3
+41,0, 0,0, 8
+41,1, 0,0, 4
+-1,-1, 0,0, 70
+
+[Begin Action 413]
+-1,-1, 0,0, 12
+41,1, 0,0, 3
+41,0, 0,0, 8
+41,1, 0,0, 4
+-1,-1, 0,0, 58
+Loopstart
+41,1, 0,0, 3
+41,0, 0,0, 8
+41,1, 0,0, 4
+-1,-1, 0,0, 70
+
+[Begin Action 420]
+42,0, 0,0, 20
+42,1, 0,0, 20
+42,2, 0,0, 20
+42,1, 0,0, 20
+42,0, 0,0, 40
+42,1, 0,0, 20
+42,2, 0,0, 20
+42,1, 0,0, 20
+
+[Begin Action 421]
+-1,-1, 0,0, 400
+43,0, 0,0, 3
+-1,-1, 0,0, 4
+43,0, 0,0, 6
+-1,-1, 0,0, 3
+43,0, 0,0, 2
+-1,-1, 0,0, 280
+
+[Begin Action 430]
+44,2, 0,0, 30
+44,1, 0,0, 30
+44,0, 0,0, 40
+44,1, 0,0, 30
+
+[Begin Action 431]
+45,1, 0,0, 35
+45,0, 0,0, 35
+45,1, 0,0, 35
+45,2, 0,0, 45
+
+;FX-END

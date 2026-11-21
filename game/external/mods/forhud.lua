@@ -109,6 +109,10 @@ local frame = 0
 hook.add("loop", "forhud", function()
 	frame = frame + 1
 	U.begin('hud')
+	-- nothing over the victory / congratulations / continue / hi-score screens
+	for _, st in ipairs({'victoryscreen', 'winscreen', 'continuescreen', 'hiscore'}) do
+		if motifState(st) then return end
+	end
 	for pn = 1, 2 do
 		if player(pn) then
 			-- hand over the Super Art picked at select
