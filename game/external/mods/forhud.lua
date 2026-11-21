@@ -3,7 +3,7 @@
 -- * Hands each player the Super Art picked at select (start.saPick[playerNo]) through the character map "sa".
 -- * Draws, at the bottom of the screen, a gauge whose length follows the art's bar length (as in 3rd Strike:
 --   SA II's long bar is drawn longer than SA III's short one), the stock count in a box at the outer edge,
---   the art's numeral, and a flashing MAX when every stock is full. The engine's own power bar is moved off
+--   the art's numeral, and MAX when every stock is full (steady, no flashing). The engine's own power bar is moved off
 --   screen in fight.def.
 
 local U = require('external.script.forui')
@@ -24,8 +24,7 @@ local function drawGauge(side, sa, stocks, maxStocks, frac, len, frame, left, ri
 	local full = stocks >= maxStocks
 	U.box(bx - 2, Y - 14, boxW + 4, H + 30, 255, 255, 255, 230)
 	U.box(bx, Y - 12, boxW, H + 26, 12, 18, 48, 255)
-	local flash = full and (math.floor(frame / 4) % 2 == 0)
-	local nc = flash and {255, 255, 255} or U.GOLD
+	local nc = U.GOLD           -- (no flashing: a full gauge is shown by its steady gold bar and MAX)
 	U.text(tostring(stocks), bx + boxW / 2, Y + H + 8, 38, 0, nc[1], nc[2], nc[3], 255, true)
 	-- the bar, growing inward from the stock box
 	local gx = (dir == 1) and (bx + boxW + 6) or (bx - 6 - w)
@@ -41,16 +40,15 @@ local function drawGauge(side, sa, stocks, maxStocks, frac, len, frame, left, ri
 		-- Perfect Harmony active: the bar turns pale blue and drains as the install runs out (3rd Strike style)
 		local iw = math.floor(w * install / INSTALL)
 		local ix = (dir == 1) and gx or (gx + w - iw)
-		local p = (math.floor(frame / 4) % 2 == 0)
-		U.box(ix, Y, iw, H, p and 170 or 120, p and 225 or 200, 255, 255)
+		U.box(ix, Y, iw, H, 140, 212, 255, 255)
 		U.box(ix, Y, iw, math.floor(H / 3), 235, 250, 255, 255)
 		fw = 0
 	end
 	if fw > 0 then
 		local fx = (dir == 1) and gx or (gx + w - fw)
 		if full then
-			local p = (math.floor(frame / 3) % 2 == 0)
-			U.box(fx, Y, fw, H, p and 255 or 255, p and 200 or 140, p and 90 or 20, 255)
+			U.box(fx, Y, fw, H, 255, 160, 30, 255)
+			U.box(fx, Y, fw, math.floor(H / 3), 255, 214, 110, 255)
 		else
 			U.box(fx, Y, fw, H, U.BLUE[1], U.BLUE[2], U.BLUE[3], 255)
 			U.box(fx, Y, fw, math.floor(H / 3), 120, 180, 255, 255)
@@ -59,7 +57,7 @@ local function drawGauge(side, sa, stocks, maxStocks, frac, len, frame, left, ri
 	-- the art's numeral and MAX above the bar
 	local lx = (dir == 1) and gx or (gx + w)
 	U.text('SA ' .. (U.ROMAN[sa] or 'I'), lx, Y - 8, 18, dir, 255, 255, 255, 255, true)
-	if full and flash then
+	if full then
 		local mx = (dir == 1) and (gx + w) or gx
 		U.text('MAX', mx, Y - 8, 18, -dir, U.GOLD[1], U.GOLD[2], U.GOLD[3], 255, true)
 	end
