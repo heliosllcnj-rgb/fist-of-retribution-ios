@@ -50,7 +50,7 @@ index 3a2c3b9..22f5e92 100644
  
  func setOrientationHints() {
 -	sdl.SetHint(sdl.HINT_ORIENTATIONS, "LandscapeLeft LandscapeRight Portrait PortraitUpsideDown")
-+	sdl.SetHint(sdl.HINT_ORIENTATIONS, "LandscapeLeft LandscapeRight Portrait") // Fist of Retribution: portrait (picture over the panel) or landscape (controls either side)
++	sdl.SetHint(sdl.HINT_ORIENTATIONS, "LandscapeLeft LandscapeRight") // Fist of Retribution: always landscape (controls either side of the picture)
  }
 diff --git a/src/system_sdl.go b/src/system_sdl.go
 index 8eea3d3..b7a26d4 100644

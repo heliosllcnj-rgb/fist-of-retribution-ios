@@ -1342,7 +1342,7 @@ public class SDLActivity extends Activity implements View.OnSystemUiVisibilityCh
             }
         }
 
-        req = ActivityInfo.SCREEN_ORIENTATION_USER; // Fist of Retribution: portrait (picture over the panel) or landscape (controls either side), follows the phone
+        req = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE; // Fist of Retribution: always landscape (controls either side of the picture), either way up
         Log.v(TAG, "setOrientation() requestedOrientation=" + req + " width=" + w +" height="+ h +" resizable=" + resizable + " hint=" + hint);
         mSingleton.setRequestedOrientation(req);
     }

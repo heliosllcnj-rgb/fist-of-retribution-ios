@@ -66,13 +66,9 @@ void IkemenLockOrientationToCurrent(void) {
             break;
         }
     }
+    // Fist of Retribution: the game always opens in landscape (controls either side of the picture), whichever
+    // way the phone is held and whether or not the rotation lock is on. Held on its other side, it opens that way up.
     switch (current) {
-        case UIInterfaceOrientationPortrait:
-            sLockedMask = UIInterfaceOrientationMaskPortrait;
-            break;
-        case UIInterfaceOrientationPortraitUpsideDown:
-            sLockedMask = UIInterfaceOrientationMaskPortraitUpsideDown;
-            break;
         case UIInterfaceOrientationLandscapeLeft:
             sLockedMask = UIInterfaceOrientationMaskLandscapeLeft;
             break;
