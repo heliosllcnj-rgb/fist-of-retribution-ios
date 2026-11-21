@@ -619,7 +619,9 @@ typedef struct {
             CGContextStrokeEllipseInRect(ctx, CGRectInset(box, 1.0, 1.0));
         }
         NSDictionary *attr = @{NSFontAttributeName: [UIFont systemFontOfSize:MAX(11.0, b.radius * 0.62) weight:UIFontWeightHeavy],
-                               NSForegroundColorAttributeName: [UIColor colorWithWhite:1.0 alpha:(img != nil ? 0.0 : 1.0)]};
+                               NSForegroundColorAttributeName: [UIColor colorWithWhite:1.0 alpha:1.0],
+                               NSStrokeColorAttributeName: [UIColor colorWithWhite:0.0 alpha:0.9],
+                               NSStrokeWidthAttributeName: @(-3.0)};
         CGSize ts = [names[i] sizeWithAttributes:attr];
         [names[i] drawAtPoint:CGPointMake(b.center.x - ts.width / 2.0, b.center.y - ts.height / 2.0) withAttributes:attr];
     }

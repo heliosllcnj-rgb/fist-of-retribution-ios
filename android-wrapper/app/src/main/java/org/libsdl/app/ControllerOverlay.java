@@ -570,6 +570,32 @@ public class ControllerOverlay extends RelativeLayout {
 
     private class ArcadeView extends View {
         private final android.graphics.Paint paint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+        private final android.graphics.Paint bmpPaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG | android.graphics.Paint.FILTER_BITMAP_FLAG);
+        private final android.graphics.RectF dst = new android.graphics.RectF();
+        private final android.graphics.Rect srcR = new android.graphics.Rect();
+        private final java.util.HashMap<String, android.graphics.Bitmap> art = new java.util.HashMap<>();
+
+        // Painted panel art (res/drawable-nodpi/for_*). Missing art falls back to the drawn shapes.
+        private android.graphics.Bitmap art(String name) {
+            if (!art.containsKey(name)) {
+                android.graphics.Bitmap b = null;
+                try {
+                    int id = getResources().getIdentifier(name, "drawable", getContext().getPackageName());
+                    if (id != 0) b = android.graphics.BitmapFactory.decodeResource(getResources(), id);
+                } catch (Throwable t) { b = null; }
+                art.put(name, b);
+            }
+            return art.get(name);
+        }
+
+        private boolean drawArt(android.graphics.Canvas c, String name, float cx, float cy, float r) {
+            android.graphics.Bitmap b = art(name);
+            if (b == null) return false;
+            dst.set(cx - r, cy - r, cx + r, cy + r);
+            c.drawBitmap(b, null, dst, bmpPaint);
+            return true;
+        }
+
         private final android.graphics.Path slash = new android.graphics.Path();
 
         ArcadeView(Context context) {
@@ -598,31 +624,45 @@ public class ControllerOverlay extends RelativeLayout {
             float dp = getContext().getResources().getDisplayMetrics().density;
 
             // Panel: dark metal with a slash of orange (everything above panelTop is left clear for the game)
-            paint.setStyle(android.graphics.Paint.Style.FILL);
-            paint.setColor(0xFF211F26);
-            c.drawRect(0, panelTop, w, h, paint);
-            paint.setColor(0xFF29262F);
-            paint.setStrokeWidth(1f);
-            for (float x = 0; x < w; x += 4 * dp) {
-                c.drawLine(x, panelTop, x, h, paint);
+            android.graphics.Bitmap pb = art("for_panel");
+            if (pb != null) {
+                float ph = h - panelTop;
+                float sc = Math.max(w / (float) pb.getWidth(), ph / (float) pb.getHeight());
+                int sw = Math.round(w / sc), sh = Math.round(ph / sc);
+                int sx0 = (pb.getWidth() - sw) / 2, sy0 = (pb.getHeight() - sh) / 2;
+                srcR.set(sx0, sy0, sx0 + sw, sy0 + sh);
+                dst.set(0, panelTop, w, h);
+                c.drawBitmap(pb, srcR, dst, bmpPaint);
+            } else {
+                paint.setStyle(android.graphics.Paint.Style.FILL);
+                paint.setColor(0xFF211F26);
+                c.drawRect(0, panelTop, w, h, paint);
+                paint.setColor(0xFF29262F);
+                paint.setStrokeWidth(1f);
+                for (float x = 0; x < w; x += 4 * dp) {
+                    c.drawLine(x, panelTop, x, h, paint);
+                }
+                slash.reset();
+                slash.moveTo(0, panelTop);
+                slash.lineTo(w * 0.52f, panelTop);
+                slash.lineTo(w * 0.36f, panelTop + topPad);
+                slash.lineTo(0, panelTop + topPad);
+                slash.close();
+                paint.setColor(0xFFC74A14);
+                c.drawPath(slash, paint);
             }
-            slash.reset();
-            slash.moveTo(0, panelTop);
-            slash.lineTo(w * 0.52f, panelTop);
-            slash.lineTo(w * 0.36f, panelTop + topPad);
-            slash.lineTo(0, panelTop + topPad);
-            slash.close();
-            paint.setColor(0xFFC74A14);
-            c.drawPath(slash, paint);
 
             // Stick: base plate, then the ball pushed toward where it is held
-            paint.setColor(0xFF0D0D0D);
-            c.drawCircle(stickX, stickY, stickR, paint);
-            paint.setStyle(android.graphics.Paint.Style.STROKE);
-            paint.setStrokeWidth(3 * dp);
-            paint.setColor(0xFF525252);
-            c.drawCircle(stickX, stickY, stickR - 1.5f * dp, paint);
             paint.setStyle(android.graphics.Paint.Style.FILL);
+            if (!drawArt(c, "for_stick_base", stickX, stickY, stickR)) {
+                paint.setColor(0xFF0D0D0D);
+                c.drawCircle(stickX, stickY, stickR, paint);
+                paint.setStyle(android.graphics.Paint.Style.STROKE);
+                paint.setStrokeWidth(3 * dp);
+                paint.setColor(0xFF525252);
+                c.drawCircle(stickX, stickY, stickR - 1.5f * dp, paint);
+                paint.setStyle(android.graphics.Paint.Style.FILL);
+            }
             float dx = hatX, dy = hatY;
             float len = (float) Math.sqrt(dx * dx + dy * dy);
             if (len > 0) {
@@ -630,10 +670,12 @@ public class ControllerOverlay extends RelativeLayout {
                 dy = dy / len * stickR * 0.36f;
             }
             float ball = stickR * 0.56f;
-            paint.setColor(0xFFCC1F1F);
-            c.drawCircle(stickX + dx, stickY + dy, ball, paint);
-            paint.setColor(0xE6FF8C80);
-            c.drawOval(stickX + dx - ball * 0.58f, stickY + dy - ball * 0.72f, stickX + dx - ball * 0.08f, stickY + dy - ball * 0.36f, paint);
+            if (!drawArt(c, "for_stick_ball", stickX + dx, stickY + dy, ball)) {
+                paint.setColor(0xFFCC1F1F);
+                c.drawCircle(stickX + dx, stickY + dy, ball, paint);
+                paint.setColor(0xE6FF8C80);
+                c.drawOval(stickX + dx - ball * 0.58f, stickY + dy - ball * 0.72f, stickX + dx - ball * 0.08f, stickY + dy - ball * 0.36f, paint);
+            }
 
             // Buttons
             paint.setTextAlign(android.graphics.Paint.Align.CENTER);
@@ -643,18 +685,22 @@ public class ControllerOverlay extends RelativeLayout {
                 boolean kick = i >= 3;
                 float r = down ? btnR * 0.94f : btnR;
                 paint.setStyle(android.graphics.Paint.Style.FILL);
-                paint.setColor(0xFF0A0A0A);
-                c.drawCircle(btnX[i], btnY[i], r + 4 * dp, paint);
-                paint.setColor(kick ? (down ? 0xFF8CBFFF : 0xFF336EEB) : (down ? 0xFFFFCC73 : 0xFFF0821F));
-                c.drawCircle(btnX[i], btnY[i], r, paint);
-                paint.setStyle(android.graphics.Paint.Style.STROKE);
-                paint.setStrokeWidth(2 * dp);
-                paint.setColor(0xD9FFFFFF);
-                c.drawCircle(btnX[i], btnY[i], r - dp, paint);
-                paint.setStyle(android.graphics.Paint.Style.FILL);
+                if (!drawArt(c, (kick ? "for_btn_kick" : "for_btn_punch") + (down ? "_on" : ""), btnX[i], btnY[i], r + 3 * dp)) {
+                    paint.setColor(0xFF0A0A0A);
+                    c.drawCircle(btnX[i], btnY[i], r + 4 * dp, paint);
+                    paint.setColor(kick ? (down ? 0xFF8CBFFF : 0xFF336EEB) : (down ? 0xFFFFCC73 : 0xFFF0821F));
+                    c.drawCircle(btnX[i], btnY[i], r, paint);
+                    paint.setStyle(android.graphics.Paint.Style.STROKE);
+                    paint.setStrokeWidth(2 * dp);
+                    paint.setColor(0xD9FFFFFF);
+                    c.drawCircle(btnX[i], btnY[i], r - dp, paint);
+                    paint.setStyle(android.graphics.Paint.Style.FILL);
+                }
+                paint.setShadowLayer(2 * dp, 0, 0, 0xE6000000);
                 paint.setColor(0xFFFFFFFF);
                 paint.setTextSize(Math.max(11 * dp, btnR * 0.62f));
                 c.drawText(ARCADE_NAMES[i], btnX[i], btnY[i] - (paint.descent() + paint.ascent()) / 2f, paint);
+                paint.clearShadowLayer();
             }
 
             // START and MENU
