@@ -1,0 +1,12 @@
+Fist of Retribution: Project Zero - Mac (Apple silicon: M1, M2, M3, M4 and later)
+
+1. Unzip FistOfRetribution-Mac.zip and drag "Fist of Retribution.app" into Applications (or leave it anywhere).
+2. The app isn't from the App Store, so the first time macOS blocks it:
+   - Double-click it once. When macOS says it can't be opened, click Done.
+   - Open System Settings > Privacy & Security, scroll down and click "Open Anyway" next to Fist of Retribution,
+     then confirm with "Open Anyway" and your password.
+   If macOS instead says the app "is damaged", open Terminal and run:
+     xattr -cr "/Applications/Fist of Retribution.app"
+   then open it again.
+3. After that it opens normally. Keyboard and controller settings are in Options; saves live in
+   ~/Library/Application Support/FistOfRetribution.

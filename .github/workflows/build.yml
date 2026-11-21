@@ -2,6 +2,7 @@
 #   iOS      -> FistOfRetribution-unsigned.ipa  (install with Sideloadly or AltStore)
 #   Android  -> FistOfRetribution.apk           (open on the phone to install)
 #   Windows  -> FistOfRetribution-Windows.zip   (unzip, run FistOfRetribution.exe)
+#   Mac      -> FistOfRetribution-Mac.zip       (Apple silicon; unzip, open "Fist of Retribution.app")
 # Both files are published on the repo's Releases page under "Phone builds (latest)" and replaced on every push.
 # How it works: the IKEMEN GO engine is fetched at a fixed commit, patches/engine.patch is applied
 # (picture at the top of a tall screen, portrait, our menus as the default), the game in game/ is copied
@@ -11,8 +12,8 @@ on:
   workflow_dispatch:
     inputs:
       targets:
-        description: "Which versions to build (any of: ios android windows)"
-        default: "ios android windows"
+        description: "Which versions to build (any of: ios android windows mac)"
+        default: "ios android windows mac"
   push:
     branches: [main]
     paths-ignore: ['README.md']
@@ -241,3 +242,108 @@ jobs:
               --notes "Newest builds of Fist of Retribution: Project Zero. Replaced on every push." || true
           gh release upload phone-builds FistOfRetribution-Windows.zip --clobber -R "$GITHUB_REPOSITORY"
 
+  mac:
+    if: github.event_name == 'push' || contains(inputs.targets, 'mac')
+    runs-on: macos-15
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Fetch the engine and apply our patch
+        run: |
+          set -euo pipefail
+          git init -q engine
+          cd engine
+          git config core.autocrlf false
+          git remote add origin "$ENGINE_REPO"
+          git fetch -q --depth 1 origin "$ENGINE_SHA"
+          git checkout -q FETCH_HEAD
+          git apply --verbose ../patches/engine.patch
+
+      - uses: actions/setup-go@v7
+        with:
+          go-version: '1.27.x'
+          cache: true
+          cache-dependency-path: engine/go.sum
+
+      - uses: humbletim/setup-vulkan-sdk@v1.2.1
+        with:
+          vulkan-query-version: 1.4.304.1
+          vulkan-components: Vulkan-Headers, Vulkan-Loader
+          vulkan-use-cache: true
+
+      - name: Host libraries
+        run: |
+          export HOMEBREW_NO_ANALYTICS=1 HOMEBREW_NO_AUTO_UPDATE=1
+          brew install --quiet pkg-config git nasm libxmp sdl2 molten-vk || brew install --quiet pkg-config git nasm libxmp sdl2 molten-vk
+
+      - name: Build the engine (Apple silicon)
+        env:
+          BUILD_FFMPEG: "yes"
+          GOOS: darwin
+          GOARCH: arm64
+          CGO_ENABLED: "1"
+          MACOSX_DEPLOYMENT_TARGET: "13.0"
+        run: |
+          set -o pipefail
+          cd engine
+          go env -w GO111MODULE=on
+          go mod download
+          ./build/build.sh MacOSARM > ../build-mac.log 2>&1 || { grep -n -E "error:|ERROR|fatal" ../build-mac.log | tail -60; echo "----- last lines -----"; tail -n 150 ../build-mac.log; exit 1; }
+          tail -n 15 ../build-mac.log
+          ls -la bin lib
+
+      - name: Put the app together
+        run: |
+          set -euo pipefail
+          app="deploy/Fist of Retribution.app"
+          mkdir -p "$app/Contents/MacOS" "$app/Contents/Frameworks" "$app/Contents/Resources/game"
+          cp engine/bin/Ikemen_GO_MacOSARM "$app/Contents/MacOS/FistOfRetribution"
+          cp mac-wrapper/launch.sh "$app/Contents/MacOS/launch.sh"
+          chmod +x "$app/Contents/MacOS/FistOfRetribution" "$app/Contents/MacOS/launch.sh"
+          cp engine/lib/*.dylib "$app/Contents/Frameworks/" 2>/dev/null || true
+          sed "s/FOR_BUILD_NUMBER/${GITHUB_RUN_NUMBER}/" mac-wrapper/Info.plist > "$app/Contents/Info.plist"
+          # icon
+          set_dir=$(mktemp -d)/icon.iconset; mkdir -p "$set_dir"
+          for s in 16 32 128 256 512; do
+            sips -z $s $s mac-wrapper/icon_1024.png --out "$set_dir/icon_${s}x${s}.png" >/dev/null
+            sips -z $((s*2)) $((s*2)) mac-wrapper/icon_1024.png --out "$set_dir/icon_${s}x${s}@2x.png" >/dev/null
+          done
+          iconutil -c icns "$set_dir" -o "$app/Contents/Resources/icon.icns"
+          # the game: engine defaults first, our files on top (same as the Windows build)
+          g="$app/Contents/Resources/game"
+          for d in data external font; do mkdir -p "$g/$d"; cp -R "engine/$d/." "$g/$d/"; done
+          for d in chars data external font sound stages; do mkdir -p "$g/$d"; cp -R "game/$d/." "$g/$d/"; done
+          [ -f "$g/data/system.base.def" ] || cp engine/src/resources/defaultMotif.ini "$g/data/system.base.def"
+          [ -f "$g/external/gamecontrollerdb.txt" ] || curl -fsSL -o "$g/external/gamecontrollerdb.txt" \
+            "https://raw.githubusercontent.com/mdqinc/SDL_GameControllerDB/refs/heads/master/gamecontrollerdb.txt" || true
+          echo "${GITHUB_SHA:0:12}" > "$g/.build"
+          # ad-hoc signature so Apple silicon will run it (not notarised: first open needs "Open Anyway")
+          codesign --force --sign - "$app/Contents/Frameworks/"*.dylib 2>/dev/null || true
+          codesign --force --deep --sign - "$app"
+          codesign --verify --deep --verbose=2 "$app" || true
+          otool -L "$app/Contents/MacOS/FistOfRetribution" | head -30
+          cp "mac-wrapper/How to open on Mac.txt" deploy/
+          cp engine/LICENCE.txt deploy/ENGINE-LICENCE.txt || true
+          ( cd deploy && ditto -c -k --sequesterRsrc --keepParent . ../FistOfRetribution-Mac.zip )
+          ls -la FistOfRetribution-Mac.zip
+
+      - name: Smoke test (starts and stays up)
+        run: |
+          app="deploy/Fist of Retribution.app"
+          "$app/Contents/MacOS/launch.sh" > smoke.log 2>&1 &
+          pid=$!
+          sleep 25
+          if kill -0 $pid 2>/dev/null; then echo "still running after 25s: OK"; kill $pid; else echo "exited early:"; fi
+          tail -n 40 smoke.log || true
+          ls "$HOME/Library/Application Support/FistOfRetribution" || true
+
+      - name: Publish on the Releases page
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          sleep 40
+          gh release view phone-builds -R "$GITHUB_REPOSITORY" >/dev/null 2>&1 || \
+            gh release create phone-builds -R "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "Phone builds (latest)" \
+              --notes "Newest builds of Fist of Retribution: Project Zero. Replaced on every push." || true
+          gh release upload phone-builds FistOfRetribution-Mac.zip --clobber -R "$GITHUB_REPOSITORY"
