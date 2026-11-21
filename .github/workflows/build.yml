@@ -272,10 +272,31 @@ jobs:
           vulkan-components: Vulkan-Headers, Vulkan-Loader
           vulkan-use-cache: true
 
-      - name: Host libraries
+      - name: Host tools
         run: |
           export HOMEBREW_NO_ANALYTICS=1 HOMEBREW_NO_AUTO_UPDATE=1
-          brew install --quiet pkg-config git nasm libxmp sdl2 molten-vk || brew install --quiet pkg-config git nasm libxmp sdl2 molten-vk
+          brew install --quiet pkg-config git nasm cmake ninja molten-vk || brew install --quiet pkg-config git nasm cmake ninja molten-vk
+
+      - name: Build SDL2 and libxmp for macOS 13+ (Homebrew's copies need macOS 15)
+        env:
+          MACOSX_DEPLOYMENT_TARGET: "13.0"
+        run: |
+          set -euo pipefail
+          P="$GITHUB_WORKSPACE/macdeps"
+          git clone -q --depth 1 -b release-2.32.10 https://github.com/libsdl-org/SDL.git sdl2-src
+          cmake -S sdl2-src -B sdl2-src/b -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$P" \
+            -DCMAKE_INSTALL_LIBDIR=lib -DCMAKE_OSX_ARCHITECTURES=arm64 -DCMAKE_OSX_DEPLOYMENT_TARGET=13.0 \
+            -DCMAKE_INSTALL_NAME_DIR=@rpath -DSDL_SHARED=ON -DSDL_STATIC=OFF -DSDL_TEST=OFF > sdl2.log
+          cmake --build sdl2-src/b --parallel > /dev/null && cmake --install sdl2-src/b > /dev/null
+          git clone -q --depth 1 -b libxmp-4.6.3 https://github.com/libxmp/libxmp.git xmp-src
+          cmake -S xmp-src -B xmp-src/b -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$P" \
+            -DCMAKE_INSTALL_LIBDIR=lib -DCMAKE_OSX_ARCHITECTURES=arm64 -DCMAKE_OSX_DEPLOYMENT_TARGET=13.0 \
+            -DCMAKE_INSTALL_NAME_DIR=@rpath -DBUILD_SHARED=ON -DBUILD_STATIC=OFF -DBUILD_TESTING=OFF > xmp.log
+          cmake --build xmp-src/b --parallel > /dev/null && cmake --install xmp-src/b > /dev/null
+          ls -la "$P/lib"
+          echo "PKG_CONFIG_PATH=$P/lib/pkgconfig" >> "$GITHUB_ENV"
+          # keep Homebrew's own SDL out of the way
+          brew unlink sdl2 sdl2-compat sdl3 libxmp 2>/dev/null || true
 
       - name: Build the engine (Apple silicon)
         env:
@@ -328,15 +349,34 @@ jobs:
           ( cd mac-deploy && ditto -c -k --sequesterRsrc --keepParent FistOfRetribution ../FistOfRetribution-Mac.zip )
           ls -la FistOfRetribution-Mac.zip
 
-      - name: Smoke test (starts and stays up)
+      - name: Check the app needs nothing from Homebrew and runs on macOS 13+
+        run: |
+          set -euo pipefail
+          app="mac-deploy/FistOfRetribution/Fist of Retribution.app"
+          bad=0
+          for f in "$app/Contents/MacOS/FistOfRetribution" "$app/Contents/Frameworks/"*.dylib; do
+            [ -L "$f" ] && continue
+            minos=$(otool -l "$f" | awk '/LC_BUILD_VERSION/{b=1} b&&/minos/{print $2; exit}')
+            deps=$(otool -L "$f" | tail -n +2 | awk '{print $1}' | grep -E "^/opt/homebrew|^/usr/local" | grep -v "$(basename "$f")" || true)
+            echo "$(basename "$f"): minos ${minos:-?} ${deps:+DEPS: $deps}"
+            if [ -n "$deps" ]; then bad=1; fi
+            case "$minos" in 14*|15*|16*|26*) bad=1;; esac
+          done
+          [ $bad = 0 ] || { echo "app depends on Homebrew or needs a newer macOS"; exit 1; }
+
+      - name: Smoke test with Homebrew hidden (starts and stays up)
         run: |
           app="mac-deploy/FistOfRetribution/Fist of Retribution.app"
+          sudo mv /opt/homebrew/opt /opt/homebrew/opt.off
+          sudo mv /opt/homebrew/lib /opt/homebrew/lib.off
           "$app/Contents/MacOS/launch.sh" > smoke.log 2>&1 &
           pid=$!
           sleep 25
-          if kill -0 $pid 2>/dev/null; then echo "still running after 25s: OK"; kill $pid; else echo "exited early:"; fi
-          tail -n 40 smoke.log || true
-          ls "$HOME/Library/Application Support/FistOfRetribution" || true
+          ok=0; if kill -0 $pid 2>/dev/null; then echo "still running after 25s: OK"; ok=1; pkill -f FistOfRetribution || true; else echo "exited early"; fi
+          sudo mv /opt/homebrew/opt.off /opt/homebrew/opt
+          sudo mv /opt/homebrew/lib.off /opt/homebrew/lib
+          cat "$HOME/Library/Application Support/FistOfRetribution/last_run.log" || true
+          [ $ok = 1 ]
 
       - name: Publish on the Releases page
         env:
