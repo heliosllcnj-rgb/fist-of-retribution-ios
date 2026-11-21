@@ -296,7 +296,7 @@ jobs:
       - name: Put the app together
         run: |
           set -euo pipefail
-          app="deploy/Fist of Retribution.app"
+          app="mac-deploy/FistOfRetribution/Fist of Retribution.app"
           mkdir -p "$app/Contents/MacOS" "$app/Contents/Frameworks" "$app/Contents/Resources/game"
           cp engine/bin/Ikemen_GO_MacOSARM "$app/Contents/MacOS/FistOfRetribution"
           cp mac-wrapper/launch.sh "$app/Contents/MacOS/launch.sh"
@@ -323,14 +323,14 @@ jobs:
           codesign --force --deep --sign - "$app"
           codesign --verify --deep --verbose=2 "$app" || true
           otool -L "$app/Contents/MacOS/FistOfRetribution" | head -30
-          cp "mac-wrapper/How to open on Mac.txt" deploy/
-          cp engine/LICENCE.txt deploy/ENGINE-LICENCE.txt || true
-          ( cd deploy && ditto -c -k --sequesterRsrc --keepParent . ../FistOfRetribution-Mac.zip )
+          cp "mac-wrapper/How to open on Mac.txt" mac-deploy/FistOfRetribution/
+          cp engine/LICENCE.txt mac-deploy/FistOfRetribution/ENGINE-LICENCE.txt || true
+          ( cd mac-deploy && ditto -c -k --sequesterRsrc --keepParent FistOfRetribution ../FistOfRetribution-Mac.zip )
           ls -la FistOfRetribution-Mac.zip
 
       - name: Smoke test (starts and stays up)
         run: |
-          app="deploy/Fist of Retribution.app"
+          app="mac-deploy/FistOfRetribution/Fist of Retribution.app"
           "$app/Contents/MacOS/launch.sh" > smoke.log 2>&1 &
           pid=$!
           sleep 25
