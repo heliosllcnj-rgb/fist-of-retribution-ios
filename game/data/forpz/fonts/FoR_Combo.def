@@ -1,0 +1,12 @@
+; FoR_Combo: original Fist of Retribution font (made in ChatGPT, built by fonts/mkfont.py)
+[FNT v2]
+fntversion = 2,00
+name = "FoR_Combo"
+
+[Def]
+Type = bitmap
+BankType = palette
+Size = 26,58
+Spacing = -10,4
+Offset = 0,0
+File = FoR_Combo.sff

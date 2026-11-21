@@ -589,10 +589,11 @@ trigger3 = Map(harmony) > 0 && statetype != A && movetype = A && ((stateno >= 20
 
 [State -1, Air Flashstep (CPU)]
 type = ChangeState
-value = ifelse(Random < 400, 1252, 1251)
+value = 1252
 triggerall = AILevel > 0 && statetype = A && ctrl && Pos Y < -40 && Vel Y > -2
 triggerall = P2BodyDist X > 15 && P2BodyDist X < 100 && P2StateType != A && P2StateType != L
 trigger1 = Random < AILevel * 4
+trigger2 = Map(harmony) > 0 && statetype != A && movetype = A && ((stateno >= 200 && stateno < 500) || (movecontact && stateno >= 1000 && stateno < 1600 && floor(stateno / 100) != 12))
 
 [State -1, Flashstep EX]
 type = ChangeState

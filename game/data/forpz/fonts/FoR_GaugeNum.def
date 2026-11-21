@@ -1,0 +1,12 @@
+; FoR_GaugeNum: original Fist of Retribution font (made in ChatGPT, built by fonts/mkfont.py)
+[FNT v2]
+fntversion = 2,00
+name = "FoR_GaugeNum"
+
+[Def]
+Type = bitmap
+BankType = palette
+Size = 10,22
+Spacing = -3,2
+Offset = 0,0
+File = FoR_GaugeNum.sff
