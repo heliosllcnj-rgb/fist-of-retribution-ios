@@ -597,13 +597,13 @@ ignorehitpause = 1
 
 [State -2, Super finish armed]
 type = MapSet
-trigger1 = RoundState = 2 && (stateno = 3000 || stateno = 3100 || stateno = 3101 || NumProjID(3000) > 0)
+trigger1 = RoundState = 2 && (stateno = 3000 || stateno = 3100 || stateno = 3101 || (stateno = [3300, 3303]) || NumProjID(3000) > 0)
 map = "sfin"
 value = 20
 
 [State -2, Super finish window]
 type = MapAdd
-trigger1 = RoundState = 2 && Map(sfin) > 0 && !(stateno = 3000 || stateno = 3100 || stateno = 3101 || NumProjID(3000) > 0)
+trigger1 = RoundState = 2 && Map(sfin) > 0 && !(stateno = 3000 || stateno = 3100 || stateno = 3101 || (stateno = [3300, 3303]) || NumProjID(3000) > 0)
 map = "sfin"
 value = -1
 
@@ -9733,4 +9733,703 @@ type = ChangeState
 trigger1 = AnimTime = 0
 value = 0
 ctrl = 1
+
+;===========================================================================
+; Fist of Retribution (desperation super): qcb hcf + 2 punches, any Super Art, full gauge, life under 30%.
+; Spends the whole gauge. Freeze (charge) 33f, burst 12f, sprint up to 22f, thrust on frame 4 of 3301.
+[Statedef 3300]
+type = S
+movetype = A
+physics = S
+anim = 3300
+ctrl = 0
+velset = 0, 0
+juggle = 0
+
+[State 3300, Spend the gauge]
+type = PowerSet
+trigger1 = Time = 0
+value = 0
+
+[State 3300, Super freeze]
+type = SuperPause
+trigger1 = Time = 0
+time = 33
+movetime = 33
+darken = 1
+anim = -1
+sound = S3, 0
+p2defmul = 1
+unhittable = 1
+
+[State 3300, Desperation sky]
+type = BGPalFX
+trigger1 = Time = 0
+time = 45
+mul = 170, 90, 90
+sinadd = 30, 10, 10, 12
+
+[State 3300, Freeze flash]
+type = PalFX
+trigger1 = Time = 0
+time = 10
+add = 40, 70, 120
+sinadd = -40, -70, -120, 10
+ignorehitpause = 1
+
+[State 3300, Freeze burst]
+type = Explod
+trigger1 = Time = 0
+anim = 6020
+postype = p1
+pos = 14, -52
+scale = .45, .45
+sprpriority = 6
+ownpal = 1
+supermovetime = 33
+bindtime = -1
+removetime = -2
+ignorehitpause = 1
+
+[State 3300, Charge crackle 1]
+type = PlaySnd
+trigger1 = Time = 6
+value = S1, 0
+channel = 3
+
+[State 3300, Charge crackle 2]
+type = PlaySnd
+trigger1 = Time = 20
+value = S1, 0
+channel = 3
+
+[State 3300, Shake]
+type = EnvShake
+trigger1 = Time = 25
+time = 10
+ampl = 3
+freq = 120
+
+[State 3300, Effort]
+type = PlaySnd
+trigger1 = Time = 33
+value = S12, Random % 5
+channel = 0
+
+[State 3300, Invincible]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+[State 3300, Burst]
+type = VelSet
+trigger1 = Anim = 3300 && Time >= 33
+x = 3 + (Time - 33) * 0.500
+
+[State 3300, Sprint anim]
+type = ChangeAnim
+trigger1 = Anim = 3300 && AnimTime = 0
+value = 3302
+
+[State 3300, Sprint]
+type = VelSet
+trigger1 = Anim = 3302
+x = 11
+
+[State 3300, Trail]
+type = AfterImage
+trigger1 = Anim = 3302 && AnimElemTime(1) = 0
+time = 28
+length = 7
+timegap = 1
+framegap = 2
+trans = add
+paladd = 10, 30, 70
+palmul = .55, .65, .8
+
+[State 3300, Sprint crackle]
+type = PlaySnd
+trigger1 = Anim = 3302 && AnimElemTime(1) = 0
+value = S1, 0
+channel = 3
+
+[State 3300, Thrust]
+type = ChangeState
+trigger1 = Anim = 3302 && P2BodyDist X < 40
+trigger2 = Anim = 3302 && AnimElemTime(1) >= 22
+trigger3 = Anim = 3302 && BackEdgeBodyDist < 0
+value = 3301
+
+;---------------------------------------------------------------------------
+; Fist of Retribution: the thrust
+[Statedef 3301]
+type = S
+movetype = A
+physics = S
+anim = 3301
+ctrl = 0
+juggle = 0
+
+[State 3301, Plant]
+type = VelSet
+trigger1 = Time < 4
+x = 11 * (4 - Time) / 5.0
+
+[State 3301, Stop]
+type = VelSet
+trigger1 = Time >= 4
+x = 0
+
+[State 3301, Invincible]
+type = NotHitBy
+trigger1 = Time <= 13
+value = SCA
+time = 1
+
+[State 3301, Voice]
+type = PlaySnd
+trigger1 = Time = 0
+value = S12, Random % 5
+channel = 0
+
+[State 3301, Blast sound]
+type = PlaySnd
+trigger1 = Time = 4
+value = S1, 1
+channel = 3
+
+[State 3301, Thrust]
+type = HitDef
+trigger1 = Time = 4
+attr = S, HA
+damage = 70, 14
+animtype = Hard
+guardflag = MA
+hitflag = MAF
+priority = 7, Hit
+pausetime = 14, 16
+sparkno = -1
+guard.sparkno = 40
+hitsound = 5, 4
+guardsound = 6, 0
+p2stateno = 3390
+guard.pausetime = 14, 16
+guard.slidetime = 18
+guard.hittime = 20
+guard.velocity = -9
+ground.type = High
+ground.hittime = 30
+fall = 0
+
+[State 3301, Impact burst]
+type = Explod
+trigger1 = MoveHit = 1
+anim = 6020
+postype = p1
+pos = 98.67, -54.33
+scale = .5, .5
+sprpriority = 6
+ownpal = 1
+bindtime = 1
+removetime = -2
+ignorehitpause = 1
+pausemovetime = 14
+
+[State 3301, Impact flash]
+type = PalFX
+trigger1 = MoveHit = 1
+time = 16
+add = 70, 90, 150
+sinadd = -70, -90, -150, 16
+ignorehitpause = 1
+
+[State 3301, Impact shake]
+type = EnvShake
+trigger1 = MoveHit = 1
+time = 14
+ampl = 6
+freq = 100
+ignorehitpause = 1
+
+[State 3301, Drill]
+type = ChangeState
+trigger1 = MoveHit
+value = 3303
+
+[State 3301, End]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Fist of Retribution: the lightning tears through the opponent (only after the thrust hits)
+[Statedef 3303]
+type = S
+movetype = A
+physics = N
+anim = 3303
+ctrl = 0
+velset = 0, 0
+juggle = 0
+
+[State 3303, Invincible]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+[State 3303, Sky]
+type = BGPalFX
+trigger1 = Time = 0
+time = 59
+mul = 110, 120, 170
+sinadd = 30, 40, 70, 6
+
+[State 3303, Drill hit 1]
+type = HitDef
+trigger1 = Time = 3
+attr = S, HA
+damage = 30, 0
+animtype = Light
+hitflag = MAFD
+priority = 7, Hit
+pausetime = 3, 5
+sparkno = -1
+hitsound = 5, 2
+p2stateno = 3390
+ground.type = High
+ground.hittime = 30
+palfx.time = 5
+palfx.add = 40, 70, 140
+
+[State 3303, Drill spark 1]
+type = Explod
+trigger1 = Time = 3
+anim = 6020
+postype = p1
+pos = 142.33, -60.67
+scale = .22, .22
+sprpriority = 6
+ownpal = 1
+bindtime = 1
+removetime = -2
+
+[State 3303, Drill crackle 1]
+type = PlaySnd
+trigger1 = Time = 3
+value = S1, 0
+channel = 3
+
+[State 3303, Drill shake 1]
+type = EnvShake
+trigger1 = Time = 3
+time = 4
+ampl = 2
+freq = 140
+
+[State 3303, Drill hit 2]
+type = HitDef
+trigger1 = Time = 9
+attr = S, HA
+damage = 30, 0
+animtype = Medium
+hitflag = MAFD
+priority = 7, Hit
+pausetime = 3, 5
+sparkno = -1
+hitsound = 5, 3
+p2stateno = 3390
+ground.type = High
+ground.hittime = 30
+palfx.time = 5
+palfx.add = 40, 70, 140
+
+[State 3303, Drill spark 2]
+type = Explod
+trigger1 = Time = 9
+anim = 6020
+postype = p1
+pos = 151.33, -53.67
+scale = .22, .22
+sprpriority = 6
+ownpal = 1
+bindtime = 1
+removetime = -2
+
+[State 3303, Drill crackle 2]
+type = PlaySnd
+trigger1 = Time = 9
+value = S1, 0
+channel = 3
+
+[State 3303, Drill shake 2]
+type = EnvShake
+trigger1 = Time = 9
+time = 4
+ampl = 2
+freq = 140
+
+[State 3303, Drill hit 3]
+type = HitDef
+trigger1 = Time = 15
+attr = S, HA
+damage = 30, 0
+animtype = Light
+hitflag = MAFD
+priority = 7, Hit
+pausetime = 3, 5
+sparkno = -1
+hitsound = 5, 2
+p2stateno = 3390
+ground.type = High
+ground.hittime = 30
+palfx.time = 5
+palfx.add = 40, 70, 140
+
+[State 3303, Drill spark 3]
+type = Explod
+trigger1 = Time = 15
+anim = 6020
+postype = p1
+pos = 160.33, -57.67
+scale = .22, .22
+sprpriority = 6
+ownpal = 1
+bindtime = 1
+removetime = -2
+
+[State 3303, Drill crackle 3]
+type = PlaySnd
+trigger1 = Time = 15
+value = S1, 0
+channel = 3
+
+[State 3303, Drill shake 3]
+type = EnvShake
+trigger1 = Time = 15
+time = 4
+ampl = 2
+freq = 140
+
+[State 3303, Drill hit 4]
+type = HitDef
+trigger1 = Time = 21
+attr = S, HA
+damage = 30, 0
+animtype = Medium
+hitflag = MAFD
+priority = 7, Hit
+pausetime = 3, 5
+sparkno = -1
+hitsound = 5, 3
+p2stateno = 3390
+ground.type = High
+ground.hittime = 30
+palfx.time = 5
+palfx.add = 40, 70, 140
+
+[State 3303, Drill spark 4]
+type = Explod
+trigger1 = Time = 21
+anim = 6020
+postype = p1
+pos = 142.33, -50.67
+scale = .22, .22
+sprpriority = 6
+ownpal = 1
+bindtime = 1
+removetime = -2
+
+[State 3303, Drill crackle 4]
+type = PlaySnd
+trigger1 = Time = 21
+value = S1, 0
+channel = 3
+
+[State 3303, Drill shake 4]
+type = EnvShake
+trigger1 = Time = 21
+time = 4
+ampl = 2
+freq = 140
+
+[State 3303, Drill hit 5]
+type = HitDef
+trigger1 = Time = 27
+attr = S, HA
+damage = 30, 0
+animtype = Light
+hitflag = MAFD
+priority = 7, Hit
+pausetime = 3, 5
+sparkno = -1
+hitsound = 5, 2
+p2stateno = 3390
+ground.type = High
+ground.hittime = 30
+palfx.time = 5
+palfx.add = 40, 70, 140
+
+[State 3303, Drill spark 5]
+type = Explod
+trigger1 = Time = 27
+anim = 6020
+postype = p1
+pos = 151.33, -54.67
+scale = .22, .22
+sprpriority = 6
+ownpal = 1
+bindtime = 1
+removetime = -2
+
+[State 3303, Drill crackle 5]
+type = PlaySnd
+trigger1 = Time = 27
+value = S1, 0
+channel = 3
+
+[State 3303, Drill shake 5]
+type = EnvShake
+trigger1 = Time = 27
+time = 4
+ampl = 2
+freq = 140
+
+[State 3303, Drill hit 6]
+type = HitDef
+trigger1 = Time = 33
+attr = S, HA
+damage = 30, 0
+animtype = Medium
+hitflag = MAFD
+priority = 7, Hit
+pausetime = 3, 5
+sparkno = -1
+hitsound = 5, 3
+p2stateno = 3390
+ground.type = High
+ground.hittime = 30
+palfx.time = 5
+palfx.add = 40, 70, 140
+
+[State 3303, Drill spark 6]
+type = Explod
+trigger1 = Time = 33
+anim = 6020
+postype = p1
+pos = 160.33, -58.67
+scale = .22, .22
+sprpriority = 6
+ownpal = 1
+bindtime = 1
+removetime = -2
+
+[State 3303, Drill crackle 6]
+type = PlaySnd
+trigger1 = Time = 33
+value = S1, 0
+channel = 3
+
+[State 3303, Drill shake 6]
+type = EnvShake
+trigger1 = Time = 33
+time = 4
+ampl = 2
+freq = 140
+
+[State 3303, Drill hit 7]
+type = HitDef
+trigger1 = Time = 39
+attr = S, HA
+damage = 30, 0
+animtype = Light
+hitflag = MAFD
+priority = 7, Hit
+pausetime = 3, 5
+sparkno = -1
+hitsound = 5, 2
+p2stateno = 3390
+ground.type = High
+ground.hittime = 30
+palfx.time = 5
+palfx.add = 40, 70, 140
+
+[State 3303, Drill spark 7]
+type = Explod
+trigger1 = Time = 39
+anim = 6020
+postype = p1
+pos = 142.33, -51.67
+scale = .22, .22
+sprpriority = 6
+ownpal = 1
+bindtime = 1
+removetime = -2
+
+[State 3303, Drill crackle 7]
+type = PlaySnd
+trigger1 = Time = 39
+value = S1, 0
+channel = 3
+
+[State 3303, Drill shake 7]
+type = EnvShake
+trigger1 = Time = 39
+time = 4
+ampl = 2
+freq = 140
+
+[State 3303, Drill hit 8]
+type = HitDef
+trigger1 = Time = 45
+attr = S, HA
+damage = 30, 0
+animtype = Medium
+hitflag = MAFD
+priority = 7, Hit
+pausetime = 3, 5
+sparkno = -1
+hitsound = 5, 3
+p2stateno = 3390
+ground.type = High
+ground.hittime = 30
+palfx.time = 5
+palfx.add = 40, 70, 140
+
+[State 3303, Drill spark 8]
+type = Explod
+trigger1 = Time = 45
+anim = 6020
+postype = p1
+pos = 151.33, -55.67
+scale = .22, .22
+sprpriority = 6
+ownpal = 1
+bindtime = 1
+removetime = -2
+
+[State 3303, Drill crackle 8]
+type = PlaySnd
+trigger1 = Time = 45
+value = S1, 0
+channel = 3
+
+[State 3303, Drill shake 8]
+type = EnvShake
+trigger1 = Time = 45
+time = 4
+ampl = 2
+freq = 140
+
+[State 3303, Final blast]
+type = HitDef
+trigger1 = Time = 53
+attr = S, HA
+damage = 140, 0
+animtype = Hard
+hitflag = MAFD
+priority = 7, Hit
+pausetime = 16, 20
+sparkno = -1
+hitsound = 5, 4
+ground.type = High
+ground.velocity = -7, -6.5
+air.velocity = -7, -6.5
+ground.hittime = 20
+fall = 1
+fall.recover = 0
+air.fall = 1
+envshake.time = 22
+envshake.ampl = 8
+palfx.time = 30
+palfx.add = 0, 40, 100
+palfx.sinadd = 70, 100, 160, 6
+palfx.mul = 220, 230, 256
+
+[State 3303, Final burst]
+type = Explod
+trigger1 = Time = 53
+anim = 6020
+postype = p1
+pos = 154.33, -55.67
+scale = .7, .7
+sprpriority = 6
+ownpal = 1
+bindtime = 1
+removetime = -2
+
+[State 3303, Final bolt]
+type = Explod
+trigger1 = Time = 53
+anim = 6002
+postype = p1
+pos = 140.33, -55.67
+scale = .4, .4
+sprpriority = 5
+ownpal = 1
+bindtime = 1
+removetime = -2
+
+[State 3303, Final sound]
+type = PlaySnd
+trigger1 = Time = 53
+value = S1, 1
+channel = 3
+
+[State 3303, Final sky]
+type = BGPalFX
+trigger1 = Time = 53
+time = 20
+mul = 140, 150, 200
+sinadd = 60, 70, 110, 20
+
+[State 3303, End]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Fist of Retribution: the opponent held on the lightning (custom state). Each hit puts them back here; the final
+; blast (or a KO, or the drill ending early) sends them into a normal knockdown.
+[Statedef 3390]
+type = S
+movetype = H
+physics = N
+ctrl = 0
+velset = 0, 0
+
+[State 3390, Anim]
+type = ChangeAnim
+trigger1 = Time = 0
+value = ifelse(Random < 500 && SelfAnimExist(5010), 5010, 5000)
+
+[State 3390, Ground]
+type = PosSet
+trigger1 = 1
+y = 0
+
+[State 3390, Push]
+type = VelSet
+trigger1 = Time < 3
+x = -1.2
+
+[State 3390, Hold]
+type = VelSet
+trigger1 = Time >= 3
+x = 0
+
+[State 3390, Out]
+type = HitFallSet
+trigger1 = Time >= 30 || !Alive
+value = 1
+xvel = -3
+yvel = -5
+
+[State 3390, Fall]
+type = SelfState
+trigger1 = Time >= 30 || !Alive
+value = 5050
 

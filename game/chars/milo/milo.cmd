@@ -69,6 +69,21 @@ command = ~B, DB, D, DF, F, z
 time = 24
 
 [Command]
+name = "RETRIBUTION"
+command = ~D, DB, B, DB, D, DF, F, x+y
+time = 40
+
+[Command]
+name = "RETRIBUTION"
+command = ~D, DB, B, DB, D, DF, F, x+z
+time = 40
+
+[Command]
+name = "RETRIBUTION"
+command = ~D, DB, B, DB, D, DF, F, y+z
+time = 40
+
+[Command]
 name = "SA_QCF2_P"
 command = ~D, DF, F, D, DF, F, x
 time = 30
@@ -340,6 +355,30 @@ time = 1
 
 ;===========================================================================
 [Statedef -1]
+
+[State -1, Fist of Retribution (desperation super)]
+type = ChangeState
+value = 3300
+triggerall = command = "RETRIBUTION"
+triggerall = PowerMax > 0 && Power >= PowerMax
+triggerall = Life * 10 < LifeMax * 3
+triggerall = statetype != A
+triggerall = AILevel = 0
+trigger1 = ctrl
+trigger2 = movecontact
+trigger2 = stateno = 200 || stateno = 210 || stateno = 230 || stateno = 400 || stateno = 410 || stateno = 430 || stateno = 440
+trigger3 = movecontact
+trigger3 = stateno = [1000, 1003] || stateno = [1100, 1103] || stateno = [1200, 1203] || stateno = [1300, 1303] || stateno = [1400, 1403]
+
+[State -1, Fist of Retribution (CPU)]
+type = ChangeState
+value = 3300
+triggerall = AILevel > 0 && RoundState = 2
+triggerall = PowerMax > 0 && Power >= PowerMax
+triggerall = Life * 10 < LifeMax * 3
+triggerall = statetype != A && ctrl
+triggerall = P2StateType != L && P2MoveType != H
+trigger1 = P2BodyDist X < 150 && Random < 6 + AILevel * 3
 
 [State -1, SA I Thunder God's Judgment]
 type = ChangeState

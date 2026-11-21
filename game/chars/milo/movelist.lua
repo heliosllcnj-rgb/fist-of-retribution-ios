@@ -47,6 +47,23 @@ return {
 					kind = "Super",
 					note = "Only when SA III was chosen at select",
 					scale = 0.5,
+				}, {
+					name = "Fist of Retribution",
+					cmd = "_QDB_HCF^P_+^P",
+					desc = {"Milo's own desperation move, whatever Super Art was", "chosen. Lightning gathers in his hand, he sprints across", "the screen and drives it through the opponent; on a hit", "the lightning tears through them, about 45% of a life", "bar. Invincible until the thrust ends; slow to recover", "if blocked or missed. Spends the whole gauge."},
+					anim = "0,0, 0,0, 10\n3300,0, 0,0, 3\n3300,1, 0,0, 3\n3300,2, 0,0, 3\n3300,3, 0,0, 3\n3300,4, 0,0, 3\n3300,5, 0,0, 3\n3300,6, 0,0, 3\n3300,7, 0,0, 3\n3300,8, 0,0, 3\n3300,9, 0,0, 3\n3300,10, 0,0, 3\n3300,11, 0,0, 2\n3300,12, 0,0, 2\n3300,13, 0,0, 2\n3300,14, 0,0, 2\n3300,15, 0,0, 2\n3300,16, 0,0, 2\n3301,0, 0,0, 2\n3301,1, 0,0, 2\n3301,2, 0,0, 3\n3301,3, 0,0, 3\n3301,4, 0,0, 3\n3301,5, 0,0, 3\n3301,6, 0,0, 3\n3301,7, 0,0, 3\n3301,8, 0,0, 3\n3301,9, 0,0, 3\n3301,10, 0,0, 3\n3301,11, 0,0, 4\n3301,12, 0,0, 4\n3301,13, 0,0, 4\n3301,14, 0,0, 4\n3301,15, 0,0, 4\n3301,16, 0,0, 4\n3303,0, 0,0, 3\n3303,1, 0,0, 3\n3303,2, 0,0, 3\n3303,3, 0,0, 3\n3303,4, 0,0, 3\n3303,5, 0,0, 3\n3303,6, 0,0, 3\n3303,7, 0,0, 3\n3303,8, 0,0, 3\n3303,9, 0,0, 3\n3303,10, 0,0, 3\n3303,11, 0,0, 3\n3303,12, 0,0, 3\n3303,13, 0,0, 3\n3303,14, 0,0, 3\n3303,15, 0,0, 3\n3303,16, 0,0, 3\n3303,17, 0,0, 3\n3303,18, 0,0, 3\n3303,19, 0,0, 3\n3303,20, 0,0, 3\n3303,21, 0,0, 3\n3303,22, 0,0, 4\n3303,23, 0,0, 4\n3303,24, 0,0, 4\n3303,25, 0,0, 4\n3303,26, 0,0, 4\n3303,27, 0,0, 4\n3303,27, 0,0, 34",
+					cols = {{
+							label = "",
+							startup = 5,
+							active = 9,
+							recovery = 42,
+							damage = 70,
+							hits = 1,
+							total = 55,
+						}},
+					kind = "Super",
+					note = "Gauge full and life under 30%",
+					scale = 0.5,
 				}},
 		}, {
 			name = "SPECIAL MOVES",
