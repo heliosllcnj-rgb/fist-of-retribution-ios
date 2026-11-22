@@ -1,0 +1,161 @@
+;Fist of Retribution: Project Zero - Club Flow (Andre's stage)
+;Painted in ChatGPT in the style of the Twilight Rooftop; the lights are made by stage_andre/build_stage.py.
+[Info]
+name = "Club Flow"
+displayname = "Club Flow"
+versiondate = 11,22,2026
+mugenversion = 1.0
+author = "Scott Balcom / Claude"
+
+[Camera]
+startx = 0
+starty = 0
+boundleft = -318
+boundright = 318
+boundhigh = -40
+boundlow = 0
+verticalfollow = .2
+floortension = 0
+tension = 60
+startzoom = 1
+zoomout = 1
+zoomin = 1
+cuthigh = 0
+cutlow = 0
+
+[PlayerInfo]
+p1startx = -70
+p1starty = 0
+p1facing = 1
+p2startx = 70
+p2starty = 0
+p2facing = -1
+leftbound = -1000
+rightbound = 1000
+
+[Bound]
+screenleft = 72
+screenright = 72
+
+[StageInfo]
+zoffset = 660
+autoturn = 1
+resetBG = 1
+localcoord = 1280, 720
+xscale = 1
+yscale = 1
+
+[Shadow]
+intensity = 70
+color = 30,0,50
+yscale = .22
+fade.range = 0,0
+
+[Reflection]
+intensity = 46
+
+[Music]
+bgmusic = sound/Andre_Stage.mp3   ; "Cape and Cowbell"
+bgmvolume = 100
+
+[BGdef]
+spr = clubflow.sff
+debugbg = 0
+
+[BG Club]
+type = normal
+spriteno = 1, 0
+layerno = 0
+start = 0, -40
+delta = 1, 1
+mask = 0
+
+[BG Wall spots]
+type = anim
+actionno = 20
+layerno = 0
+start = 0, -40
+delta = 1, 1
+trans = add
+
+[BG Ball glints]
+type = anim
+actionno = 21
+layerno = 0
+start = 4, 72
+delta = 1, 1
+trans = add
+
+[BG Neon]
+type = anim
+actionno = 30
+layerno = 0
+start = -218, 200
+delta = 1, 1
+trans = add
+
+[BG Stage lights]
+type = anim
+actionno = 31
+layerno = 0
+start = -658, -40
+delta = 1, 1
+trans = add
+
+[BG Dance floor]
+type = anim
+actionno = 10
+layerno = 0
+start = 0, 500
+delta = 1, 1
+trans = add
+
+[Begin Action 10]
+10,0, 0,0, 7, , A
+10,1, 0,0, 8, , A
+-1,-1, 0,0, 15
+10,2, 0,0, 7, , A
+10,3, 0,0, 8, , A
+-1,-1, 0,0, 14
+10,4, 0,0, 7, , A
+10,5, 0,0, 8, , A
+-1,-1, 0,0, 15
+10,0, 0,0, 7, , A
+10,1, 0,0, 8, , A
+-1,-1, 0,0, 14
+10,2, 0,0, 7, , A
+10,3, 0,0, 8, , A
+-1,-1, 0,0, 15
+10,4, 0,0, 7, , A
+10,5, 0,0, 8, , A
+-1,-1, 0,0, 14
+
+[Begin Action 20]
+20,0, 0,0, 6, , A
+20,1, 0,0, 6, , A
+20,2, 0,0, 6, , A
+20,3, 0,0, 6, , A
+20,4, 0,0, 6, , A
+20,5, 0,0, 6, , A
+20,6, 0,0, 6, , A
+20,7, 0,0, 6, , A
+
+[Begin Action 21]
+21,0, 0,0, 5, , A
+21,1, 0,0, 5, , A
+21,2, 0,0, 5, , A
+21,3, 0,0, 5, , A
+21,4, 0,0, 5, , A
+21,5, 0,0, 5, , A
+
+[Begin Action 30]
+30,0, 0,0, 6, , A
+30,1, 0,0, 8, , A
+-1,-1, 0,0, 16
+30,0, 0,0, 6, , A
+30,1, 0,0, 8, , A
+-1,-1, 0,0, 15
+
+[Begin Action 31]
+31,0, 0,0, 59, , A
+-1,-1, 0,0, 59

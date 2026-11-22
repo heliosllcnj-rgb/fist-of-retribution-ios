@@ -1,0 +1,51 @@
+<#f0f000>:System:</>
+High / mid parry						_F <#bebebe>(tap)</>
+Low / mid parry						_D <#bebebe>(tap)</>
+Air parry							_AIR_F <#bebebe>(tap)</>
+Dash / Back dash						_F_F / _B_B
+Throw / Throw escape					^X_+^A
+Back throw						_B_+^X_+^A
+Universal Overhead					^Y_+^B
+Taunt								^Z_+^C
+
+<#f0f000>:Special Moves:</>
+Flowing Current_EX							_QDF^P
+Rising Rhythm_EX							_F_D_DF^K
+Dancing Tempest_EX						_QDF^K
+Slipstream_EX							_QDB^K
+<#bebebe>LK back, MK on the spot, HK through the opponent. Throws still catch him.</>
+Rhythm Break_EX							_QDB^P
+<#bebebe>Counter: LP vs standing/jumping strikes, MP vs crouching, HP both.</>
+Flow State_EX							_B_DB_D_DF_F^P
+<#bebebe>Hands down: sways strikes and swats projectiles. Throws beat it.</>
+
+<#f0f000>:Super Art I:</>
+Sonic Dominion <#bebebe>(1000)</>				_QDF_QDF^P
+
+<#f0f000>:Super Art II:</>
+Champion's Symphony <#bebebe>(1000)</>			_QDF_QDF^K
+
+<#f0f000>:Super Art III:</>
+Absolute Flow <#bebebe>(1000)</>				_QDB_QDB^P
+<#bebebe>8s install: standing = auto-dodge, walking = phase through.</>
+<#bebebe>Vulnerable while attacking/dashing/jumping. Throws still work.</>
+
+<#f0f000>:Normals:</>
+Rhythm Jab						^X
+Champion's Straight						^Y
+Rolling Cross						^Z
+Tempo Tap						^A
+Pivot Kick						^B
+Crescent Heel						^C
+Low Jab						_D^X
+Body Hook						_D^Y
+Rising Palm						_D^Z
+Shin Check						_D^A
+Flow Sweep						_D^B
+Turning Leg Sweep						_D^C
+Air Jab						_AIR^X
+Floating Elbow						_AIR^Y
+Falling Cross						_AIR^Z
+Flick Kick						_AIR^A
+Drifting Knee						_AIR^B
+Flying Heel						_AIR^C

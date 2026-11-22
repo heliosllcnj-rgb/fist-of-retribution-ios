@@ -1,10 +1,11 @@
 ;Fist of Retribution: Project Zero - roster
 [Characters]
 milo, stages/rooftop.def
-;andre, stages/stage0-720.def   ; hidden until his sprites are done
+andre, stages/clubflow.def
 
 [ExtraStages]
 stages/rooftop.def
+stages/clubflow.def
 
 [Options] to customize amount of
  ;   matches per order priority.

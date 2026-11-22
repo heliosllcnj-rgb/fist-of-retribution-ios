@@ -1,0 +1,42 @@
+; Andre Booker - Fist of Retribution: Project Zero (IKEMEN GO prototype)
+[Info]
+name = "Andre Booker"
+displayname = "Andre Booker"
+versiondate = 11,18,2026
+mugenversion = 1.1
+author = "Scott Balcom / Claude (prototype)"
+pal.defaults = 1,2,3,4,5,6
+localcoord = 320,240
+
+[Files]
+cmd = andre.cmd
+cns = andre.cns
+st = andre.cns
+stcommon = common1.cns
+sprite = andre.sff
+anim = andre.air
+sound = andre.snd
+movelist = movelist.dat
+pal1 = andre_default.act
+pal2 = andre_jets.act
+pal3 = andre_nets.act
+pal4 = andre_mets.act
+pal5 = andre_milo.act
+pal6 = andre_devils.act
+pal7 = andre_gold.act
+
+; Colour select as in 3rd Strike: the button that picks the fighter picks the colour.
+; LP MP HP = colours 1-3, LK MK HK = colours 4-6; LP+MK+HP together, or START held with any button, = colour 7.
+[Palette Keymap]
+x = 1
+y = 2
+z = 3
+a = 4
+b = 5
+c = 6
+x2 = 7
+y2 = 7
+z2 = 7
+a2 = 7
+b2 = 7
+c2 = 7
