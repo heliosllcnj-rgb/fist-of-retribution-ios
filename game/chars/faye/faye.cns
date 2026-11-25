@@ -165,36 +165,6 @@ trigger1 = stateno = 5001 || stateno = 5011 || stateno = 151 || stateno = 153
 trigger1 = gethitvar(fall.envshake.time) = 4 && Time >= 1 && Time <= 12
 x = -0.89 * (ifelse(Time = 1, 4, ifelse(Time = 2, 7, ifelse(Time = 3, 9, ifelse(Time = 4, 10, ifelse(Time = 5, 12, ifelse(Time = 6, 9, ifelse(Time = 7, 6, ifelse(Time = 8, 5, ifelse(Time = 9, 4, ifelse(Time = 10, 3, ifelse(Time = 11, 2, ifelse(Time = 12, 1, 0)))))))))))))
 
-[State -2, Veil clock]
-type = VarAdd
-trigger1 = var(30) > 0 && !IsHelper
-v = 30
-value = -1
-
-[State -2, Veil broken]
-type = VarSet
-trigger1 = var(30) > 0 && !IsHelper
-trigger1 = movetype = H || (stateno >= 150 && stateno <= 155) || (movetype = A && !(stateno = [1400, 1403]) && (MoveContact || Time >= 3))
-v = 30
-value = 0
-
-[State -2, Veiled]
-type = Trans
-trigger1 = var(30) > 0 && !IsHelper
-trans = addalpha
-alpha = ifelse(var(31), 14, 40), ifelse(var(31), 242, 216)
-
-[State -2, Mirage image struck]
-type = SelfState
-trigger1 = IsHelper(1550) && movetype = H
-value = 1551
-ignorehitpause = 1
-
-[State -2, Veiled - no shadow]
-type = AssertSpecial
-trigger1 = var(30) > 0 && !IsHelper
-flag = noshadow
-
 ;---------------------------------------------------------------------------
 ; 3rd Strike super gauge (see SA_ARTS in cnsgen.py)
 [State -2, SA default]
@@ -316,24 +286,24 @@ ignorehitpause = 1
 
 [State -2, Gain start class 10]
 type = PowerAdd
-trigger1 = Time = 1 && (stateno = 1000 || stateno = 1001 || stateno = 1002 || stateno = 1003)
+trigger1 = Time = 1 && (stateno = 1000 || stateno = 1001 || stateno = 1002 || stateno = 1003 || stateno = 1700 || stateno = 1703 || stateno = 1710 || stateno = 1713 || stateno = 1720 || stateno = 1723)
 value = floor((3) * 1.2 * 1000 / ifelse(Map(sa) = 2, 128, ifelse(Map(sa) = 3, 80, 112)) + .5)
 
 [State -2, Gain hit class 10]
 type = PowerAdd
-trigger1 = HitCount > var(36) && (stateno = 1000 || stateno = 1001 || stateno = 1002 || stateno = 1003)
+trigger1 = HitCount > var(36) && (stateno = 1000 || stateno = 1001 || stateno = 1002 || stateno = 1003 || stateno = 1700 || stateno = 1703 || stateno = 1710 || stateno = 1713 || stateno = 1720 || stateno = 1723)
 value = floor((ifelse(HitCount = 1, 9, 2) * ifelse(ComboCount <= 1, 32, ifelse(ComboCount >= 16, 1, 32 - (ComboCount - 1) * 2)) / 32.0) * 1.2 * 1000 / ifelse(Map(sa) = 2, 128, ifelse(Map(sa) = 3, 80, 112)) + .5)
 ignorehitpause = 1
 
 [State -2, Gain hit class 10 (defender)]
 type = TargetPowerAdd
-trigger1 = HitCount > var(36) && numtarget && (stateno = 1000 || stateno = 1001 || stateno = 1002 || stateno = 1003)
+trigger1 = HitCount > var(36) && numtarget && (stateno = 1000 || stateno = 1001 || stateno = 1002 || stateno = 1003 || stateno = 1700 || stateno = 1703 || stateno = 1710 || stateno = 1713 || stateno = 1720 || stateno = 1723)
 value = floor(ifelse(HitCount = 1, 9, 2) / 3 * 1.2 * 1000 / ifelse((target, Map(sagl)) > 0, (target, Map(sagl)), 112) + .5)
 ignorehitpause = 1
 
 [State -2, Gain guard class 10]
 type = PowerAdd
-trigger1 = MoveGuarded && var(37) = 0 && (stateno = 1000 || stateno = 1001 || stateno = 1002 || stateno = 1003)
+trigger1 = MoveGuarded && var(37) = 0 && (stateno = 1000 || stateno = 1001 || stateno = 1002 || stateno = 1003 || stateno = 1700 || stateno = 1703 || stateno = 1710 || stateno = 1713 || stateno = 1720 || stateno = 1723)
 value = floor((2) * 1.2 * 1000 / ifelse(Map(sa) = 2, 128, ifelse(Map(sa) = 3, 80, 112)) + .5)
 ignorehitpause = 1
 
@@ -362,24 +332,24 @@ ignorehitpause = 1
 
 [State -2, Gain start class 12]
 type = PowerAdd
-trigger1 = Time = 1 && (stateno = 1200 || stateno = 1201 || stateno = 1202 || stateno = 1203 || stateno = 1400 || stateno = 1401 || stateno = 1402 || stateno = 1403 || stateno = 1500 || stateno = 1501 || stateno = 1502 || stateno = 1503)
+trigger1 = Time = 1 && (stateno = 1200 || stateno = 1201 || stateno = 1202 || stateno = 1203 || stateno = 1220 || stateno = 1221 || stateno = 1400 || stateno = 1401 || stateno = 1402 || stateno = 1403 || stateno = 1500 || stateno = 1501 || stateno = 1502 || stateno = 1503)
 value = floor((3) * 1.2 * 1000 / ifelse(Map(sa) = 2, 128, ifelse(Map(sa) = 3, 80, 112)) + .5)
 
 [State -2, Gain hit class 12]
 type = PowerAdd
-trigger1 = HitCount > var(36) && (stateno = 1200 || stateno = 1201 || stateno = 1202 || stateno = 1203 || stateno = 1400 || stateno = 1401 || stateno = 1402 || stateno = 1403 || stateno = 1500 || stateno = 1501 || stateno = 1502 || stateno = 1503)
+trigger1 = HitCount > var(36) && (stateno = 1200 || stateno = 1201 || stateno = 1202 || stateno = 1203 || stateno = 1220 || stateno = 1221 || stateno = 1400 || stateno = 1401 || stateno = 1402 || stateno = 1403 || stateno = 1500 || stateno = 1501 || stateno = 1502 || stateno = 1503)
 value = floor((ifelse(HitCount = 1, 13, 2) * ifelse(ComboCount <= 1, 32, ifelse(ComboCount >= 16, 1, 32 - (ComboCount - 1) * 2)) / 32.0) * 1.2 * 1000 / ifelse(Map(sa) = 2, 128, ifelse(Map(sa) = 3, 80, 112)) + .5)
 ignorehitpause = 1
 
 [State -2, Gain hit class 12 (defender)]
 type = TargetPowerAdd
-trigger1 = HitCount > var(36) && numtarget && (stateno = 1200 || stateno = 1201 || stateno = 1202 || stateno = 1203 || stateno = 1400 || stateno = 1401 || stateno = 1402 || stateno = 1403 || stateno = 1500 || stateno = 1501 || stateno = 1502 || stateno = 1503)
+trigger1 = HitCount > var(36) && numtarget && (stateno = 1200 || stateno = 1201 || stateno = 1202 || stateno = 1203 || stateno = 1220 || stateno = 1221 || stateno = 1400 || stateno = 1401 || stateno = 1402 || stateno = 1403 || stateno = 1500 || stateno = 1501 || stateno = 1502 || stateno = 1503)
 value = floor(ifelse(HitCount = 1, 13, 2) / 3 * 1.2 * 1000 / ifelse((target, Map(sagl)) > 0, (target, Map(sagl)), 112) + .5)
 ignorehitpause = 1
 
 [State -2, Gain guard class 12]
 type = PowerAdd
-trigger1 = MoveGuarded && var(37) = 0 && (stateno = 1200 || stateno = 1201 || stateno = 1202 || stateno = 1203 || stateno = 1400 || stateno = 1401 || stateno = 1402 || stateno = 1403 || stateno = 1500 || stateno = 1501 || stateno = 1502 || stateno = 1503)
+trigger1 = MoveGuarded && var(37) = 0 && (stateno = 1200 || stateno = 1201 || stateno = 1202 || stateno = 1203 || stateno = 1220 || stateno = 1221 || stateno = 1400 || stateno = 1401 || stateno = 1402 || stateno = 1403 || stateno = 1500 || stateno = 1501 || stateno = 1502 || stateno = 1503)
 value = floor((8) * 1.2 * 1000 / ifelse(Map(sa) = 2, 128, ifelse(Map(sa) = 3, 80, 112)) + .5)
 ignorehitpause = 1
 
@@ -416,6 +386,43 @@ ignorehitpause = 1
 type = VarSet
 trigger1 = MoveGuarded && var(37) = 0
 var(37) = 1
+ignorehitpause = 1
+
+[State -2, Veil clock]
+type = VarAdd
+trigger1 = var(30) > 0 && !IsHelper
+v = 30
+value = -1
+
+[State -2, Veil broken]
+type = VarSet
+trigger1 = var(30) > 0 && !IsHelper
+trigger1 = movetype = H || (stateno >= 150 && stateno <= 155) || (movetype = A && !(stateno = [1400, 1403]) && (MoveContact || Time >= 3))
+v = 30
+value = 0
+
+[State -2, Veiled]
+type = Trans
+trigger1 = var(30) > 0 && !IsHelper
+trans = addalpha
+alpha = ifelse(var(31), 0, 40), ifelse(var(31), 256, 216)
+
+[State -2, Mirage image struck]
+type = SelfState
+trigger1 = IsHelper(1550) && movetype = H
+value = 1551
+ignorehitpause = 1
+
+[State -2, Veiled - no shadow]
+type = AssertSpecial
+trigger1 = var(30) > 0 && !IsHelper
+flag = noshadow
+
+[State -2, Pistol cooldown]
+type = VarAdd
+trigger1 = var(14) > 0 && !IsHelper
+v = 14
+value = -1
 ignorehitpause = 1
 
 ;---------------------------------------------------------------------------
@@ -2952,6 +2959,18 @@ type = ChangeState
 triggerall = AILevel > 0
 trigger1 = p2bodydist x < 75 && ctrl && statetype = S && var(40) <= 2 && var(30) <= 0 && enemynear, movetype = A && (enemynear, Time) <= 1 && (Random % 1000) < ifelse((Map(pz) = 1), 300, ifelse((Map(pz) = 1), 7, ifelse(((var(45) > 541) + (var(45) > 601) + (var(45) > 661) + (var(45) > 721) + (var(45) > 781) + (var(45) > 841) + (var(45) > 901)) > AILevel - 1, ((var(45) > 541) + (var(45) > 601) + (var(45) > 661) + (var(45) > 721) + (var(45) > 781) + (var(45) > 841) + (var(45) > 901)), AILevel - 1)) * 22)
 value = ifelse(power >= 1000 && Map(sa) = 2 && (Random % 3) = 0, 3200, 1600 + ifelse((Random % 4) = 0 && !(Map(pz) = 1), Random % 3, ifelse(enemynear, statetype = A, 2, ifelse(enemynear, statetype = C, 1, 0))))
+
+[State -2, CPU pistol]
+type = ChangeState
+triggerall = AILevel > 0
+trigger1 = ctrl && statetype = S && var(14) <= 0 && var(30) <= 0 && stateno < 1000 && ((p2bodydist x > 170 && enemynear, movetype != A && (Random % 1000) < ifelse((Map(pz) = 1), 60, 6 + ifelse((Map(pz) = 1), 7, ifelse(((var(45) > 541) + (var(45) > 601) + (var(45) > 661) + (var(45) > 721) + (var(45) > 781) + (var(45) > 841) + (var(45) > 901)) > AILevel - 1, ((var(45) > 541) + (var(45) > 601) + (var(45) > 661) + (var(45) > 721) + (var(45) > 781) + (var(45) > 841) + (var(45) > 901)), AILevel - 1)) * 4)) || (enemynear, stateno = [5080, 5110] && p2bodydist x < 150 && p2bodydist x > 50 && (Random % 1000) < ifelse((Map(pz) = 1), 300, 40 + ifelse((Map(pz) = 1), 7, ifelse(((var(45) > 541) + (var(45) > 601) + (var(45) > 661) + (var(45) > 721) + (var(45) > 781) + (var(45) > 841) + (var(45) > 901)) > AILevel - 1, ((var(45) > 541) + (var(45) > 601) + (var(45) > 661) + (var(45) > 721) + (var(45) > 781) + (var(45) > 841) + (var(45) > 901)), AILevel - 1)) * 20)))
+value = ifelse(enemynear, stateno = [5080, 5110], 1710, 1700)
+
+[State -2, CPU shade]
+type = ChangeState
+triggerall = AILevel > 0
+trigger1 = (stateno = [1200, 1203]) && Time >= 6 && p2bodydist x < 95 && (Random % 1000) < ifelse((Map(pz) = 1), 600, 150 + ifelse((Map(pz) = 1), 7, ifelse(((var(45) > 541) + (var(45) > 601) + (var(45) > 661) + (var(45) > 721) + (var(45) > 781) + (var(45) > 841) + (var(45) > 901)) > AILevel - 1, ((var(45) > 541) + (var(45) > 601) + (var(45) > 661) + (var(45) > 721) + (var(45) > 781) + (var(45) > 841) + (var(45) > 901)), AILevel - 1)) * 40)
+value = ifelse((Random % 5) = 0, 1222, ifelse((Random % 4) = 0 && !(Map(pz) = 1), 1220 + Random % 2, ifelse(enemynear, statetype = C, 1221, 1220)))
 
 [State -2, CPU normal hold crouch]
 type = VarSet
@@ -6171,7 +6190,7 @@ add = 90, 40, 40
 type = Trans
 trigger1 = Time < 5
 trans = addalpha
-alpha = 256 - Time * 43, Time * 43
+alpha = 256 - Time * 51, Time * 51
 
 [State 1403, Gone]
 type = VarSet
@@ -6828,6 +6847,918 @@ trigger1 = Time > 30
 trigger2 = Time > 1 && (EnemyNear, StateNo) != 1610
 value = 0
 ctrl = 1
+
+;===========================================================================
+; Ghost Step follow-ups (during the sprint: LK low, MK overhead, HK feint) - afterimage fake-outs
+;---------------------------------------------------------------------------
+; Shade Low - real low slide, image leaps
+[Statedef 1220]
+type = C
+movetype = A
+physics = N
+anim = 450
+ctrl = 0
+sprpriority = 2
+velset = 0,0
+juggle = 3
+
+[State 1220, Image leaps]
+type = Helper
+trigger1 = Time = 0
+helpertype = normal
+name = "Shade"
+ID = 1561
+stateno = 1561
+pos = 0, 0
+postype = p1
+ownpal = 0
+keyctrl = 0
+
+[State 1220, Slide]
+type = VelSet
+trigger1 = Time = 0
+x = 5.6
+
+[State 1220, Slow]
+type = VelMul
+trigger1 = Time > 12
+x = .8
+
+[State 1220, Slide]
+type = HitDef
+trigger1 = Time = 8
+attr = C, SA
+damage = 60, 6
+animtype = Hard
+guardflag = L
+hitflag = MAF
+priority = 5, Hit
+pausetime = 11, 11
+sparkno = 2
+guard.sparkno = 40
+sparkxy = -8, -14
+hitsound = 5, 2
+guardsound = 6, 0
+ground.type = Low
+ground.slidetime = 10
+ground.hittime = 25
+guard.slidetime = 10
+guard.hittime = 13
+ground.velocity = -2, -3
+guard.velocity = -6
+air.velocity = -2, -3
+fall = 1
+fall.recover = 0
+dizzypoints = 141
+
+[State 1220, End]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 11
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Shade High - real flip kick (overhead), image slides
+[Statedef 1221]
+type = A
+movetype = A
+physics = N
+anim = 650
+ctrl = 0
+sprpriority = 2
+velset = 0,0
+juggle = 3
+
+[State 1221, Image slides]
+type = Helper
+trigger1 = Time = 0
+helpertype = normal
+name = "Shade"
+ID = 1560
+stateno = 1560
+pos = 0, 0
+postype = p1
+ownpal = 0
+keyctrl = 0
+
+[State 1221, Leap]
+type = VelSet
+trigger1 = Time = 0
+x = 4.2
+y = -5.4
+
+[State 1221, Fall]
+type = VelAdd
+trigger1 = Time > 0
+y = 0.5
+
+[State 1221, Flip kick]
+type = HitDef
+trigger1 = Time = 8
+attr = A, SA
+damage = 70, 7
+animtype = Hard
+guardflag = HA
+hitflag = MAF
+priority = 5, Hit
+pausetime = 11, 11
+sparkno = 2
+guard.sparkno = 40
+sparkxy = -8, -70
+hitsound = 5, 2
+guardsound = 6, 0
+ground.type = High
+ground.slidetime = 10
+ground.hittime = 21
+guard.slidetime = 10
+guard.hittime = 15
+ground.velocity = -4
+guard.velocity = -5
+air.velocity = -3, -4
+dizzypoints = 156
+
+[State 1221, Land]
+type = ChangeState
+trigger1 = Time > 4 && Vel Y > 0 && Pos Y >= 0
+value = 1223
+
+;---------------------------------------------------------------------------
+; Shade High - landing
+[Statedef 1223]
+type = S
+movetype = I
+physics = S
+anim = 47
+ctrl = 0
+sprpriority = 2
+velset = 0,0
+
+[State 1223, Ground]
+type = PosSet
+trigger1 = Time = 0
+y = 0
+
+[State 1223, End]
+type = ChangeState
+trigger1 = Time >= 10
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Shade Feint - both are images; she slips back
+[Statedef 1222]
+type = S
+movetype = I
+physics = N
+anim = 1210
+ctrl = 0
+sprpriority = 2
+velset = 0,0
+
+[State 1222, Image slides]
+type = Helper
+trigger1 = Time = 0
+helpertype = normal
+name = "Shade"
+ID = 1560
+stateno = 1560
+pos = 0, 0
+postype = p1
+ownpal = 0
+keyctrl = 0
+
+[State 1222, Image leaps]
+type = Helper
+trigger1 = Time = 0
+helpertype = normal
+name = "Shade"
+ID = 1561
+stateno = 1561
+pos = 0, 0
+postype = p1
+ownpal = 0
+keyctrl = 0
+
+[State 1222, Unseen]
+type = Trans
+trigger1 = Time < 12
+trans = addalpha
+alpha = 0, 256
+
+[State 1222, No shadow]
+type = AssertSpecial
+trigger1 = Time < 12
+flag = noshadow
+
+[State 1222, Slip back]
+type = VelSet
+trigger1 = Time = 0
+x = -5.5
+
+[State 1222, Stop]
+type = VelMul
+trigger1 = Time > 10
+x = .7
+
+[State 1222, Through]
+type = PlayerPush
+trigger1 = Time < 12
+value = 0
+
+[State 1222, End]
+type = ChangeState
+trigger1 = Time >= 22
+value = 0
+ctrl = 1
+
+; Shade image (slide): a copy of her that is not really there
+[Statedef 1560]
+type = C
+movetype = I
+physics = N
+anim = 450
+ctrl = 0
+velset = 0,0
+sprpriority = 2
+
+[State 1560, Not there]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+[State 1560, No push]
+type = PlayerPush
+trigger1 = 1
+value = 0
+
+[State 1560, Slide]
+type = VelSet
+trigger1 = Time = 0
+x = 5.6
+
+[State 1560, Slow]
+type = VelMul
+trigger1 = Time > 10
+x = .85
+
+[State 1560, Vanish]
+type = Trans
+trigger1 = Time >= 16
+trans = addalpha
+alpha = 256 - (Time - 16) * 40, (Time - 16) * 40
+
+[State 1560, Gone]
+type = DestroySelf
+trigger1 = Time >= 22
+
+; Shade image (flip): a copy of her that is not really there
+[Statedef 1561]
+type = A
+movetype = I
+physics = N
+anim = 650
+ctrl = 0
+velset = 0,0
+sprpriority = 2
+
+[State 1561, Not there]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+[State 1561, No push]
+type = PlayerPush
+trigger1 = 1
+value = 0
+
+[State 1561, Leap]
+type = VelSet
+trigger1 = Time = 0
+x = 4.2
+y = -5.4
+
+[State 1561, Fall]
+type = VelAdd
+trigger1 = Time > 0
+y = 0.5
+
+[State 1561, Floor]
+type = DestroySelf
+trigger1 = Time > 4 && Pos Y >= 0
+
+[State 1561, Vanish]
+type = Trans
+trigger1 = Time >= 16
+trans = addalpha
+alpha = 256 - (Time - 16) * 40, (Time - 16) * 40
+
+[State 1561, Gone]
+type = DestroySelf
+trigger1 = Time >= 22
+
+;===========================================================================
+; Special move: Pistol (63214+P) - one shot (LP/HP level, MP low into the floor, air angled down); kick cancels into
+; Ghost Step. EX (two punches; MP+HP for the low one): a double shot for one stock of meter, cooldown or not.
+;---------------------------------------------------------------------------
+; Pistol hi - fires on the art's firing frame
+[Statedef 1700]
+type = S
+movetype = A
+physics = S
+anim = 1700
+ctrl = 0
+sprpriority = 2
+velset = 0,0
+
+[State 1700, Shots fired]
+type = VarSet
+trigger1 = Time = 0
+v = 15
+value = 0
+
+[State 1700, Bullet]
+type = Projectile
+trigger1 = AnimElem = 8
+projid = 1700
+projanim = 6200
+projhitanim = 6202
+projremanim = 6202
+projcancelanim = 6202
+projremovetime = 9
+projpriority = 1
+projsprpriority = 3
+projscale = .333, .333
+projheightbound = -400, 1
+offset = 36, -78
+velocity = 26, 0
+attr = S, SP
+damage = 40, 4
+animtype = Light
+guardflag = MA
+hitflag = MAF
+pausetime = 0, 8
+sparkno = -1
+guard.sparkno = 40
+hitsound = S1, 7
+guardsound = 6, 0
+ground.type = High
+ground.slidetime = 8
+ground.hittime = 16
+guard.slidetime = 8
+guard.hittime = 12
+ground.velocity = -3
+guard.velocity = -3
+air.velocity = -2.5, -3
+down.velocity = -1, -3
+down.hittime = 20
+
+[State 1700, Muzzle flash]
+type = Explod
+trigger1 = AnimElem = 8
+anim = 6201
+postype = p1
+pos = 36, -78
+bindtime = 6
+scale = .333, .333
+sprpriority = 4
+ontop = 1
+removetime = -2
+ignorehitpause = 1
+
+[State 1700, Shot]
+type = PlaySnd
+trigger1 = AnimElem = 8
+value = S1, 6
+channel = 2
+
+[State 1700, Cooldown]
+type = VarSet
+trigger1 = AnimElem = 8
+v = 14
+value = 150
+
+[State 1700, Count]
+type = VarAdd
+trigger1 = AnimElem = 8
+v = 15
+value = 1
+
+[State 1700, End]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Pistol hi EX - two shots - fires on the art's firing frame
+[Statedef 1703]
+type = S
+movetype = A
+physics = S
+anim = 1700
+ctrl = 0
+sprpriority = 2
+velset = 0,0
+
+[State 1703, Meter]
+type = PowerAdd
+trigger1 = Time = 0
+value = -ceil(40000.0 / ifelse(Map(sa) = 2, 128, ifelse(Map(sa) = 3, 80, 112)))
+
+[State 1703, EX flash]
+type = PalFX
+trigger1 = Time = 0
+time = 8
+add = 90, 40, 40
+
+[State 1703, Shots fired]
+type = VarSet
+trigger1 = Time = 0
+v = 15
+value = 0
+
+[State 1703, Bullet]
+type = Projectile
+trigger1 = AnimElem = 8
+projid = 1700
+projanim = 6200
+projhitanim = 6202
+projremanim = 6202
+projcancelanim = 6202
+projremovetime = 9
+projpriority = 1
+projsprpriority = 3
+projscale = .333, .333
+projheightbound = -400, 1
+offset = 36, -78
+velocity = 26, 0
+attr = S, SP
+damage = 40, 4
+animtype = Light
+guardflag = MA
+hitflag = MAF
+pausetime = 0, 8
+sparkno = -1
+guard.sparkno = 40
+hitsound = S1, 7
+guardsound = 6, 0
+ground.type = High
+ground.slidetime = 8
+ground.hittime = 16
+guard.slidetime = 8
+guard.hittime = 12
+ground.velocity = -3
+guard.velocity = -3
+air.velocity = -2.5, -3
+down.velocity = -1, -3
+down.hittime = 20
+
+[State 1703, Muzzle flash]
+type = Explod
+trigger1 = AnimElem = 8
+anim = 6201
+postype = p1
+pos = 36, -78
+bindtime = 6
+scale = .333, .333
+sprpriority = 4
+ontop = 1
+removetime = -2
+ignorehitpause = 1
+
+[State 1703, Shot]
+type = PlaySnd
+trigger1 = AnimElem = 8
+value = S1, 6
+channel = 2
+
+[State 1703, Cooldown]
+type = VarSet
+trigger1 = AnimElem = 8
+v = 14
+value = 150
+
+[State 1703, Count]
+type = VarAdd
+trigger1 = AnimElem = 8
+v = 15
+value = 1
+
+[State 1703, Second shot]
+type = ChangeAnim
+trigger1 = var(15) = 1 && AnimElemTime(8) = 5
+value = 1700
+elem = 7
+
+[State 1703, End]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Pistol lo - fires on the art's firing frame
+[Statedef 1710]
+type = S
+movetype = A
+physics = S
+anim = 1710
+ctrl = 0
+sprpriority = 2
+velset = 0,0
+
+[State 1710, Shots fired]
+type = VarSet
+trigger1 = Time = 0
+v = 15
+value = 0
+
+[State 1710, Bullet]
+type = Projectile
+trigger1 = AnimElem = 8
+projid = 1700
+projanim = 6203
+projhitanim = 6202
+projremanim = 6202
+projcancelanim = 6202
+projremovetime = 9
+projpriority = 1
+projsprpriority = 3
+projscale = .333, .333
+projheightbound = -400, 14
+offset = 29, -38
+velocity = 12.4, 20.6
+attr = S, SP
+damage = 35, 4
+animtype = Light
+guardflag = L
+hitflag = MAFD
+pausetime = 0, 8
+sparkno = -1
+guard.sparkno = 40
+hitsound = S1, 7
+guardsound = 6, 0
+ground.type = Low
+ground.slidetime = 8
+ground.hittime = 16
+guard.slidetime = 8
+guard.hittime = 12
+ground.velocity = -3
+guard.velocity = -3
+air.velocity = -2.5, -3
+down.velocity = -1, -3
+down.hittime = 20
+
+[State 1710, Muzzle flash]
+type = Explod
+trigger1 = AnimElem = 8
+anim = 6204
+postype = p1
+pos = 29, -38
+bindtime = 6
+scale = .333, .333
+sprpriority = 4
+ontop = 1
+removetime = -2
+ignorehitpause = 1
+
+[State 1710, Shot]
+type = PlaySnd
+trigger1 = AnimElem = 8
+value = S1, 6
+channel = 2
+
+[State 1710, Cooldown]
+type = VarSet
+trigger1 = AnimElem = 8
+v = 14
+value = 150
+
+[State 1710, Count]
+type = VarAdd
+trigger1 = AnimElem = 8
+v = 15
+value = 1
+
+[State 1710, End]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Pistol lo EX - two shots - fires on the art's firing frame
+[Statedef 1713]
+type = S
+movetype = A
+physics = S
+anim = 1710
+ctrl = 0
+sprpriority = 2
+velset = 0,0
+
+[State 1713, Meter]
+type = PowerAdd
+trigger1 = Time = 0
+value = -ceil(40000.0 / ifelse(Map(sa) = 2, 128, ifelse(Map(sa) = 3, 80, 112)))
+
+[State 1713, EX flash]
+type = PalFX
+trigger1 = Time = 0
+time = 8
+add = 90, 40, 40
+
+[State 1713, Shots fired]
+type = VarSet
+trigger1 = Time = 0
+v = 15
+value = 0
+
+[State 1713, Bullet]
+type = Projectile
+trigger1 = AnimElem = 8
+projid = 1700
+projanim = 6203
+projhitanim = 6202
+projremanim = 6202
+projcancelanim = 6202
+projremovetime = 9
+projpriority = 1
+projsprpriority = 3
+projscale = .333, .333
+projheightbound = -400, 14
+offset = 29, -38
+velocity = 12.4, 20.6
+attr = S, SP
+damage = 35, 4
+animtype = Light
+guardflag = L
+hitflag = MAFD
+pausetime = 0, 8
+sparkno = -1
+guard.sparkno = 40
+hitsound = S1, 7
+guardsound = 6, 0
+ground.type = Low
+ground.slidetime = 8
+ground.hittime = 16
+guard.slidetime = 8
+guard.hittime = 12
+ground.velocity = -3
+guard.velocity = -3
+air.velocity = -2.5, -3
+down.velocity = -1, -3
+down.hittime = 20
+
+[State 1713, Muzzle flash]
+type = Explod
+trigger1 = AnimElem = 8
+anim = 6204
+postype = p1
+pos = 29, -38
+bindtime = 6
+scale = .333, .333
+sprpriority = 4
+ontop = 1
+removetime = -2
+ignorehitpause = 1
+
+[State 1713, Shot]
+type = PlaySnd
+trigger1 = AnimElem = 8
+value = S1, 6
+channel = 2
+
+[State 1713, Cooldown]
+type = VarSet
+trigger1 = AnimElem = 8
+v = 14
+value = 150
+
+[State 1713, Count]
+type = VarAdd
+trigger1 = AnimElem = 8
+v = 15
+value = 1
+
+[State 1713, Second shot]
+type = ChangeAnim
+trigger1 = var(15) = 1 && AnimElemTime(8) = 5
+value = 1710
+elem = 7
+
+[State 1713, End]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Pistol air - fires on the art's firing frame
+[Statedef 1720]
+type = A
+movetype = A
+physics = A
+anim = 1720
+ctrl = 0
+sprpriority = 2
+
+[State 1720, Shots fired]
+type = VarSet
+trigger1 = Time = 0
+v = 15
+value = 0
+
+[State 1720, Bullet]
+type = Projectile
+trigger1 = AnimElem = 7
+projid = 1700
+projanim = 6205
+projhitanim = 6202
+projremanim = 6202
+projcancelanim = 6202
+projremovetime = 9
+projpriority = 1
+projsprpriority = 3
+projscale = .333, .333
+projheightbound = -400, 1
+offset = 24, -47
+velocity = 21.2, 11.3
+attr = S, SP
+damage = 40, 4
+animtype = Light
+guardflag = MA
+hitflag = MAF
+pausetime = 0, 8
+sparkno = -1
+guard.sparkno = 40
+hitsound = S1, 7
+guardsound = 6, 0
+ground.type = High
+ground.slidetime = 8
+ground.hittime = 16
+guard.slidetime = 8
+guard.hittime = 12
+ground.velocity = -3
+guard.velocity = -3
+air.velocity = -2.5, -3
+down.velocity = -1, -3
+down.hittime = 20
+
+[State 1720, Muzzle flash]
+type = Explod
+trigger1 = AnimElem = 7
+anim = 6206
+postype = p1
+pos = 24, -47
+bindtime = 6
+scale = .25, .25
+sprpriority = 4
+ontop = 1
+removetime = -2
+ignorehitpause = 1
+
+[State 1720, Shot]
+type = PlaySnd
+trigger1 = AnimElem = 7
+value = S1, 6
+channel = 2
+
+[State 1720, Cooldown]
+type = VarSet
+trigger1 = AnimElem = 7
+v = 14
+value = 150
+
+[State 1720, Count]
+type = VarAdd
+trigger1 = AnimElem = 7
+v = 15
+value = 1
+
+[State 1720, Land]
+type = ChangeState
+trigger1 = Vel Y > 0 && Pos Y >= 0
+value = 52
+
+[State 1720, Done]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 50
+ctrl = 0
+
+;---------------------------------------------------------------------------
+; Pistol air EX - two shots - fires on the art's firing frame
+[Statedef 1723]
+type = A
+movetype = A
+physics = A
+anim = 1720
+ctrl = 0
+sprpriority = 2
+
+[State 1723, Meter]
+type = PowerAdd
+trigger1 = Time = 0
+value = -ceil(40000.0 / ifelse(Map(sa) = 2, 128, ifelse(Map(sa) = 3, 80, 112)))
+
+[State 1723, EX flash]
+type = PalFX
+trigger1 = Time = 0
+time = 8
+add = 90, 40, 40
+
+[State 1723, Shots fired]
+type = VarSet
+trigger1 = Time = 0
+v = 15
+value = 0
+
+[State 1723, Bullet]
+type = Projectile
+trigger1 = AnimElem = 7
+projid = 1700
+projanim = 6205
+projhitanim = 6202
+projremanim = 6202
+projcancelanim = 6202
+projremovetime = 9
+projpriority = 1
+projsprpriority = 3
+projscale = .333, .333
+projheightbound = -400, 1
+offset = 24, -47
+velocity = 21.2, 11.3
+attr = S, SP
+damage = 40, 4
+animtype = Light
+guardflag = MA
+hitflag = MAF
+pausetime = 0, 8
+sparkno = -1
+guard.sparkno = 40
+hitsound = S1, 7
+guardsound = 6, 0
+ground.type = High
+ground.slidetime = 8
+ground.hittime = 16
+guard.slidetime = 8
+guard.hittime = 12
+ground.velocity = -3
+guard.velocity = -3
+air.velocity = -2.5, -3
+down.velocity = -1, -3
+down.hittime = 20
+
+[State 1723, Muzzle flash]
+type = Explod
+trigger1 = AnimElem = 7
+anim = 6206
+postype = p1
+pos = 24, -47
+bindtime = 6
+scale = .25, .25
+sprpriority = 4
+ontop = 1
+removetime = -2
+ignorehitpause = 1
+
+[State 1723, Shot]
+type = PlaySnd
+trigger1 = AnimElem = 7
+value = S1, 6
+channel = 2
+
+[State 1723, Cooldown]
+type = VarSet
+trigger1 = AnimElem = 7
+v = 14
+value = 150
+
+[State 1723, Count]
+type = VarAdd
+trigger1 = AnimElem = 7
+v = 15
+value = 1
+
+[State 1723, Second shot]
+type = ChangeAnim
+trigger1 = var(15) = 1 && AnimElemTime(7) = 5
+value = 1720
+elem = 6
+
+[State 1723, Land]
+type = ChangeState
+trigger1 = Vel Y > 0 && Pos Y >= 0
+value = 52
+
+[State 1723, Done]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 50
+ctrl = 0
 
 ;===========================================================================
 ; Super Art I: Phantom Massacre (236236+P) - a rush: straights, then kicks, ending in a spinning high kick. 8 hits

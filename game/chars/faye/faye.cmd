@@ -162,6 +162,41 @@ command = ~B, DB, D, DF, F, z
 time = 24
 
 [Command]
+name = "HCB_x"
+command = ~F, DF, D, DB, B, x
+time = 24
+
+[Command]
+name = "HCB_y"
+command = ~F, DF, D, DB, B, y
+time = 24
+
+[Command]
+name = "HCB_z"
+command = ~F, DF, D, DB, B, z
+time = 24
+
+[Command]
+name = "HCB_PP"
+command = ~F, DF, D, DB, B, x+y
+time = 24
+
+[Command]
+name = "HCB_PP"
+command = ~F, DF, D, DB, B, x+z
+time = 24
+
+[Command]
+name = "HCB_PP"
+command = ~F, DF, D, DB, B, y+z
+time = 24
+
+[Command]
+name = "HCB_yz"
+command = ~F, DF, D, DB, B, y+z
+time = 24
+
+[Command]
 name = "DP_KK"
 command = ~F, D, DF, a+b
 
@@ -371,6 +406,24 @@ trigger2 = movecontact
 trigger2 = stateno = 200 || stateno = 210 || stateno = 230 || stateno = 400 || stateno = 410 || stateno = 430 || stateno = 440
 trigger3 = movecontact && (stateno = [1000, 1003] || stateno = [1100, 1103])
 
+[State -1, Shade Low]
+type = ChangeState
+value = 1220
+triggerall = command = "a"
+trigger1 = (stateno = [1200, 1203]) && Time >= 6
+
+[State -1, Shade High]
+type = ChangeState
+value = 1221
+triggerall = command = "b"
+trigger1 = (stateno = [1200, 1203]) && Time >= 6
+
+[State -1, Shade Feint]
+type = ChangeState
+value = 1222
+triggerall = command = "c"
+trigger1 = (stateno = [1200, 1203]) && Time >= 6
+
 [State -1, Death's Approach EX]
 type = ChangeState
 value = 1103
@@ -436,6 +489,93 @@ value = 1600
 triggerall = command = "HCF_x"
 triggerall = statetype != A
 trigger1 = ctrl
+
+[State -1, Pistol EX low]
+type = ChangeState
+value = 1713
+triggerall = command = "HCB_yz"
+triggerall = power >= ceil(40000.0 / ifelse(Map(sa) = 2, 128, ifelse(Map(sa) = 3, 80, 112)))
+triggerall = statetype != A
+trigger1 = ctrl
+trigger2 = movecontact
+trigger2 = stateno = 200 || stateno = 210 || stateno = 230 || stateno = 400 || stateno = 410 || stateno = 430 || stateno = 440
+
+[State -1, Pistol EX]
+type = ChangeState
+value = 1703
+triggerall = command = "HCB_PP"
+triggerall = power >= ceil(40000.0 / ifelse(Map(sa) = 2, 128, ifelse(Map(sa) = 3, 80, 112)))
+triggerall = statetype != A
+trigger1 = ctrl
+trigger2 = movecontact
+trigger2 = stateno = 200 || stateno = 210 || stateno = 230 || stateno = 400 || stateno = 410 || stateno = 430 || stateno = 440
+
+[State -1, Pistol HP]
+type = ChangeState
+value = 1700
+triggerall = command = "HCB_z"
+triggerall = var(14) <= 0
+triggerall = statetype != A
+trigger1 = ctrl
+trigger2 = movecontact
+trigger2 = stateno = 200 || stateno = 210 || stateno = 230 || stateno = 400 || stateno = 410 || stateno = 430 || stateno = 440
+
+[State -1, Pistol MP]
+type = ChangeState
+value = 1710
+triggerall = command = "HCB_y"
+triggerall = var(14) <= 0
+triggerall = statetype != A
+trigger1 = ctrl
+trigger2 = movecontact
+trigger2 = stateno = 200 || stateno = 210 || stateno = 230 || stateno = 400 || stateno = 410 || stateno = 430 || stateno = 440
+
+[State -1, Pistol LP]
+type = ChangeState
+value = 1700
+triggerall = command = "HCB_x"
+triggerall = var(14) <= 0
+triggerall = statetype != A
+trigger1 = ctrl
+trigger2 = movecontact
+trigger2 = stateno = 200 || stateno = 210 || stateno = 230 || stateno = 400 || stateno = 410 || stateno = 430 || stateno = 440
+
+[State -1, Pistol air EX]
+type = ChangeState
+value = 1723
+triggerall = command = "HCB_PP"
+triggerall = power >= ceil(40000.0 / ifelse(Map(sa) = 2, 128, ifelse(Map(sa) = 3, 80, 112)))
+triggerall = statetype = A
+trigger1 = ctrl
+
+[State -1, Pistol air]
+type = ChangeState
+value = 1720
+triggerall = command = "HCB_x" || command = "HCB_y" || command = "HCB_z"
+triggerall = var(14) <= 0
+triggerall = statetype = A
+trigger1 = ctrl
+
+[State -1, Pistol to Ghost Step a]
+type = ChangeState
+value = 1200
+triggerall = command = "a"
+trigger1 = (stateno = 1700 || stateno = 1710) && AnimElemTime(8) > 0
+trigger2 = (stateno = 1703 || stateno = 1713) && var(15) >= 2 && AnimElemTime(8) > 0
+
+[State -1, Pistol to Ghost Step b]
+type = ChangeState
+value = 1201
+triggerall = command = "b"
+trigger1 = (stateno = 1700 || stateno = 1710) && AnimElemTime(8) > 0
+trigger2 = (stateno = 1703 || stateno = 1713) && var(15) >= 2 && AnimElemTime(8) > 0
+
+[State -1, Pistol to Ghost Step c]
+type = ChangeState
+value = 1202
+triggerall = command = "c"
+trigger1 = (stateno = 1700 || stateno = 1710) && AnimElemTime(8) > 0
+trigger2 = (stateno = 1703 || stateno = 1713) && var(15) >= 2 && AnimElemTime(8) > 0
 
 [State -1, Phantom Veil EX]
 type = ChangeState
