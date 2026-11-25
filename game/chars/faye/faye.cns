@@ -196,6 +196,229 @@ trigger1 = var(30) > 0 && !IsHelper
 flag = noshadow
 
 ;---------------------------------------------------------------------------
+; 3rd Strike super gauge (see SA_ARTS in cnsgen.py)
+[State -2, SA default]
+type = MapSet
+trigger1 = Map(sa) = 0
+map = "sa"
+value = ifelse(AILevel > 0, 1 + Random % 3, 1)
+ignorehitpause = 1
+
+[State -2, SA bar length]
+type = MapSet
+trigger1 = 1
+map = "sagl"
+value = ifelse(Map(sa) = 2, 128, ifelse(Map(sa) = 3, 80, 112))
+ignorehitpause = 1
+
+[State -2, SA stocks]
+type = ModifyPlayer
+trigger1 = PowerMax != ifelse(Map(sa) = 2, 1, ifelse(Map(sa) = 3, 3, 2)) * 1000
+powermax = ifelse(Map(sa) = 2, 1, ifelse(Map(sa) = 3, 3, 2)) * 1000
+ignorehitpause = 1
+
+[State -2, Gauge counted reset]
+type = VarSet
+trigger1 = HitCount < var(36)
+trigger2 = Time = 0
+var(36) = 0
+ignorehitpause = 1
+
+[State -2, Guard counted reset]
+type = VarSet
+trigger1 = Time = 0 || !MoveContact
+var(37) = 0
+ignorehitpause = 1
+
+[State -2, Parry gain]
+type = PowerAdd
+trigger1 = (stateno = [700, 702]) && Time = 1
+value = floor((4) * 1.2 * 1000 / ifelse(Map(sa) = 2, 128, ifelse(Map(sa) = 3, 80, 112)) + .5)
+
+[State -2, Throw gain]
+type = PowerAdd
+trigger1 = (stateno = 810 || stateno = 815) && Time = 1
+value = floor((7) * 1.2 * 1000 / ifelse(Map(sa) = 2, 128, ifelse(Map(sa) = 3, 80, 112)) + .5)
+
+[State -2, Throw gain (defender)]
+type = TargetPowerAdd
+trigger1 = (stateno = 810 || stateno = 815) && Time = 1 && numtarget
+value = floor(7 / 3 * 1.2 * 1000 / ifelse((target, Map(sagl)) > 0, (target, Map(sagl)), 112) + .5)
+
+[State -2, Gain start class 1]
+type = PowerAdd
+trigger1 = Time = 1 && (stateno = 200 || stateno = 230 || stateno = 400 || stateno = 430 || stateno = 600 || stateno = 630)
+value = floor((0) * 1.2 * 1000 / ifelse(Map(sa) = 2, 128, ifelse(Map(sa) = 3, 80, 112)) + .5)
+
+[State -2, Gain hit class 1]
+type = PowerAdd
+trigger1 = HitCount > var(36) && (stateno = 200 || stateno = 230 || stateno = 400 || stateno = 430 || stateno = 600 || stateno = 630)
+value = floor((ifelse(HitCount = 1, 2, 2) * ifelse(ComboCount <= 1, 32, ifelse(ComboCount >= 16, 1, 32 - (ComboCount - 1) * 2)) / 32.0) * 1.2 * 1000 / ifelse(Map(sa) = 2, 128, ifelse(Map(sa) = 3, 80, 112)) + .5)
+ignorehitpause = 1
+
+[State -2, Gain hit class 1 (defender)]
+type = TargetPowerAdd
+trigger1 = HitCount > var(36) && numtarget && (stateno = 200 || stateno = 230 || stateno = 400 || stateno = 430 || stateno = 600 || stateno = 630)
+value = floor(ifelse(HitCount = 1, 2, 2) / 3 * 1.2 * 1000 / ifelse((target, Map(sagl)) > 0, (target, Map(sagl)), 112) + .5)
+ignorehitpause = 1
+
+[State -2, Gain guard class 1]
+type = PowerAdd
+trigger1 = MoveGuarded && var(37) = 0 && (stateno = 200 || stateno = 230 || stateno = 400 || stateno = 430 || stateno = 600 || stateno = 630)
+value = floor((1) * 1.2 * 1000 / ifelse(Map(sa) = 2, 128, ifelse(Map(sa) = 3, 80, 112)) + .5)
+ignorehitpause = 1
+
+[State -2, Gain start class 4]
+type = PowerAdd
+trigger1 = Time = 1 && (stateno = 210 || stateno = 240 || stateno = 260 || stateno = 300 || stateno = 320 || stateno = 410 || stateno = 440 || stateno = 610 || stateno = 640)
+value = floor((2) * 1.2 * 1000 / ifelse(Map(sa) = 2, 128, ifelse(Map(sa) = 3, 80, 112)) + .5)
+
+[State -2, Gain hit class 4]
+type = PowerAdd
+trigger1 = HitCount > var(36) && (stateno = 210 || stateno = 240 || stateno = 260 || stateno = 300 || stateno = 320 || stateno = 410 || stateno = 440 || stateno = 610 || stateno = 640)
+value = floor((ifelse(HitCount = 1, 8, 2) * ifelse(ComboCount <= 1, 32, ifelse(ComboCount >= 16, 1, 32 - (ComboCount - 1) * 2)) / 32.0) * 1.2 * 1000 / ifelse(Map(sa) = 2, 128, ifelse(Map(sa) = 3, 80, 112)) + .5)
+ignorehitpause = 1
+
+[State -2, Gain hit class 4 (defender)]
+type = TargetPowerAdd
+trigger1 = HitCount > var(36) && numtarget && (stateno = 210 || stateno = 240 || stateno = 260 || stateno = 300 || stateno = 320 || stateno = 410 || stateno = 440 || stateno = 610 || stateno = 640)
+value = floor(ifelse(HitCount = 1, 8, 2) / 3 * 1.2 * 1000 / ifelse((target, Map(sagl)) > 0, (target, Map(sagl)), 112) + .5)
+ignorehitpause = 1
+
+[State -2, Gain guard class 4]
+type = PowerAdd
+trigger1 = MoveGuarded && var(37) = 0 && (stateno = 210 || stateno = 240 || stateno = 260 || stateno = 300 || stateno = 320 || stateno = 410 || stateno = 440 || stateno = 610 || stateno = 640)
+value = floor((4) * 1.2 * 1000 / ifelse(Map(sa) = 2, 128, ifelse(Map(sa) = 3, 80, 112)) + .5)
+ignorehitpause = 1
+
+[State -2, Gain start class 7]
+type = PowerAdd
+trigger1 = Time = 1 && (stateno = 220 || stateno = 250 || stateno = 310 || stateno = 330 || stateno = 420 || stateno = 450 || stateno = 620 || stateno = 650)
+value = floor((3) * 1.2 * 1000 / ifelse(Map(sa) = 2, 128, ifelse(Map(sa) = 3, 80, 112)) + .5)
+
+[State -2, Gain hit class 7]
+type = PowerAdd
+trigger1 = HitCount > var(36) && (stateno = 220 || stateno = 250 || stateno = 310 || stateno = 330 || stateno = 420 || stateno = 450 || stateno = 620 || stateno = 650)
+value = floor((ifelse(HitCount = 1, 14, 2) * ifelse(ComboCount <= 1, 32, ifelse(ComboCount >= 16, 1, 32 - (ComboCount - 1) * 2)) / 32.0) * 1.2 * 1000 / ifelse(Map(sa) = 2, 128, ifelse(Map(sa) = 3, 80, 112)) + .5)
+ignorehitpause = 1
+
+[State -2, Gain hit class 7 (defender)]
+type = TargetPowerAdd
+trigger1 = HitCount > var(36) && numtarget && (stateno = 220 || stateno = 250 || stateno = 310 || stateno = 330 || stateno = 420 || stateno = 450 || stateno = 620 || stateno = 650)
+value = floor(ifelse(HitCount = 1, 14, 2) / 3 * 1.2 * 1000 / ifelse((target, Map(sagl)) > 0, (target, Map(sagl)), 112) + .5)
+ignorehitpause = 1
+
+[State -2, Gain guard class 7]
+type = PowerAdd
+trigger1 = MoveGuarded && var(37) = 0 && (stateno = 220 || stateno = 250 || stateno = 310 || stateno = 330 || stateno = 420 || stateno = 450 || stateno = 620 || stateno = 650)
+value = floor((6) * 1.2 * 1000 / ifelse(Map(sa) = 2, 128, ifelse(Map(sa) = 3, 80, 112)) + .5)
+ignorehitpause = 1
+
+[State -2, Gain start class 10]
+type = PowerAdd
+trigger1 = Time = 1 && (stateno = 1000 || stateno = 1001 || stateno = 1002 || stateno = 1003)
+value = floor((3) * 1.2 * 1000 / ifelse(Map(sa) = 2, 128, ifelse(Map(sa) = 3, 80, 112)) + .5)
+
+[State -2, Gain hit class 10]
+type = PowerAdd
+trigger1 = HitCount > var(36) && (stateno = 1000 || stateno = 1001 || stateno = 1002 || stateno = 1003)
+value = floor((ifelse(HitCount = 1, 9, 2) * ifelse(ComboCount <= 1, 32, ifelse(ComboCount >= 16, 1, 32 - (ComboCount - 1) * 2)) / 32.0) * 1.2 * 1000 / ifelse(Map(sa) = 2, 128, ifelse(Map(sa) = 3, 80, 112)) + .5)
+ignorehitpause = 1
+
+[State -2, Gain hit class 10 (defender)]
+type = TargetPowerAdd
+trigger1 = HitCount > var(36) && numtarget && (stateno = 1000 || stateno = 1001 || stateno = 1002 || stateno = 1003)
+value = floor(ifelse(HitCount = 1, 9, 2) / 3 * 1.2 * 1000 / ifelse((target, Map(sagl)) > 0, (target, Map(sagl)), 112) + .5)
+ignorehitpause = 1
+
+[State -2, Gain guard class 10]
+type = PowerAdd
+trigger1 = MoveGuarded && var(37) = 0 && (stateno = 1000 || stateno = 1001 || stateno = 1002 || stateno = 1003)
+value = floor((2) * 1.2 * 1000 / ifelse(Map(sa) = 2, 128, ifelse(Map(sa) = 3, 80, 112)) + .5)
+ignorehitpause = 1
+
+[State -2, Gain start class 11]
+type = PowerAdd
+trigger1 = Time = 1 && (stateno = 1100 || stateno = 1101 || stateno = 1102 || stateno = 1103 || stateno = 1600 || stateno = 1601 || stateno = 1602 || stateno = 1603)
+value = floor((3) * 1.2 * 1000 / ifelse(Map(sa) = 2, 128, ifelse(Map(sa) = 3, 80, 112)) + .5)
+
+[State -2, Gain hit class 11]
+type = PowerAdd
+trigger1 = HitCount > var(36) && (stateno = 1100 || stateno = 1101 || stateno = 1102 || stateno = 1103 || stateno = 1600 || stateno = 1601 || stateno = 1602 || stateno = 1603)
+value = floor((ifelse(HitCount = 1, 15, 2) * ifelse(ComboCount <= 1, 32, ifelse(ComboCount >= 16, 1, 32 - (ComboCount - 1) * 2)) / 32.0) * 1.2 * 1000 / ifelse(Map(sa) = 2, 128, ifelse(Map(sa) = 3, 80, 112)) + .5)
+ignorehitpause = 1
+
+[State -2, Gain hit class 11 (defender)]
+type = TargetPowerAdd
+trigger1 = HitCount > var(36) && numtarget && (stateno = 1100 || stateno = 1101 || stateno = 1102 || stateno = 1103 || stateno = 1600 || stateno = 1601 || stateno = 1602 || stateno = 1603)
+value = floor(ifelse(HitCount = 1, 15, 2) / 3 * 1.2 * 1000 / ifelse((target, Map(sagl)) > 0, (target, Map(sagl)), 112) + .5)
+ignorehitpause = 1
+
+[State -2, Gain guard class 11]
+type = PowerAdd
+trigger1 = MoveGuarded && var(37) = 0 && (stateno = 1100 || stateno = 1101 || stateno = 1102 || stateno = 1103 || stateno = 1600 || stateno = 1601 || stateno = 1602 || stateno = 1603)
+value = floor((10) * 1.2 * 1000 / ifelse(Map(sa) = 2, 128, ifelse(Map(sa) = 3, 80, 112)) + .5)
+ignorehitpause = 1
+
+[State -2, Gain start class 12]
+type = PowerAdd
+trigger1 = Time = 1 && (stateno = 1200 || stateno = 1201 || stateno = 1202 || stateno = 1203 || stateno = 1400 || stateno = 1401 || stateno = 1402 || stateno = 1403 || stateno = 1500 || stateno = 1501 || stateno = 1502 || stateno = 1503)
+value = floor((3) * 1.2 * 1000 / ifelse(Map(sa) = 2, 128, ifelse(Map(sa) = 3, 80, 112)) + .5)
+
+[State -2, Gain hit class 12]
+type = PowerAdd
+trigger1 = HitCount > var(36) && (stateno = 1200 || stateno = 1201 || stateno = 1202 || stateno = 1203 || stateno = 1400 || stateno = 1401 || stateno = 1402 || stateno = 1403 || stateno = 1500 || stateno = 1501 || stateno = 1502 || stateno = 1503)
+value = floor((ifelse(HitCount = 1, 13, 2) * ifelse(ComboCount <= 1, 32, ifelse(ComboCount >= 16, 1, 32 - (ComboCount - 1) * 2)) / 32.0) * 1.2 * 1000 / ifelse(Map(sa) = 2, 128, ifelse(Map(sa) = 3, 80, 112)) + .5)
+ignorehitpause = 1
+
+[State -2, Gain hit class 12 (defender)]
+type = TargetPowerAdd
+trigger1 = HitCount > var(36) && numtarget && (stateno = 1200 || stateno = 1201 || stateno = 1202 || stateno = 1203 || stateno = 1400 || stateno = 1401 || stateno = 1402 || stateno = 1403 || stateno = 1500 || stateno = 1501 || stateno = 1502 || stateno = 1503)
+value = floor(ifelse(HitCount = 1, 13, 2) / 3 * 1.2 * 1000 / ifelse((target, Map(sagl)) > 0, (target, Map(sagl)), 112) + .5)
+ignorehitpause = 1
+
+[State -2, Gain guard class 12]
+type = PowerAdd
+trigger1 = MoveGuarded && var(37) = 0 && (stateno = 1200 || stateno = 1201 || stateno = 1202 || stateno = 1203 || stateno = 1400 || stateno = 1401 || stateno = 1402 || stateno = 1403 || stateno = 1500 || stateno = 1501 || stateno = 1502 || stateno = 1503)
+value = floor((8) * 1.2 * 1000 / ifelse(Map(sa) = 2, 128, ifelse(Map(sa) = 3, 80, 112)) + .5)
+ignorehitpause = 1
+
+[State -2, Gain start class 13]
+type = PowerAdd
+trigger1 = Time = 1 && (stateno = 1610)
+value = floor((0) * 1.2 * 1000 / ifelse(Map(sa) = 2, 128, ifelse(Map(sa) = 3, 80, 112)) + .5)
+
+[State -2, Gain hit class 13]
+type = PowerAdd
+trigger1 = HitCount > var(36) && (stateno = 1610)
+value = floor((ifelse(HitCount = 1, 7, 2) * ifelse(ComboCount <= 1, 32, ifelse(ComboCount >= 16, 1, 32 - (ComboCount - 1) * 2)) / 32.0) * 1.2 * 1000 / ifelse(Map(sa) = 2, 128, ifelse(Map(sa) = 3, 80, 112)) + .5)
+ignorehitpause = 1
+
+[State -2, Gain hit class 13 (defender)]
+type = TargetPowerAdd
+trigger1 = HitCount > var(36) && numtarget && (stateno = 1610)
+value = floor(ifelse(HitCount = 1, 7, 2) / 3 * 1.2 * 1000 / ifelse((target, Map(sagl)) > 0, (target, Map(sagl)), 112) + .5)
+ignorehitpause = 1
+
+[State -2, Gain guard class 13]
+type = PowerAdd
+trigger1 = MoveGuarded && var(37) = 0 && (stateno = 1610)
+value = floor((0) * 1.2 * 1000 / ifelse(Map(sa) = 2, 128, ifelse(Map(sa) = 3, 80, 112)) + .5)
+ignorehitpause = 1
+
+[State -2, Hits counted]
+type = VarSet
+trigger1 = HitCount > var(36)
+var(36) = HitCount
+ignorehitpause = 1
+
+[State -2, Guard counted]
+type = VarSet
+trigger1 = MoveGuarded && var(37) = 0
+var(37) = 1
+ignorehitpause = 1
+
+;---------------------------------------------------------------------------
 ; Sound effects and voice (Faye)
 [State -2, Whoosh 0]
 type = PlaySnd
