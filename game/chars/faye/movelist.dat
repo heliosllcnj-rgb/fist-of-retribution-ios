@@ -1,0 +1,32 @@
+<#f0f000>:System:</>
+High / mid parry						_F <#bebebe>(tap)</>
+Low / mid parry						_D <#bebebe>(tap)</>
+Air parry							_AIR_F <#bebebe>(tap)</>
+Dash / Back dash						_F_F / _B_B
+Throw / Throw escape					^X_+^A
+Back throw						_B_+^X_+^A
+Universal Overhead					^Y_+^B
+Taunt								^Z_+^C
+
+<#f0f000>:Special Moves:</>
+Silent Execution_EX							_QDF^P
+
+<#f0f000>:Normals:</>
+Phantom Jab						^X
+Desert Rose Straight						^Y
+Executioner's Cross						^Z
+Low Sting						^A
+Rib Breaker						^B
+Assassin's Crescent						^C
+Low Jab						_D^X
+Rising Knifehand						_D^Y
+Shadow Uppercut						_D^Z
+Ankle Cutter						_D^A
+Silent Sweep						_D^B
+Desert Reaper						_D^C
+Air Sting						_AIR^X
+Falling Backfist						_AIR^Y
+Assassin's Hammer						_AIR^Z
+Flying Knee						_AIR^A
+Crosswind Kick						_AIR^B
+Descending Guillotine						_AIR^C

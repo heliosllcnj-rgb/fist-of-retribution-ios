@@ -105,6 +105,17 @@ local function drawStun(side, frac, isDizzy, frame)
 	end
 end
 
+-- Project Zero: the boss difficulty past Difficulty 8 (Options). Saved in save/forpz_projectzero.txt, kept in the
+-- global forpz_pz, and handed to every fighter as map "pz" (the CPU code only uses it when that fighter is CPU).
+if forpz_pz == nil then
+	forpz_pz = 0
+	local f = io.open('save/forpz_projectzero.txt', 'r')
+	if f then
+		if (f:read('*all') or ''):match('1') then forpz_pz = 1 end
+		f:close()
+	end
+end
+
 local frame = 0
 hook.add("loop", "forhud", function()
 	frame = frame + 1
@@ -119,6 +130,10 @@ hook.add("loop", "forhud", function()
 			local pick = start ~= nil and start.saPick ~= nil and start.saPick[pn] or nil
 			if pick ~= nil and map('sa') ~= pick then
 				mapSet('sa', pick)
+			end
+			local pz = (forpz_pz == 1 and gameMode() ~= 'training') and 1 or 0
+			if map('pz') ~= pz then
+				mapSet('pz', pz)
 			end
 			local sa = math.floor(map('sa'))
 			local pmax = powerMax()

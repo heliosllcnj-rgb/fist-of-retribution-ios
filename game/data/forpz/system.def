@@ -141,17 +141,17 @@ loading.text = NOW LOADING...
 footer.title.font = default-3x5.def, 0, 1, 191, 191, 191, 255, -1
 footer.title.offset = 5, 715
 footer.title.scale = 3,3
-footer.title.text = FIST OF RETRIBUTION: PROJECT ZERO
+footer.title.text = STORY AND CHARACTERS CREATED BY SCOTT BALCOM
 
 footer.info.font = default-3x5.def, 0, 0, 191, 191, 191, 255, -1
 footer.info.offset = 640, 715
 footer.info.scale = 3,3
-footer.info.text = (C) 2026 HELIOS
+footer.info.text = 
 
 footer.version.font = default-3x5.def, 0, -1, 191, 191, 191, 255, -1
 footer.version.offset = 1275, 715
 footer.version.scale = 3,3
-footer.version.text = PROTOTYPE v0.2
+footer.version.text = (C) 2026 HELIOS - PROTOTYPE v0.2
 
 footer.overlay.col = 40, 0, 0
 footer.overlay.alpha = 255, 100
@@ -289,6 +289,13 @@ layerno = 1
 start = -250,190
 mask = 1
 sin.y = 6, 264, 2
+
+[TitleBG Created By]
+type = normal
+spriteno = 3130,1
+layerno = 1
+start = -250,372
+mask = 1
 
 ;----------------------------
 [Infobox] ;(new in MUGEN 1.0)
@@ -518,38 +525,38 @@ p1.name.spacing = 15,25                   ;Space between each name for players o
 p2.name.spacing = -15,25
 
 ;Stage select
-stage.pos = 640,707
+stage.pos = 640,712
 stage.font = 3,0,0
 stage.active.font = 3,0,0
-stage.active2.font = 3,0,0, 200,256,200  ;Second font color for blinking
-stage.done.font = 3,0
+stage.active2.font = 3,0,0, 255,220,120
+stage.done.font = 3,0,0
 stage.layerno = 2
 
 ;Stage portraits
 ;stage.portrait.anim = 
 stage.portrait.spr = 9000,1
-stage.portrait.offset = -121, -141
-stage.portrait.scale = 0.25, 0.25
-stage.portrait.bg.anim = 110
+stage.portrait.offset = -125,-130
+stage.portrait.scale = 1,1
+stage.portrait.bg.anim = -1
 ;stage.portrait.bg.spr = 
-stage.portrait.bg.offset = -163, -144
-stage.portrait.bg.scale = 1.0, 1.0
+stage.portrait.bg.offset = -242,-170
+stage.portrait.bg.scale = 1,1
 stage.portrait.bg.layerno = 2
 ;stage.portrait.random.anim = 113
-stage.portrait.random.spr = 111,0
-stage.portrait.random.offset = -163, -144
-stage.portrait.random.scale = 1.0, 1.0
+stage.portrait.random.spr = 3127,0
+stage.portrait.random.offset = -125,-130
+stage.portrait.random.scale = 1,1
 stage.portrait.random.layerno = 2
 ; stage.portrait.loading.spr = 
-stage.portrait.loading.anim = 113
-stage.portrait.loading.offset = -163, -144
-stage.portrait.loading.scale = 1.0, 1.0
+stage.portrait.loading.anim = -1
+stage.portrait.loading.offset = -125,-130
+stage.portrait.loading.scale = 1,1
 stage.portrait.loading.layerno = 2
-stage.portrait.window = 521, 567, 759, 665
+stage.portrait.window = 515,582,765,682
 stage.portrait.layerno = 2
 
 ;Stage Slot Indicator
-stage.portrait.slot.anim = 156
+stage.portrait.slot.anim = -1
 ;stage.portrait.slot.spr = 155, 0
 stage.portrait.slot.offset = -27, -197
 stage.portrait.slot.facing = 1
@@ -686,91 +693,99 @@ p2.palmenu.value.snd = 100, 0
 p2.palmenu.done.snd = 100, 1
 p2.palmenu.cancel.snd = 100, 2
 
-; ---- Fist of Retribution: 3rd Strike-style select screen ----
+; ---- Fist of Retribution: select screen, roster in the middle, a portrait each side (ui/select_layout.py) ----
 rows = 4
 columns = 2
 pos = 0,0
 showemptyboxes = 1
 moveoveremptyboxes = 0
-cell.size = 120,120
+cell.size = 96,96
 cell.spacing = 0,0
-cell.bg.spr = 3103,0
+cell.bg.spr = 3122,0
 cell.bg.scale = 1,1
 portrait.spr = 9000,0
 portrait.offset = 0,0
-portrait.scale = 0.25,0.25
-portrait.loading.spr = 3103,0
+portrait.scale = 0.2000,0.2000
+portrait.loading.spr = 3122,0
 portrait.loading.scale = 1,1
-cell.0-0.offset = 1120,75
-cell.0-1.offset = 1128,60
-cell.0-2.offset = 1112,45
-cell.0-3.offset = 1078,30
-cell.1-0.offset = 870,128
-cell.1-1.offset = 870,113
-cell.1-2.offset = 845,98
-cell.1-3.offset = 805,83
+cell.0-0.offset = 553,127
+cell.0-1.offset = 543,135
+cell.0-2.offset = 533,143
+cell.0-3.offset = 523,151
+cell.1-0.offset = 565,127
+cell.1-1.offset = 555,135
+cell.1-2.offset = 545,143
+cell.1-3.offset = 535,151
 p1.cursor.active.anim = 3110
 p1.cursor.active.scale = 1,1
-p1.cursor.done.spr = 3104,2
+p1.cursor.done.spr = 3123,2
 p1.cursor.done.scale = 1,1
 p2.cursor.active.anim = 3111
 p2.cursor.active.scale = 1,1
-p2.cursor.done.spr = 3105,2
+p2.cursor.done.spr = 3124,2
 p2.cursor.done.scale = 1,1
 p1.cursor.startcell = 0,0
-p2.cursor.startcell = 0,0
+p2.cursor.startcell = 0,1
 p1.face.anim = -1
 p1.face.spr = 9000,1
-p1.face.offset = 70,20
-p1.face.scale = 0.25,0.25
+p1.face.offset = 10,112
+p1.face.scale = 0.2300,0.2300
 p1.face.facing = 1
 p1.face.window = 0,0,1280,720
 p1.face.applypal = 0
 p1.face.layerno = 1
 p2.face.anim = -1
 p2.face.spr = 9000,1
-p2.face.offset = 1210,20
-p2.face.scale = 0.25,0.25
+p2.face.offset = 1270,112
+p2.face.scale = 0.2300,0.2300
 p2.face.facing = -1
 p2.face.window = 0,0,1280,720
 p2.face.applypal = 0
 p2.face.layerno = 1
 p1.face.done.anim = -1
 p2.face.done.anim = -1
-p1.name.offset = 272,94
+p1.name.offset = 170,94
 p1.name.font = 4,0,1, 255,255,255
+p1.name.scale = 0.74,0.74
 p1.name.layerno = 2
-p2.name.offset = 1008,94
+p2.name.offset = 1110,94
 p2.name.font = 4,0,-1, 255,255,255
+p2.name.scale = 0.74,0.74
 p2.name.layerno = 2
 title.font = -1,0,0
 timer.count = 30
 timer.framespercount = 60
 timer.font = 8,0,0, 255,255,255
-timer.offset = 1232,712
-timer.scale = 0.95,0.95
+timer.offset = 636,98
+timer.scale = 0.9,0.9
 timer.layerno = 2
 timer.displaytime = 10
-p1.palmenu.bg.spr = 3106,0
-p1.palmenu.bg.offset = 560,300
+p1.palmenu.bg.spr = 3125,0
+p1.palmenu.bg.offset = 172,602
 p1.palmenu.bg.layerno = 2
 p1.palmenu.pos = 0,0
 p1.palmenu.bg.anim = -1
 p1.palmenu.text.text =  
 p1.palmenu.number.font = 8,0,0, 255,210,60
-p1.palmenu.number.offset = 960,346
+p1.palmenu.number.offset = 350,668
 p1.palmenu.number.layerno = 2
 p1.palmenu.random.text = ?
-p2.palmenu.bg.spr = 3106,0
-p2.palmenu.bg.offset = 560,300
+p2.palmenu.bg.spr = 3125,0
+p2.palmenu.bg.offset = 878,602
 p2.palmenu.bg.layerno = 2
 p2.palmenu.pos = 0,0
 p2.palmenu.bg.anim = -1
 p2.palmenu.text.text =  
 p2.palmenu.number.font = 8,0,0, 255,210,60
-p2.palmenu.number.offset = 960,346
+p2.palmenu.number.offset = 1056,668
 p2.palmenu.number.layerno = 2
 p2.palmenu.random.text = ?
+stage.scale = 0.8,0.8
+stage.text = %s
+stage.random.text = Random
+stage.portrait.bg.spr = 3126,0
+stage.portrait.random.anim = -1
+stage.portrait.loading.spr = 3127,0
 
 p1.palmenu.bg.scale = 1,1
 p2.palmenu.bg.scale = 1,1
@@ -911,12 +926,12 @@ Interpolate Scale
 ;Character select screen background
 
 [Begin Action 3110]
-3104,0, 0,0, 6
-3104,1, 0,0, 6
+3123,0, 0,0, 6
+3123,1, 0,0, 6
 
 [Begin Action 3111]
-3105,0, 0,0, 6
-3105,1, 0,0, 6
+3124,0, 0,0, 6
+3124,1, 0,0, 6
 
 [SelectBGdef]
 
@@ -929,16 +944,16 @@ mask = 1
 
 [SelectBG Top Banner]
 type = normal
-spriteno = 3101,0
+spriteno = 3120,0
 layerno = 1
 start = -640,0
 mask = 1
 
 [SelectBG Player Select]
 type = normal
-spriteno = 3102,0
+spriteno = 3121,0
 layerno = 1
-start = -120,550
+start = -230,586
 mask = 1
 
 ;-------------------------------------------------------------------
@@ -1683,70 +1698,153 @@ fadein.col = 0, 0, 0
 fadeout.time = 10
 fadeout.col = 0, 0, 0
 ;fadeout.anim = 
-title.offset = 640,48
-title.font = 4,0,0
-title.scale = 1.0, 1.0
-title.text = OPTIONS
-menu.pos = 414, 99
+title.offset = 96, 92
+title.font = 4,0,1
+title.scale = 1.05, 1.05
+title.text = SETTINGS
+menu.pos = 118, 196
 menu.item.offset = 0, 0
-menu.item.font = 7,0,1, 191,191,191
-menu.item.scale = 1.0, 1.0
+menu.item.font = 4,0,1
+menu.item.scale = 0.6, 0.6
 menu.item.active.offset = 0, 0
-menu.item.active.font = 7,0,1
-menu.item.active.scale = 1.0, 1.0
+menu.item.active.font = 10,0,1
+menu.item.active.scale = 0.6, 0.6
 menu.item.selected.offset = 0, 0
-menu.item.selected.font = 7,0,1, 0,247,247
-menu.item.selected.scale = 1.0, 1.0                
+menu.item.selected.font = 10,0,1, 255,210,90
+menu.item.selected.scale = 0.6, 0.6
 menu.item.selected.active.offset = 0, 0            
-menu.item.selected.active.font = 7,0,1, 0,247,247  
-menu.item.selected.active.scale = 1.0, 1.0
-menu.item.value.offset = 450, 0
-menu.item.value.font = 7,0,-1, 191,191,191
-menu.item.value.scale = 1.0, 1.0
-menu.item.value.active.offset = 450, 0
-menu.item.value.active.font = 7,0,-1
-menu.item.value.active.scale = 1.0, 1.0
-menu.item.value.conflict.offset = 450, 0
+menu.item.selected.active.font = 10,0,1, 255,240,170
+menu.item.selected.active.scale = 0.6, 0.6
+menu.item.value.offset = 596, 0
+menu.item.value.font = 3,0,-1
+menu.item.value.scale = 0.62, 0.62
+menu.item.value.active.offset = 596, 0
+menu.item.value.active.font = 3,0,-1, 255,255,255
+menu.item.value.active.scale = 0.62, 0.62
+menu.item.value.conflict.offset = 596, 0
 menu.item.value.conflict.font = 7,0,-1, 247,0,0
-menu.item.value.conflict.scale = 1.0, 1.0
-menu.item.info.offset = 450, 0
-menu.item.info.font = 7,0,-1, 247,247,0
-menu.item.info.scale = 1.0, 1.0
-menu.item.info.active.offset = 450, 0
-menu.item.info.active.font = 7,0,-1, 247,247,0
-menu.item.info.active.scale = 1.0, 1.0
-menu.item.spacing = 0, 42
-menu.window.margins.y = 21, 2
-menu.window.visibleitems = 13
-menu.boxcursor.visible = 1
+menu.item.value.conflict.scale = 0.62, 0.62
+menu.item.info.offset = 596, 0
+menu.item.info.font = 3,0,-1, 255,210,90
+menu.item.info.scale = 0.62, 0.62
+menu.item.info.active.offset = 596, 0
+menu.item.info.active.font = 3,0,-1, 255,240,170
+menu.item.info.active.scale = 0.62, 0.62
+menu.item.spacing = 0, 46
+menu.window.margins.y = 40, 10
+menu.window.visibleitems = 10
+menu.boxcursor.visible = 0
 menu.boxcursor.coords = -15, -30, 462, 11
 menu.boxcursor.col = 255, 255, 255
 menu.boxcursor.pulse = 30, 20, 30
-menu.boxbg.visible = 1
+menu.boxbg.visible = 0
 menu.boxbg.col = 0, 0, 0
 menu.boxbg.alpha = 0, 128
 ;menu.arrow.up.anim = 
+; ---- Fist of Retribution's own settings screens (ui/options_ui.py): slanted plates instead of the box cursor
+menu.item.bg.default.spr = 3202,0
+menu.item.bg.default.offset = -28, 0
+menu.item.bg.default.spacing = 0, 46
+menu.item.active.bg.default.spr = 3202,1
+menu.item.active.bg.default.offset = -28, 0
+menu.item.active.bg.default.spacing = 0, 46
+; the menu, trimmed to what this game uses (a blank name hides an item) and named for it
+menu.itemname.menugame = GAME CONFIG
+menu.itemname.menugame.language =
+menu.itemname.menugame.difficulty = DIFFICULTY
+menu.itemname.menugame.roundtime = ROUND TIME
+menu.itemname.menugame.lifemul = LIFE
+menu.itemname.menugame.singlevsteamlife =
+menu.itemname.menugame.gamespeed = GAME SPEED
+menu.itemname.menugame.roundsnumsingle = ROUNDS TO WIN
+menu.itemname.menugame.maxdrawgames = DRAW GAMES
+menu.itemname.menugame.credits = CREDITS
+menu.itemname.menugame.aipalette = CPU COLOURS
+menu.itemname.menugame.aisurvivalpalette =
+menu.itemname.menugame.airamping = CPU LEVEL CLIMB
+menu.itemname.menugame.quickcontinue = QUICK CONTINUE
+menu.itemname.menugame.autoguard =
+menu.itemname.menugame.dizzy = STUN
+menu.itemname.menugame.guardbreak = GUARD CRUSH
+menu.itemname.menugame.redlife = RED LIFE
+menu.itemname.menugame.teamduplicates =
+menu.itemname.menugame.teamlifeshare =
+menu.itemname.menugame.teampowershare =
+menu.itemname.menugame.spacer1 =
+menu.itemname.menugame.menutag =
+menu.itemname.menugame.menusimul =
+menu.itemname.menugame.menuturns =
+menu.itemname.menugame.back = BACK
+menu.itemname.menuvideo = VIDEO
+menu.itemname.menuvideo.renderer = RENDERER
+menu.itemname.menuvideo.renderer.back = BACK
+menu.itemname.menuvideo.resolution = RESOLUTION
+menu.itemname.menuvideo.resolution.customres = CUSTOM
+menu.itemname.menuvideo.resolution.back = BACK
+menu.itemname.menuvideo.fullscreen = FULL SCREEN
+menu.itemname.menuvideo.vsync = VSYNC
+menu.itemname.menuvideo.aspectratio = ASPECT RATIO
+menu.itemname.menuvideo.aspectratio.back = BACK
+menu.itemname.menuvideo.keepaspect = KEEP ASPECT
+menu.itemname.menuvideo.windowscalemode = WINDOW SCALING
+menu.itemname.menuvideo.msaa = ANTI-ALIASING
+menu.itemname.menuvideo.shaders = SCREEN FILTERS
+menu.itemname.menuvideo.shaders.noshader = NONE
+menu.itemname.menuvideo.shaders.back = BACK
+menu.itemname.menuvideo.model =
+menu.itemname.menuvideo.back = BACK
+menu.itemname.menuaudio = SOUND
+menu.itemname.menuaudio.mastervolume = MASTER VOLUME
+menu.itemname.menuaudio.bgmvolume = MUSIC
+menu.itemname.menuaudio.sfxvolume = EFFECTS AND VOICES
+menu.itemname.menuaudio.audioducking =
+menu.itemname.menuaudio.stereoeffects = STEREO
+menu.itemname.menuaudio.panningrange = STEREO WIDTH
+menu.itemname.menuaudio.back = BACK
+menu.itemname.menuinput = BUTTON CONFIG
+menu.itemname.menuinput.keyboard = KEYBOARD
+menu.itemname.menuinput.touch = TOUCH CONTROLS
+menu.itemname.menuinput.touch.touchsize = BUTTON SIZE
+menu.itemname.menuinput.touch.touchseethrough = SEE-THROUGH
+menu.itemname.menuinput.touch.touchvibration = VIBRATION
+menu.itemname.menuinput.touch.back = BACK
+menu.itemname.menuinput.gamepad = CONTROLLER
+menu.itemname.menuinput.inputdefault = DEFAULT BUTTONS
+menu.itemname.menuinput.back = BACK
+menu.itemname.menuengine =
+menu.itemname.menunetplay = ONLINE
+menu.itemname.menunetplay.netcode = NETCODE
+menu.itemname.menunetplay.portchange = HOST PORT
+menu.itemname.menunetplay.rollbackport = ROLLBACK PORT
+menu.itemname.menunetplay.framedelay = FRAME DELAY
+menu.itemname.menunetplay.back = BACK
+menu.itemname.default = RESTORE DEFAULTS
+menu.itemname.savereturn = SAVE AND EXIT
+menu.itemname.return = EXIT WITHOUT SAVING
+menu.valuename.on = ON
+menu.valuename.off = OFF
+menu.valuename.yes = YES
+menu.valuename.no = NO
+menu.valuename.enabled = ON
+menu.valuename.disabled = OFF
+menu.valuename.normal = NORMAL
+menu.valuename.default = DEFAULT
+menu.valuename.random = RANDOM
+menu.valuename.none = NONE
 menu.arrow.up.spr = 400, 0
-menu.arrow.up.offset = 428, -51
+menu.arrow.up.offset = 610, -58
 menu.arrow.up.facing = 1
 menu.arrow.up.scale = 1.0, 1.0
 ;menu.arrow.down.anim = 
 menu.arrow.down.spr = 401, 0
-menu.arrow.down.offset = 428, 525
+menu.arrow.down.offset = 610, 440
 menu.arrow.down.facing = 1
 menu.arrow.down.scale = 1.0, 1.0
 menu.title.uppercase = 1
-menu.valuename.none = None
-menu.valuename.random = Random
-menu.valuename.default = Default
 menu.valuename.f = (F%i)
 menu.valuename.esc = (Esc)
 menu.valuename.page = (Tab)
 menu.valuename.nokey = Not used
-menu.valuename.yes = Yes
-menu.valuename.no = No
-menu.valuename.enabled = Enabled
-menu.valuename.disabled = Disabled
 
 cursor.move.snd = 100, 0
 cursor.done.snd = 100, 1
@@ -1760,49 +1858,72 @@ textinput.overlay.col = 0, 0, 0
 textinput.overlay.alpha = 0, 128
 
 ;P1 Key menu
-keymenu.p1.menuoffset = 276, 99
-keymenu.p1.playerno.offset = 156, 0
-keymenu.p1.playerno.font = 7,0,0, 0,247,247
-keymenu.p1.playerno.scale = 1.0, 1.0
+keymenu.p1.menuoffset = 110, 212
+keymenu.p1.playerno.offset = 0, -30
+keymenu.p1.playerno.font = 3,0,1
+keymenu.p1.playerno.scale = 0.7, 0.7
 ;P2 Key menu
-keymenu.p2.menuoffset = 693, 99
-keymenu.p2.playerno.offset = 156, 0
-keymenu.p2.playerno.font = 7,0,0, 247,0,0
-keymenu.p2.playerno.scale = 1.0, 1.0
+keymenu.p2.menuoffset = 490, 212
+keymenu.p2.playerno.offset = 0, -30
+keymenu.p2.playerno.font = 3,0,1, 140,180,255
+keymenu.p2.playerno.scale = 0.7, 0.7
 
 ; unassigned 'keymenu' parameters use corresponding 'menu' values
 
 keymenu.pos = 0, 0
 
-keymenu.item.spacing = 0, 36
-keymenu.item.value.offset = 303, 0
-keymenu.item.value.active.offset = 303, 0
-keymenu.item.value.conflict.offset = 303, 0
-keymenu.item.info.offset = 303, 0
-keymenu.item.info.active.offset = 303, 0
+keymenu.item.spacing = 0, 27
+keymenu.item.value.offset = 318, 0
+keymenu.item.value.active.offset = 318, 0
+keymenu.item.value.conflict.offset = 318, 0
+keymenu.item.info.offset = 318, 0
+keymenu.item.info.active.offset = 318, 0
 
 keymenu.window.margins.y = 0, 0
 keymenu.window.visibleitems = 0
 
 keymenu.boxcursor.coords = -15, -27, 318, 8
 
-keymenu.itemname.configall = Config all
-keymenu.itemname.up = Up
-keymenu.itemname.down = Down
-keymenu.itemname.left = Left
-keymenu.itemname.right = Right
-keymenu.itemname.a = A
-keymenu.itemname.b = B
-keymenu.itemname.c = C
-keymenu.itemname.x = X
-keymenu.itemname.y = Y
-keymenu.itemname.z = Z
-keymenu.itemname.start = Start
-keymenu.itemname.d = D
-keymenu.itemname.w = W
-keymenu.itemname.menu = Menu
-keymenu.itemname.back = Back
-keymenu.itemname.page = Page
+; key config, styled to match
+keymenu.item.font = 4,0,1
+keymenu.item.scale = 0.42, 0.42
+keymenu.item.active.font = 10,0,1
+keymenu.item.active.scale = 0.42, 0.42
+keymenu.item.value.font = 3,0,-1
+keymenu.item.value.scale = 0.5, 0.5
+keymenu.item.value.active.font = 3,0,-1, 255,255,255
+keymenu.item.value.active.scale = 0.5, 0.5
+keymenu.item.value.conflict.font = 3,0,-1, 255,60,60
+keymenu.item.value.conflict.scale = 0.5, 0.5
+keymenu.item.info.font = 3,0,-1, 255,210,90
+keymenu.item.info.scale = 0.5, 0.5
+keymenu.item.info.active.font = 3,0,-1, 255,240,170
+keymenu.item.info.active.scale = 0.5, 0.5
+keymenu.boxcursor.visible = 0
+keymenu.boxbg.visible = 0
+keymenu.item.bg.default.spr = 3202,2
+keymenu.item.bg.default.offset = -18, 0
+keymenu.item.bg.default.spacing = 0, 27
+keymenu.item.active.bg.default.spr = 3202,3
+keymenu.item.active.bg.default.offset = -18, 0
+keymenu.item.active.bg.default.spacing = 0, 27
+keymenu.itemname.configall = SET ALL
+keymenu.itemname.up = UP
+keymenu.itemname.down = DOWN
+keymenu.itemname.left = LEFT
+keymenu.itemname.right = RIGHT
+keymenu.itemname.a = LIGHT KICK
+keymenu.itemname.b = MEDIUM KICK
+keymenu.itemname.c = HEAVY KICK
+keymenu.itemname.x = LIGHT PUNCH
+keymenu.itemname.y = MEDIUM PUNCH
+keymenu.itemname.z = HEAVY PUNCH
+keymenu.itemname.start = START
+keymenu.itemname.d = EXTRA 1
+keymenu.itemname.w = EXTRA 2
+keymenu.itemname.menu = PAUSE MENU
+keymenu.itemname.back = BACK
+keymenu.itemname.page = SWITCH PAGE
 
 ; If custom menus are not declared, default option screen layout is loaded.
 ; Refer to system.base.def for an example how to modify option screen menus.
@@ -1839,6 +1960,20 @@ mask = 1
 
 ;-------------------------------------------------------------------
 ;Replay select screen definition
+[OptionBG FoR Cast]
+type = normal
+spriteno = 3201,0
+layerno = 0
+start = -40, 40
+mask = 1
+
+[OptionBG FoR Overlay]
+type = normal
+spriteno = 3200,0
+layerno = 0
+start = -640, 0
+mask = 1
+
 [Replay Info]
 fadein.time = 10
 fadein.col = 0, 0, 0

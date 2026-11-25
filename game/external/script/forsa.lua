@@ -109,19 +109,21 @@ function S.draw(side, arts, cur, ref)
 	-- darken the screen, keep the portrait readable
 	U.box(0, 0, U.LW, U.LH, 4, 6, 18, 150)
 	-- banner: slanted gold bar with the title
-	local bx, by = 470, 62
-	U.slant(X(bx - 30, 800), by, 800, 70, 30, 0, 0, 0, 200)
-	U.slant(X(bx - 20, 790), by + 6, 790, 58, 24, 14, 20, 52, 255)
-	U.slant(X(bx - 20, 790), by + 6, 790, 4, 2, U.GOLD[1], 170, 40, 255)
-	U.slant(X(bx - 20, 790), by + 60, 790, 4, 2, U.GOLD[1], 170, 40, 255)
+	-- (below the names and the timer; each player's menu keeps to the half of the screen away from their
+	-- portrait, so two players can choose at the same time)
+	local bx, by, bw = 676, 112, 600
+	U.slant(X(bx - 30, bw), by, bw, 70, 30, 0, 0, 0, 200)
+	U.slant(X(bx - 20, bw - 10), by + 6, bw - 10, 58, 24, 14, 20, 52, 255)
+	U.slant(X(bx - 20, bw - 10), by + 6, bw - 10, 4, 2, U.GOLD[1], 170, 40, 255)
+	U.slant(X(bx - 20, bw - 10), by + 60, bw - 10, 4, 2, U.GOLD[1], 170, 40, 255)
 	U.spr('data/forpz/hudfx.sff', 3, L and 0 or 1, X(bx + 6, 0), by + 35, 0.92)
 	-- three slanted cards; the chosen one slides out and crackles
-	local cx, cy, cw, ch, gap = 560, 150, 640, 98, 10
+	local cx, cy, cw, ch, gap = 664, 196, 596, 92, 8
 	for i, a in ipairs(arts) do
 		local on = (i == cur)
 		slide[i] = slide[i] or 0
 		slide[i] = slide[i] + ((on and 1 or 0) - slide[i]) * 0.3
-		local sx = cx - math.floor(46 * slide[i])
+		local sx = cx - math.floor(30 * slide[i])
 		local y = cy + (i - 1) * (ch + gap)
 		local x = X(sx, cw)
 		if on then
@@ -134,30 +136,30 @@ function S.draw(side, arts, cur, ref)
 		U.slant(x, y, cw, 5, 1, on and U.GOLD[1] or 60, on and U.GOLD[2] or 70, on and U.GOLD[3] or 110, 255)
 		-- big Roman numeral
 		local rn = U.ROMAN[i] or tostring(i)
-		U.btext(rn, X(sx + 70, 0), y + 76, on and 'FoR_Menu' or 'FoR_MenuDim', 1.55, 0, on and 255 or 170)
+		U.btext(rn, X(sx + 62, 0), y + 72, on and 'FoR_Menu' or 'FoR_MenuDim', 1.55, 0, on and 255 or 170)
 		-- name, command, gauge
-		local tx = sx + 150
-		U.btext(string.upper(a.name), X(tx, 0), y + 38, on and 'FoR_Display' or 'FoR_DisplaySmall', on and 0.74 or 1.2, L and 1 or -1, on and 255 or 170)
-		U.cmd(a.cmd, L and (x + cw - 30) or (x + 30), y + 52, 28, L)
+		local tx = sx + 132
+		U.btext(string.upper(a.name), X(tx, 0), y + 36, on and 'FoR_Display' or 'FoR_DisplaySmall', on and 0.74 or 1.2, L and 1 or -1, on and 255 or 170)
+		U.cmd(a.cmd, L and (x + cw - 30) or (x + 30), y + 49, 28, L)
 		local gw = math.floor(250 * a.len / 128)
 		local sw = math.floor((gw - (a.stocks - 1) * 6) / a.stocks)
 		local fill = on and math.min(1, ((frame % 90) / 45)) or 1
 		for k = 1, a.stocks do
 			local gx = tx + (k - 1) * (sw + 6)
-			U.box(X(gx - 2, sw + 4), y + 52, sw + 4, 20, 0, 0, 0, 255)
-			U.box(X(gx, sw), y + 54, sw, 16, 20, 30, 70, 255)
+			U.box(X(gx - 2, sw + 4), y + 48, sw + 4, 20, 0, 0, 0, 255)
+			U.box(X(gx, sw), y + 50, sw, 16, 20, 30, 70, 255)
 			local fw = math.floor(sw * math.max(0, math.min(1, fill * a.stocks - (k - 1))))
 			if fw > 0 then
-				U.box(L and X(gx, fw) or X(gx + sw - fw, fw), y + 54, fw, 16, on and 60 or 40, on and 150 or 80, 255, 255)
-				U.box(L and X(gx, fw) or X(gx + sw - fw, fw), y + 54, fw, 5, 190, 230, 255, on and 255 or 120)
+				U.box(L and X(gx, fw) or X(gx + sw - fw, fw), y + 50, fw, 16, on and 60 or 40, on and 150 or 80, 255, 255)
+				U.box(L and X(gx, fw) or X(gx + sw - fw, fw), y + 50, fw, 5, 190, 230, 255, on and 255 or 120)
 			end
 		end
-		U.btext(a.stocks .. (a.stocks == 1 and ' STOCK' or ' STOCKS'), X(tx, 0), y + 92, 'FoR_DisplaySmall', 0.9, L and 1 or -1, on and 255 or 150)
+		U.btext(a.stocks .. (a.stocks == 1 and ' STOCK' or ' STOCKS'), X(tx, 0), y + 87, 'FoR_DisplaySmall', 0.9, L and 1 or -1, on and 255 or 150)
 	end
 	-- preview of the chosen super, with its description
-	local px, py, pw, ph = 560, cy + 3 * (ch + gap) + 6, 640, 180
+	local px, py, pw, ph = 664, cy + 3 * (ch + gap) + 4, 596, 166
 	local x = X(px, pw)
-	local aw = 250
+	local aw = 220
 	U.box(x - 3, py - 3, pw + 6, ph + 6, U.GOLD[1], 140, 20, 255)
 	U.box(x, py, pw, ph, 10, 14, 36, 255)
 	local flash = (frame % 120) < 4
@@ -177,7 +179,7 @@ function S.draw(side, arts, cur, ref)
 		for w in l:gmatch('%S+') do table.insert(words, w) end
 	end
 	for _, w in ipairs(words) do
-		if #line + #w + 1 > 40 then
+		if #line + #w + 1 > 38 then
 			table.insert(lines, line)
 			line = w
 		else
@@ -188,7 +190,7 @@ function S.draw(side, arts, cur, ref)
 	for i, l in ipairs(lines) do
 		U.text(l, x + aw + 16, py + 12 + i * 25, 18, 1, 225, 230, 242, 255)
 	end
-	U.btext('ANY ATTACK BUTTON TO CHOOSE', X(px, 0), py + ph + 30, 'FoR_DisplaySmall', 0.9, L and 1 or -1, 230)
+	U.btext('ANY ATTACK BUTTON TO CHOOSE', X(px, 0), py + ph + 26, 'FoR_DisplaySmall', 0.9, L and 1 or -1, 230)
 end
 
 -- announcer: "Select your fighter" shortly after each character select screen opens

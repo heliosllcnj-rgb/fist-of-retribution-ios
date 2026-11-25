@@ -245,6 +245,8 @@ function start.f_difficulty(player, offset)
 	end
 	if t.ai ~= nil then
 		return t.ai
+	elseif forpz_pz == 1 then
+		return 8   -- Project Zero: the boss from the first fight (the CPU code adds the rest through map "pz")
 	else
 		return gameOption('Options.Difficulty') + offset
 	end

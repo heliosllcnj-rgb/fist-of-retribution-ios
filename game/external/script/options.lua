@@ -28,6 +28,70 @@ end
 
 --- Save the current configuration to the config file and handle common file modifications
 local t_commonFilesOriginal = gameOption('Common')
+-- Phone touch controls (Options > Button Config > Touch Controls on iOS / Android). Saved to save/touch.cfg,
+-- which the app shell's touch overlay reads (ios-wrapper TouchOverlayView.m, android-wrapper ControllerOverlay.java).
+options.touch = {size = 100, seethrough = 55, vibration = 1}
+do
+	local f = io.open('save/touch.cfg', 'r')
+	if f then
+		for k, v in (f:read('*all') or ''):gmatch('(%w+)%s*=%s*(%-?%d+)') do
+			if options.touch[k] ~= nil then options.touch[k] = tonumber(v) end
+		end
+		f:close()
+	end
+end
+function options.f_saveTouch()
+	local f = io.open('save/touch.cfg', 'w')
+	if f then
+		f:write(string.format('size=%d\nseethrough=%d\nvibration=%d\n', options.touch.size, options.touch.seethrough, options.touch.vibration))
+		f:close()
+	end
+end
+local function touchStep(key, step, lo, hi)
+	return function(t, item, cursorPosY, moveTxt)
+		local add = getInput(-1, motif.option_info.menu.add.key)
+		local sub = not add and getInput(-1, motif.option_info.menu.subtract.key)
+		local v = options.touch[key]
+		if add and v < hi then v = math.min(hi, v + step) elseif sub and v > lo then v = math.max(lo, v - step) else return true end
+		sndPlay(motif.Snd, motif.option_info.cursor.move.snd[1], motif.option_info.cursor.move.snd[2])
+		options.touch[key] = v
+		options.f_saveTouch()
+		t.items[item].vardisplay = options.t_vardisplay['touch' .. key]()
+		return true
+	end
+end
+options.f_touchHandlers = {
+	touchsize = touchStep('size', 10, 70, 140),
+	touchseethrough = touchStep('seethrough', 10, 20, 100),
+	touchvibration = function(t, item, cursorPosY, moveTxt)
+		if getInput(-1, motif.option_info.menu.add.key, motif.option_info.menu.subtract.key, motif.option_info.menu.done.key) then
+			sndPlay(motif.Snd, motif.option_info.cursor.move.snd[1], motif.option_info.cursor.move.snd[2])
+			options.touch.vibration = 1 - options.touch.vibration
+			options.f_saveTouch()
+			t.items[item].vardisplay = options.t_vardisplay['touchvibration']()
+		end
+		return true
+	end,
+}
+
+-- Project Zero switch (see external/mods/forhud.lua): saved straight away in its own file
+if forpz_pz == nil then
+	forpz_pz = 0
+	local f = io.open('save/forpz_projectzero.txt', 'r')
+	if f then
+		if (f:read('*all') or ''):match('1') then forpz_pz = 1 end
+		f:close()
+	end
+end
+function options.f_setProjectZero(v)
+	forpz_pz = v
+	local f = io.open('save/forpz_projectzero.txt', 'w')
+	if f then
+		f:write(tostring(v))
+		f:close()
+	end
+end
+
 function options.f_saveCfg(reload)
 	-- Restore the original content of the common files
 	local t_commonFiles = gameOption('Common')
@@ -112,6 +176,7 @@ options.t_itemname = {
 			-- modifyGameOption('Common.Modules', {})
 			-- modifyGameOption('Common.Lua', {"loop()"})
 			modifyGameOption('Options.Difficulty', 4)
+			options.f_setProjectZero(0)
 			modifyGameOption('Options.Life', 100)
 			modifyGameOption('Options.Time', 99)
 			modifyGameOption('Options.GameSpeed', 0)
@@ -259,12 +324,24 @@ options.t_itemname = {
 	end,
 	-- Difficulty Level
 	['difficulty'] = function(t, item, cursorPosY, moveTxt)
-		if getInput(-1, motif.option_info.menu.add.key) and gameOption('Options.Difficulty') < 8 then
+		-- read each key once: a second getInput in the same frame comes back false
+		local add = getInput(-1, motif.option_info.menu.add.key)
+		local sub = not add and getInput(-1, motif.option_info.menu.subtract.key)
+		if add and gameOption('Options.Difficulty') < 8 then
 			sndPlay(motif.Snd, motif.option_info.cursor.move.snd[1], motif.option_info.cursor.move.snd[2])
 			modifyGameOption('Options.Difficulty', gameOption('Options.Difficulty') + 1)
 			t.items[item].vardisplay = options.t_vardisplay['difficulty']()
 			options.modified = true
-		elseif getInput(-1, motif.option_info.menu.subtract.key) and gameOption('Options.Difficulty') > 1 then
+		elseif add and forpz_pz ~= 1 then
+			-- one step past 8: Project Zero, the boss CPU (Difficulty stays 8; the switch is our own file)
+			sndPlay(motif.Snd, motif.option_info.cursor.move.snd[1], motif.option_info.cursor.move.snd[2])
+			options.f_setProjectZero(1)
+			t.items[item].vardisplay = options.t_vardisplay['difficulty']()
+		elseif sub and forpz_pz == 1 then
+			sndPlay(motif.Snd, motif.option_info.cursor.move.snd[1], motif.option_info.cursor.move.snd[2])
+			options.f_setProjectZero(0)
+			t.items[item].vardisplay = options.t_vardisplay['difficulty']()
+		elseif sub and gameOption('Options.Difficulty') > 1 then
 			sndPlay(motif.Snd, motif.option_info.cursor.move.snd[1], motif.option_info.cursor.move.snd[2])
 			modifyGameOption('Options.Difficulty', gameOption('Options.Difficulty') - 1)
 			t.items[item].vardisplay = options.t_vardisplay['difficulty']()
@@ -1490,10 +1567,22 @@ options.t_vardisplay = {
 	['debugmode'] = function()
 		return options.f_boolDisplay(gameOption('Debug.AllowDebugMode'), motif.option_info.menu.valuename.on, motif.option_info.menu.valuename.off)
 	end,
+	['touchsize'] = function()
+		return options.touch.size .. '%'
+	end,
+	['touchseethrough'] = function()
+		return options.touch.seethrough .. '%'
+	end,
+	['touchvibration'] = function()
+		return options.touch.vibration == 1 and motif.option_info.menu.valuename.on or motif.option_info.menu.valuename.off
+	end,
 	['difficulty'] = function()
-		-- 3rd Strike GAME CONFIGURATION style: an 8-step gauge, EASY to HARD (arcade default 4)
+		-- 3rd Strike GAME CONFIGURATION style: an 8-step gauge, EASY to HARD (arcade default 4), then PROJECT ZERO
+		if forpz_pz == 1 then
+			return 'PROJECT ZERO'
+		end
 		local d = gameOption('Options.Difficulty')
-		return 'EASY ' .. string.rep('#', d) .. string.rep('-', 8 - d) .. ' HARD  ' .. d
+		return string.rep('I', d) .. string.rep('-', 8 - d) .. '   ' .. d
 	end,
 	['enablemodel'] = function()
 		return options.f_definedDisplay(gameOption('Video.EnableModel'), {[true] = motif.option_info.menu.valuename.on}, motif.option_info.menu.valuename.off)
@@ -1791,7 +1880,7 @@ function options.f_start()
 				if options.menu.submenu[c] == nil or c:match("^spacer%d*$") then
 					options.menu.submenu[c] = {title = main.f_itemnameUpper(motif.option_info.menu.itemname[suffix], motif.option_info.menu.title.uppercase), submenu = {}, items = {}}
 					options.menu.submenu[c].loop = options.f_createMenu(options.menu.submenu[c], false)
-					if not suffix:match(c .. '_') then
+					if not suffix:match(c .. '_') and (motif.option_info.menu.itemname[suffix] or '') ~= '' then
 						table.insert(options.menu.items, {
 							itemname = c,
 							displayname = motif.option_info.menu.itemname[suffix],
@@ -1808,14 +1897,15 @@ function options.f_start()
 				if t_pos.submenu[c] == nil or c:match("^spacer%d*$") then
 					t_pos.submenu[c] = {title = main.f_itemnameUpper(motif.option_info.menu.itemname[suffix], motif.option_info.menu.title.uppercase), submenu = {}, items = {}}
 					t_pos.submenu[c].loop = options.f_createMenu(t_pos.submenu[c], false)
-					table.insert(t_pos.items, {
+					-- a blank name hides the item (Fist of Retribution trims the engine's menu in system.def)
+					if (motif.option_info.menu.itemname[suffix] or '') ~= '' then table.insert(t_pos.items, {
 						itemname = c,
 						displayname = motif.option_info.menu.itemname[suffix],
 						paramname = suffix,
 						vardisplay = options.f_vardisplay(c),
 						selected = false,
 					})
-					table.insert(options.t_vardisplayPointers, t_pos.items[#t_pos.items])
+					table.insert(options.t_vardisplayPointers, t_pos.items[#t_pos.items]) end
 				end
 				if j > lastNum then
 					t_pos = t_pos.submenu[c]
@@ -1825,13 +1915,38 @@ function options.f_start()
 			lastNum = j
 		end
 	end
-	-- Runtime platform filtering
-	local runtimeOS = getRuntimeOS()
-	local excluded = {gles32 = true}
+	-- Runtime platform filtering. Phones (iOS / Android) get their own Button Config: Touch Controls first, a
+	-- Bluetooth controller page, no keyboard page; PC-only video options and Online are left out there.
+	-- (FOR_TEST_OS lets the phone menus be checked on a PC.)
+	local runtimeOS = os.getenv('FOR_TEST_OS') or getRuntimeOS()
+	local mobile = runtimeOS == 'android' or runtimeOS == 'ios'
+	local excluded = {gles32 = true, touch = true}
 	if runtimeOS == 'android' then
 		excluded = {keyboard = true, gl33 = true}
 	elseif runtimeOS == 'ios' then
 		excluded = {keyboard = true, gl33 = true, gles32 = true}
+	end
+	if mobile then
+		for _, k in ipairs({'renderer', 'resolution', 'fullscreen', 'vsync', 'windowscalemode', 'menunetplay'}) do
+			excluded[k] = true
+		end
+		for k, f in pairs(options.f_touchHandlers) do
+			options.t_itemname[k] = f
+		end
+		local inp = options.menu.submenu.menuinput
+		if inp ~= nil then
+			for i, v in ipairs(inp.items) do
+				if v.itemname == 'touch' and i > 1 then
+					table.insert(inp.items, 1, table.remove(inp.items, i))
+					break
+				end
+			end
+			for _, v in ipairs(inp.items) do
+				if v.itemname == 'gamepad' then
+					v.displayname = 'BLUETOOTH CONTROLLER'
+				end
+			end
+		end
 	end
 	main.f_pruneMenu(options.menu, excluded)
 	main.f_prunePointers(options.t_vardisplayPointers, excluded)

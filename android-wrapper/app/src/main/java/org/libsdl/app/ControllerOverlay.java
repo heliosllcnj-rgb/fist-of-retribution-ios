@@ -435,6 +435,77 @@ public class ControllerOverlay extends RelativeLayout {
     private int laidW = -1, laidH = -1, laidInset = -1;
     private boolean laidFull = false;
 
+    // Touch settings chosen in the game's own menu (Options > Button Config > Touch Controls), written by
+    // external/script/options.lua to <game folder>/save/touch.cfg: size (percent), seethrough (percent, full screen),
+    // vibration (0 / 1). Checked once a second while the overlay is on screen.
+    private float touchScale = 1f;
+    private int touchAlpha = 140;
+    private boolean touchVibrate = true;
+    private long touchCfgStamp = -1;
+    private final android.os.Handler touchCfgHandler = new android.os.Handler(android.os.Looper.getMainLooper());
+    private final Runnable touchCfgPoll = new Runnable() {
+        @Override
+        public void run() {
+            if (loadTouchSettings()) {
+                laidW = -1;
+                arcadeLayout();
+                if (arcadeView != null) arcadeView.invalidate();
+            }
+            touchCfgHandler.postDelayed(this, 1000);
+        }
+    };
+
+    private boolean loadTouchSettings() {
+        String base = SDLActivity.getBasePath();
+        if (base == null || base.isEmpty()) return false;
+        java.io.File f = new java.io.File(base, "save/touch.cfg");
+        long stamp = f.exists() ? f.lastModified() : 0;
+        if (stamp == touchCfgStamp) return false;
+        touchCfgStamp = stamp;
+        float scale = 1f;
+        int alpha = 140;
+        boolean vib = true;
+        if (stamp != 0) {
+            try (java.io.BufferedReader r = new java.io.BufferedReader(new java.io.FileReader(f))) {
+                String line;
+                while ((line = r.readLine()) != null) {
+                    String[] kv = line.trim().split("=", 2);
+                    if (kv.length != 2) continue;
+                    int v;
+                    try {
+                        v = Integer.parseInt(kv[1].trim());
+                    } catch (NumberFormatException e) {
+                        continue;
+                    }
+                    String k = kv[0].trim();
+                    if (k.equals("size")) scale = clampF(v / 100f, 0.7f, 1.4f);
+                    else if (k.equals("seethrough")) alpha = Math.round(clampF(v / 100f, 0.2f, 1f) * 255f);
+                    else if (k.equals("vibration")) vib = v != 0;
+                }
+            } catch (java.io.IOException e) {
+                android.util.Log.e("ControllerOverlay", "could not read touch.cfg", e);
+            }
+        }
+        boolean changed = scale != touchScale || alpha != touchAlpha || vib != touchVibrate;
+        touchScale = scale;
+        touchAlpha = alpha;
+        touchVibrate = vib;
+        return changed;
+    }
+
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        touchCfgHandler.removeCallbacks(touchCfgPoll);
+        touchCfgHandler.post(touchCfgPoll);
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        touchCfgHandler.removeCallbacks(touchCfgPoll);
+        super.onDetachedFromWindow();
+    }
+
     private android.content.SharedPreferences prefs() {
         return getContext().getSharedPreferences("for_layout", Context.MODE_PRIVATE);
     }
@@ -469,54 +540,78 @@ public class ControllerOverlay extends RelativeLayout {
 
     // Landscape: picture in the middle, stick on the left, buttons on the right, MENU / START / FULL under the
     // picture. Full screen: the picture as tall as the screen and see-through controls over its lower corners.
+    private static float clampF(float v, float lo, float hi) {
+        return v < lo ? lo : (v > hi ? hi : v);
+    }
+
     private void landscapeLayout(int w, int h, float dp) {
         int[] si = sideInsetsPx();
-        float bottom = h - Math.max(si[2], 6 * dp);
+        float bottom = h - Math.max(si[2], 8 * dp);
+        // half the cut-out inset is enough to keep clear of the camera and the rounded corners
+        float leftClear = Math.max(si[0] * 0.5f, 12 * dp), rightClear = Math.max(si[1] * 0.5f, 12 * dp);
+        // side-panel sizes: the strips are as wide as the stick and the button block need, the picture gets the rest
+        float sideBtnR = clampF(h * 0.066f, 24 * dp, 44 * dp) * touchScale, sideStep = sideBtnR * 2f + 4 * dp;
+        float sideStickR = clampF(h * 0.15f, 56 * dp, 96 * dp) * touchScale;
+        float stripL = sideStickR * 2f + leftClear + 10 * dp;
+        float stripR = sideStep * 3f + sideBtnR * 0.3f + rightClear + 6 * dp;
+        float pw = 100 * dp, ph = 40 * dp;
         if (fullScreen) {
             float gh = h, gw = (float) Math.floor(gh * 16.0 / 9.0);
             if (gw > w) { gw = w; gh = (float) Math.floor(gw * 9.0 / 16.0); }
             gameRect.set((w - gw) / 2f, (h - gh) / 2f, (w + gw) / 2f, (h + gh) / 2f);
         } else {
-            float side = Math.max(165 * dp, w * 0.175f);
-            float band = 46 * dp + 4 * dp;
-            float gw = w - side * 2f, gh = (float) Math.floor(gw * 9.0 / 16.0);
-            if (gh > h - band) { gh = h - band; gw = (float) Math.floor(gh * 16.0 / 9.0); }
-            gameRect.set((w - gw) / 2f, 0, (w + gw) / 2f, gh);
+            float band = ph + 12 * dp + Math.max(si[2], 4 * dp);
+            float gw = (float) Math.floor(w - stripL - stripR), gh = (float) Math.floor(gw * 9.0 / 16.0);
+            if (gh > h - band) { gh = (float) Math.floor(h - band); gw = (float) Math.floor(gh * 16.0 / 9.0); }
+            float gx = (float) Math.floor(stripL + (w - stripL - stripR - gw) / 2f);
+            gameRect.set(gx, 0, gx + gw, gh);
         }
         setEnv("FOR_VIEW_TOP", "");
         setEnv("FOR_VIEW_RECT", Math.round(gameRect.left) + "," + Math.round(gameRect.top) + "," + Math.round(gameRect.width()) + "," + Math.round(gameRect.height()));
         panelTop = 0; topPad = 0;
-        float leftClear = Math.max(si[0], 6 * dp), rightClear = Math.max(si[1], 6 * dp);
-        float pw = 72 * dp, ph = 28 * dp, cx;
-        float py;
         if (fullScreen) {
-            stickR = Math.min(h * 0.20f, 92 * dp);
-            stickX = leftClear + stickR + 8 * dp;
-            stickY = bottom - stickR - 18 * dp;
-            btnR = Math.min(h * 0.068f, 31 * dp);
-            float step = btnR * 2.25f, x0 = w - rightClear - step * 3f + btnR * 0.2f, cy = bottom - btnR * 2.6f;
+            // see-through stick and buttons in the lower corners, over the picture
+            stickR = clampF(h * 0.20f, 60 * dp, 100 * dp) * touchScale;
+            stickX = leftClear + stickR + 6 * dp;
+            stickY = bottom - stickR - 14 * dp;
+            btnR = clampF(h * 0.075f, 26 * dp, 44 * dp) * touchScale;
+            float step = btnR * 2.2f, x0 = w - rightClear - step * 3f + btnR * 0.1f, cy = bottom - btnR * 2.5f;
             for (int i = 0; i < 6; i++) {
                 int c = i % 3, r = i / 3;
-                btnX[i] = x0 + step * (c + 0.5f) + (r == 1 ? -btnR * 0.35f : 0);
-                btnY[i] = cy + (r == 0 ? -btnR * 1.2f : btnR * 1.2f) - c * btnR * 0.25f;
+                btnX[i] = x0 + step * (c + 0.5f) + (r == 1 ? -btnR * 0.3f : 0);
+                btnY[i] = cy + (r == 0 ? -btnR * 1.15f : btnR * 1.15f) - c * btnR * 0.22f;
             }
-            pw = 64 * dp; ph = 26 * dp; py = bottom - ph - 2 * dp; cx = w / 2f;
-        } else {
-            float leftW = gameRect.left, rightX = gameRect.right, rightW = w - rightX;
-            stickR = Math.min((leftW - leftClear) * 0.42f, h * 0.22f);
-            stickX = leftClear + (leftW - leftClear) / 2f;
-            stickY = Math.min(h * 0.64f, bottom - stickR - 6 * dp);
-            float usableW = rightW - rightClear - 4 * dp, step = usableW / 3f;
-            btnR = Math.min(step * 0.44f, h * 0.075f);
-            for (int i = 0; i < 6; i++) {
-                int c = i % 3, r = i / 3;
-                btnX[i] = rightX + 4 * dp + step * (c + 0.5f) + (r == 1 ? -btnR * 0.25f : btnR * 0.1f);
-                btnY[i] = stickY + (r == 0 ? -btnR * 1.25f : btnR * 1.25f) - c * btnR * 0.22f;
+            float barL = gameRect.left, barR = w - gameRect.right;
+            if (barL >= 64 * dp && barR >= 64 * dp) {
+                // black bars beside the picture: MENU and PANEL in the left one, START in the right one, off the picture
+                float bh = 36 * dp, top = 22 * dp;
+                float pwL = Math.min(92 * dp, barL - 14 * dp), pwR = Math.min(92 * dp, barR - 14 * dp);
+                menuRect.set(barL - pwL - 4 * dp, top, barL - 4 * dp, top + bh);
+                viewRect.set(barL - pwL - 4 * dp, top + bh + 10 * dp, barL - 4 * dp, top + bh * 2f + 10 * dp);
+                startRect.set(gameRect.right + 4 * dp, top, gameRect.right + 4 * dp + pwR, top + bh);
+                return;
             }
-            py = gameRect.bottom + Math.max(6 * dp, (bottom - gameRect.bottom - ph) / 2f);
-            cx = gameRect.centerX();
+            pw = 84 * dp; ph = 34 * dp;
+            float py = bottom - ph - 2 * dp, cx = w / 2f, g = 10 * dp;
+            menuRect.set(cx - pw * 1.5f - g, py, cx - pw * 0.5f - g, py + ph);
+            startRect.set(cx - pw * 0.5f, py, cx + pw * 0.5f, py + ph);
+            viewRect.set(cx + pw * 0.5f + g, py, cx + pw * 1.5f + g, py + ph);
+            return;
         }
-        float g = 10 * dp;
+        // side controls: stick centred in the left strip, the button block centred in the right strip
+        float leftW = gameRect.left, rightX = gameRect.right;
+        stickR = sideStickR;
+        stickX = leftClear + (leftW - leftClear) / 2f;
+        stickY = Math.min(h * 0.60f, bottom - stickR - 6 * dp);
+        btnR = sideBtnR;
+        float x0 = rightX + (w - rightClear - rightX - sideStep * 3f - btnR * 0.3f) / 2f + btnR * 0.3f;
+        for (int i = 0; i < 6; i++) {
+            int c = i % 3, r = i / 3;
+            btnX[i] = x0 + sideStep * (c + 0.5f) + (r == 1 ? -btnR * 0.3f : 0);
+            btnY[i] = stickY + (r == 0 ? -(btnR + 3 * dp) : (btnR + 3 * dp)) - c * btnR * 0.22f;
+        }
+        float py = gameRect.bottom + Math.max(6 * dp, (bottom - gameRect.bottom - ph) / 2f);
+        float cx = gameRect.centerX(), g = 12 * dp;
         menuRect.set(cx - pw * 1.5f - g, py, cx - pw * 0.5f - g, py + ph);
         startRect.set(cx - pw * 0.5f, py, cx + pw * 0.5f, py + ph);
         viewRect.set(cx + pw * 0.5f + g, py, cx + pw * 1.5f + g, py + ph);
@@ -564,24 +659,25 @@ public class ControllerOverlay extends RelativeLayout {
         if (w >= 600 * dp && panelTop < h * 0.5f + 20 * dp) {
             panelTop = h * 0.5f + 20 * dp;
         }
-        topPad = 46 * dp;
+        topPad = 56 * dp;
         float bottom = h - 14 * dp;
         float usable = Math.max(bottom - (panelTop + topPad), 60 * dp);
         boolean tall = usable > w * 0.9f;
         float cy = panelTop + topPad + usable * (tall ? 0.46f : 0.52f);
-        stickR = Math.min(w * 0.20f, usable * (tall ? 0.22f : 0.40f));
-        stickX = w * 0.25f;
+        stickR = Math.min(w * 0.19f, usable * (tall ? 0.22f : 0.40f)) * touchScale;
+        stickX = Math.max(w * 0.215f, stickR + 8 * dp);
         stickY = cy;
-        float col = (w * 0.50f) / 3f;
-        btnR = Math.min(col * 0.44f, usable * (tall ? 0.115f : 0.21f));
-        float x0 = w * 0.485f, gap = btnR * 1.22f;
+        float col = (w * 0.57f) / 3f;
+        btnR = Math.min(col * 0.46f, usable * (tall ? 0.13f : 0.22f)) * touchScale;
+        float x0 = w * 0.42f, gap = btnR * 1.16f;
         for (int i = 0; i < 6; i++) {
             int c = i % 3, r = i / 3;
             btnX[i] = x0 + col * (c + 0.5f);
             btnY[i] = cy + (r == 0 ? -gap : gap) - c * btnR * 0.22f;
         }
-        startRect.set(w - 84 * dp, panelTop + 9 * dp, w - 12 * dp, panelTop + 37 * dp);
-        menuRect.set(w - 164 * dp, panelTop + 9 * dp, w - 92 * dp, panelTop + 37 * dp);
+        float ppw = 92 * dp, pph = 36 * dp, ppy = panelTop + (topPad - pph) / 2f;
+        startRect.set(w - 12 * dp - ppw, ppy, w - 12 * dp, ppy + pph);
+        menuRect.set(w - 20 * dp - ppw * 2f, ppy, w - 20 * dp - ppw, ppy + pph);
     }
 
     private void arcadeSend(int code, boolean pressed) {
@@ -607,7 +703,7 @@ public class ControllerOverlay extends RelativeLayout {
             float sl = 10 * dp;
             boolean onPill = startRect.contains(x, y) || menuRect.contains(x, y) ||
                     (!viewRect.isEmpty() && x >= viewRect.left - sl && x <= viewRect.right + sl && y >= viewRect.top - sl && y <= viewRect.bottom + sl);
-            boolean stickSide = landscape ? (x < getWidth() * 0.40f && !onPill) : (x < getWidth() * 0.47f && y > panelTop + topPad);
+            boolean stickSide = landscape ? (x < getWidth() * 0.40f && !onPill) : (x < getWidth() * 0.41f && y > panelTop + topPad);
             if (stickPointer == -1 && stickSide) {
                 stickPointer = event.getPointerId(index);
             }
@@ -666,7 +762,7 @@ public class ControllerOverlay extends RelativeLayout {
                 }
             }
             arcadeMask = mask;
-            if (anyDown) {
+            if (anyDown && touchVibrate) {
                 performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);
             }
         }
@@ -759,7 +855,7 @@ public class ControllerOverlay extends RelativeLayout {
                     c.drawRect(gameRect.left - 3 * dp, gameRect.top - 3 * dp, gameRect.right + 3 * dp, gameRect.bottom + 3 * dp, paint);
                     c.restore();
                 } else {
-                    ctlLayer = c.saveLayerAlpha(0, 0, w, h, 140);
+                    ctlLayer = c.saveLayerAlpha(0, 0, w, h, touchAlpha);
                 }
             } else {
             // Panel: dark metal with a slash of orange (everything above panelTop is left clear for the game)
@@ -859,7 +955,7 @@ public class ControllerOverlay extends RelativeLayout {
             paint.setColor(down ? 0xFFFFFFFF : 0xFFDBDBDB);
             c.drawRoundRect(r, r.height() / 2f, r.height() / 2f, paint);
             paint.setColor(0xFF1A1A1A);
-            paint.setTextSize(12 * dp);
+            paint.setTextSize(Math.max(12 * dp, r.height() * 0.40f));
             c.drawText(title, r.centerX(), r.centerY() - (paint.descent() + paint.ascent()) / 2f, paint);
         }
     }

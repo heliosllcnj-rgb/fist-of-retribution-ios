@@ -1,7 +1,8 @@
 ; Michael "Milo" Foster - Fist of Retribution: Project Zero (IKEMEN GO prototype)
+; Character, story and world created and written by Scott Balcom (original story: Fist of Retribution: Project Zero).
 [Info]
 name = "Michael "Milo" Foster"
-displayname = "Milo"
+displayname = "Milo Foster"
 versiondate = 11,18,2026
 mugenversion = 1.1
 author = "Scott Balcom / Claude (prototype)"

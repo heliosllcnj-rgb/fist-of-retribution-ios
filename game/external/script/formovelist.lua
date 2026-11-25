@@ -178,6 +178,24 @@ local function num(v)
 	return tostring(v)
 end
 
+-- LEFT / RIGHT: next tab; past the first or last tab, the other player's list (two players, or the training dummy)
+local function tabStep(data, sec, d)
+	sndPlay(motif.Snd, sec.cursor.move.snd[1], sec.cursor.move.snd[2])
+	local nt = data.tab + d
+	if (nt < 1 or nt > #data.tabs) and menu.t_movelists ~= nil and #menu.t_movelists > 1 then
+		menu.movelistChar = (menu.movelistChar - 1 + d) % #menu.t_movelists + 1
+		local od = load(charDef(menu.t_movelists[menu.movelistChar]))
+		if od ~= nil then
+			od.tab = (d > 0) and 1 or #od.tabs
+			od.anim = nil
+		end
+		data.anim = nil
+		return
+	end
+	data.tab = (data.tab - 1 + d) % #data.tabs + 1
+	data.anim = nil
+end
+
 function M.render(sec, t)
 	local data = load(charDef(t))
 	if data == nil then
@@ -194,11 +212,13 @@ function M.render(sec, t)
 		sndPlay(motif.Snd, sec.cancel.snd[1], sec.cancel.snd[2])
 		menu.itemname = ''
 		return true
-	elseif getInput(-1, sec.menu.subtract.key) or getInput(-1, sec.menu.add.key) then
-		sndPlay(motif.Snd, sec.cursor.move.snd[1], sec.cursor.move.snd[2])
-		local d = getInput(-1, sec.menu.add.key) and 1 or -1
-		data.tab = (data.tab - 1 + d) % #data.tabs + 1
-		data.anim = nil
+	elseif getInput(-1, sec.menu.subtract.key) then
+		-- (each key is read once: a second getInput for the same press in one frame comes back false, which used to
+		-- make RIGHT step backwards as well)
+		tabStep(data, sec, -1)
+		return true
+	elseif getInput(-1, sec.menu.add.key) then
+		tabStep(data, sec, 1)
 		return true
 	elseif getInput(-1, sec.menu.previous.key) then
 		sndPlay(motif.Snd, sec.cursor.move.snd[1], sec.cursor.move.snd[2])
@@ -221,7 +241,11 @@ function M.render(sec, t)
 	box(0, 0, LW, 84, 10, 14, 34, 255)
 	box(0, 84, LW, 3, GOLD[1], GOLD[2], GOLD[3], 255)
 	text('COMMAND LIST', 56, 56, 40, 1, 255, 255, 255, 255, true)
-	text(data.char or t.name or '', LW - 56, 56, 40, -1, GOLD[1], GOLD[2], GOLD[3], 255, true)
+	local who = data.char or t.name or ''
+	if menu.t_movelists ~= nil and #menu.t_movelists > 1 and t.pn ~= nil then
+		who = t.pn .. 'P  ' .. who
+	end
+	text(who, LW - 56, 56, 40, -1, GOLD[1], GOLD[2], GOLD[3], 255, true)
 
 	-- tabs
 	local tw = (LW - 112) / #data.tabs

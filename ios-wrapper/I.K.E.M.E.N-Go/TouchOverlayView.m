@@ -18,7 +18,74 @@
 @property (nonatomic, assign) CGSize lastKnownSize;
 @property (nonatomic, strong) ArcadePanelView *arcadePanel;
 @property (nonatomic, strong) UIButton *arcadeCarrier;
+@property (nonatomic, strong) NSTimer *touchCfgTimer;
 @end
+
+// Sizes for the landscape side-panel layout, worked out from the screen so the stick, the six buttons and the
+// picture always agree. Everything is in points.
+typedef struct {
+    CGFloat btnR, step, stickR, leftW, rightW, leftClear, rightClear, pillW, pillH;
+} FORSideMetrics;
+
+static CGFloat FORClamp(CGFloat v, CGFloat lo, CGFloat hi) {
+    return v < lo ? lo : (v > hi ? hi : v);
+}
+
+// Touch settings chosen in the game's own menu (Options > Button Config > Touch Controls), written by
+// external/script/options.lua to save/touch.cfg in the game folder (the engine's working directory):
+// size (percent), seethrough (percent, full screen), vibration (0 / 1). Checked once a second.
+static CGFloat FORTouchScale = 1.0, FORTouchAlpha = 0.55;
+static BOOL FORTouchVibrate = YES, FORTouchLoaded = NO;
+static NSDate *FORTouchStamp = nil;
+
+static BOOL FORLoadTouchSettings(void) {
+    NSFileManager *fm = [NSFileManager defaultManager];
+    NSString *path = [[fm currentDirectoryPath] stringByAppendingPathComponent:@"save/touch.cfg"];
+    NSDate *stamp = [[fm attributesOfItemAtPath:path error:nil] fileModificationDate];
+    if (FORTouchLoaded && ((stamp == nil && FORTouchStamp == nil) || (stamp != nil && [stamp isEqualToDate:FORTouchStamp]))) {
+        return NO;
+    }
+    FORTouchLoaded = YES;
+    FORTouchStamp = stamp;
+    CGFloat scale = 1.0, alpha = 0.55;
+    BOOL vib = YES;
+    NSString *text = stamp ? [NSString stringWithContentsOfFile:path encoding:NSUTF8StringEncoding error:nil] : nil;
+    for (NSString *line in [text ?: @"" componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]]) {
+        NSArray<NSString *> *kv = [line componentsSeparatedByString:@"="];
+        if (kv.count != 2) {
+            continue;
+        }
+        NSString *k = [kv[0] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+        NSInteger v = [kv[1] integerValue];
+        if ([k isEqualToString:@"size"]) {
+            scale = FORClamp(v / 100.0, 0.7, 1.4);
+        } else if ([k isEqualToString:@"seethrough"]) {
+            alpha = FORClamp(v / 100.0, 0.2, 1.0);
+        } else if ([k isEqualToString:@"vibration"]) {
+            vib = (v != 0);
+        }
+    }
+    BOOL changed = scale != FORTouchScale || alpha != FORTouchAlpha || vib != FORTouchVibrate;
+    FORTouchScale = scale;
+    FORTouchAlpha = alpha;
+    FORTouchVibrate = vib;
+    return changed;
+}
+
+static FORSideMetrics FORSideMetricsFor(CGFloat H, UIEdgeInsets si) {
+    FORSideMetrics m;
+    // half the cut-out inset is enough to keep clear of the camera island and the rounded corners
+    m.leftClear = MAX(si.left * 0.5, 12.0);
+    m.rightClear = MAX(si.right * 0.5, 12.0);
+    m.btnR = FORClamp(H * 0.066, 24.0, 44.0) * FORTouchScale;
+    m.step = m.btnR * 2.0 + 4.0;
+    m.stickR = FORClamp(H * 0.15, 56.0, 96.0) * FORTouchScale;
+    m.leftW = m.stickR * 2.0 + m.leftClear + 10.0;
+    m.rightW = m.step * 3.0 + m.btnR * 0.3 + m.rightClear + 6.0;
+    m.pillW = 100.0;
+    m.pillH = 40.0;
+    return m;
+}
 
 @implementation TouchOverlayView
 
@@ -71,6 +138,10 @@ static SDL_Joystick *virtualJoystick;
     self.rightJoystickView.hidden = YES;
     self.vewlixButtonView.hidden = YES;
     self.gameFolderButton.hidden = YES;
+    // ...and neither are the stock Start / Menu buttons, which used to sit over the picture
+    for (UIButton *btn in self.buttons) {
+        btn.hidden = YES;
+    }
     self.alpha = 1.0;
 
     CGSize screen = win.bounds.size;
@@ -90,12 +161,14 @@ static SDL_Joystick *virtualJoystick;
             if (gw > W) { gw = W; gh = floor(gw * 9.0 / 16.0); }
             game = CGRectMake(floor((W - gw) / 2.0), floor((H - gh) / 2.0), gw, gh);
         } else {
-            CGFloat side = MAX(165.0, W * 0.175);
-            CGFloat band = 46.0 + MAX(safe.bottom, 4.0);
-            CGFloat gw = W - side * 2.0;
+            // The strips are as wide as the stick and the button block need; the picture takes what is left
+            FORSideMetrics m = FORSideMetricsFor(H, safe);
+            CGFloat top = MAX(safe.top, 0.0);
+            CGFloat band = m.pillH + 12.0 + MAX(safe.bottom, 4.0);
+            CGFloat gw = floor(W - m.leftW - m.rightW);
             CGFloat gh = floor(gw * 9.0 / 16.0);
-            if (gh > H - band) { gh = H - band; gw = floor(gh * 16.0 / 9.0); }
-            game = CGRectMake(floor((W - gw) / 2.0), MAX(safe.top, 0.0), gw, gh);
+            if (gh > H - band - top) { gh = floor(H - band - top); gw = floor(gh * 16.0 / 9.0); }
+            game = CGRectMake(floor(m.leftW + (W - m.leftW - m.rightW - gw) / 2.0), top, gw, gh);
         }
         inWindow = CGRectMake(0, 0, W, H);
         char rect[64];
@@ -154,6 +227,19 @@ static SDL_Joystick *virtualJoystick;
 
 - (void)didMoveToWindow {
     [super didMoveToWindow];
+    [self.touchCfgTimer invalidate];
+    self.touchCfgTimer = nil;
+    if (self.window != nil) {
+        FORLoadTouchSettings();
+        __weak TouchOverlayView *weakSelf = self;
+        self.touchCfgTimer = [NSTimer scheduledTimerWithTimeInterval:1.0 repeats:YES block:^(NSTimer *timer) {
+            if (FORLoadTouchSettings()) {
+                [weakSelf setNeedsLayout];
+                [weakSelf layoutIfNeeded];
+                [weakSelf.arcadePanel relayout];
+            }
+        }];
+    }
     [self setNeedsLayout];
 }
 
@@ -308,6 +394,11 @@ static SDL_Joystick *virtualJoystick;
 
 // This method processes touch events so that multiple button presses (A+B, X+Y, X+A, etc.) work
 - (void)processTouches:(NSSet<UITouch *> *)touches {
+    if (self.arcadePanel != nil) {
+        // The arcade panel does all the input; the stock buttons are hidden and must not be pressed by a
+        // touch that lands on the picture where they used to be
+        return;
+    }
     NSMutableSet<UIButton *> *newPressedButtons = [NSMutableSet set];
     
     // Evaluate active touch locations across the view
@@ -554,19 +645,19 @@ typedef struct {
     }
     _viewRect = CGRectZero;
     CGFloat w = size.width;
-    CGFloat topPad = 46.0;                          // row for START / MENU
+    CGFloat topPad = 56.0;                          // row for START / MENU
     CGFloat bottom = size.height - MAX(_bottomInset, 10.0);
     CGFloat usable = MAX(bottom - topPad, 60.0);
     BOOL tall = usable > w * 0.9;                   // a tall phone leaves a deep panel; a short one gets a single band
     CGFloat cy = topPad + usable * (tall ? 0.46 : 0.52);
 
-    _stickRadius = MIN(w * 0.20, usable * (tall ? 0.22 : 0.40));
-    _stickCenter = CGPointMake(w * 0.25, cy);
+    _stickRadius = MIN(w * 0.19, usable * (tall ? 0.22 : 0.40)) * FORTouchScale;
+    _stickCenter = CGPointMake(MAX(w * 0.215, _stickRadius + 8.0), cy);
 
-    CGFloat colWidth = (w * 0.50) / 3.0;
-    CGFloat radius = MIN(colWidth * 0.44, usable * (tall ? 0.115 : 0.21));
-    CGFloat x0 = w * 0.485;
-    CGFloat rowGap = radius * 1.22;
+    CGFloat colWidth = (w * 0.57) / 3.0;
+    CGFloat radius = MIN(colWidth * 0.46, usable * (tall ? 0.13 : 0.22)) * FORTouchScale;
+    CGFloat x0 = w * 0.42;
+    CGFloat rowGap = radius * 1.16;
     // Top row punches (x y z), bottom row kicks (a b c): the same order as the arcade cabinet
     NSInteger tags[6] = {4, 5, 6, 1, 2, 3};
     for (int i = 0; i < 6; i++) {
@@ -578,8 +669,9 @@ typedef struct {
         _buttons[i].tag = tags[i];
         _buttons[i].kick = (row == 1);
     }
-    _startRect = CGRectMake(w - 84.0, 9.0, 72.0, 28.0);
-    _menuRect = CGRectMake(w - 84.0 - 80.0, 9.0, 72.0, 28.0);
+    CGFloat pw = 92.0, ph = 36.0, py = (topPad - ph) / 2.0;
+    _startRect = CGRectMake(w - 12.0 - pw, py, pw, ph);
+    _menuRect = CGRectMake(w - 12.0 - pw * 2.0 - 8.0, py, pw, ph);
 }
 
 - (void)computeLandscapeLayout:(CGSize)size {
@@ -588,50 +680,59 @@ typedef struct {
     UIEdgeInsets si = self.sideInsets;
     CGFloat bottom = H - MAX(self.bottomInset, 8.0);
     NSInteger tags[6] = {4, 5, 6, 1, 2, 3};
+    FORSideMetrics m = FORSideMetricsFor(H, si);
     if (self.fullScreen) {
-        // see-through controls in the lower corners, over the picture
-        _stickRadius = MIN(H * 0.20, 92.0);
-        _stickCenter = CGPointMake(MAX(si.left, 12.0) + _stickRadius + 8.0, bottom - _stickRadius - 18.0);
-        CGFloat r = MIN(H * 0.068, 31.0);
-        CGFloat step = r * 2.25;
-        CGFloat x0 = W - MAX(si.right, 12.0) - step * 3.0 + r * 0.2;
-        CGFloat cy = bottom - r * 2.6;
+        // see-through stick and buttons in the lower corners, over the picture
+        _stickRadius = FORClamp(H * 0.20, 60.0, 100.0) * FORTouchScale;
+        _stickCenter = CGPointMake(m.leftClear + _stickRadius + 6.0, bottom - _stickRadius - 14.0);
+        CGFloat r = FORClamp(H * 0.075, 26.0, 44.0) * FORTouchScale;
+        CGFloat step = r * 2.2;
+        CGFloat x0 = W - m.rightClear - step * 3.0 + r * 0.1;
+        CGFloat cy = bottom - r * 2.5;
         for (int i = 0; i < 6; i++) {
             int col = i % 3, row = i / 3;
-            _buttons[i].center = CGPointMake(x0 + step * (col + 0.5) + (row == 1 ? -r * 0.35 : 0), cy + (row == 0 ? -r * 1.2 : r * 1.2) - col * r * 0.25);
+            _buttons[i].center = CGPointMake(x0 + step * (col + 0.5) + (row == 1 ? -r * 0.3 : 0), cy + (row == 0 ? -r * 1.15 : r * 1.15) - col * r * 0.22);
             _buttons[i].radius = r;
             _buttons[i].tag = tags[i];
             _buttons[i].kick = (row == 1);
         }
-        CGFloat pw = 64.0, ph = 26.0, py = bottom - ph - 2.0, cx = W / 2.0;
-        _menuRect = CGRectMake(cx - pw * 1.5 - 8.0, py, pw, ph);
-        _startRect = CGRectMake(cx - pw * 0.5, py, pw, ph);
-        _viewRect = CGRectMake(cx + pw * 0.5 + 8.0, py, pw, ph);
+        CGFloat barL = g.origin.x, barR = W - CGRectGetMaxX(g);
+        if (barL >= 64.0 && barR >= 64.0) {
+            // black bars beside the picture: MENU and PANEL go in the left one, START in the right one, off the picture
+            CGFloat ph = 36.0, top = 22.0;
+            CGFloat pwL = MIN(92.0, barL - 14.0), pwR = MIN(92.0, barR - 14.0);
+            _menuRect = CGRectMake(barL - pwL - 4.0, top, pwL, ph);
+            _viewRect = CGRectMake(barL - pwL - 4.0, top + ph + 10.0, pwL, ph);
+            _startRect = CGRectMake(CGRectGetMaxX(g) + 4.0, top, pwR, ph);
+        } else {
+            CGFloat pw = 84.0, ph = 34.0, py = bottom - ph - 2.0, cx = W / 2.0;
+            _menuRect = CGRectMake(cx - pw * 1.5 - 10.0, py, pw, ph);
+            _startRect = CGRectMake(cx - pw * 0.5, py, pw, ph);
+            _viewRect = CGRectMake(cx + pw * 0.5 + 10.0, py, pw, ph);
+        }
         return;
     }
-    // side controls: stick centred in the left strip, buttons in the right strip, a little below the middle
-    CGFloat leftW = g.origin.x, rightX = CGRectGetMaxX(g), rightW = W - rightX;
-    CGFloat leftClear = MAX(si.left, 6.0), rightClear = MAX(si.right, 6.0);
-    _stickRadius = MIN((leftW - leftClear) * 0.42, H * 0.22);
-    _stickCenter = CGPointMake(leftClear + (leftW - leftClear) / 2.0, MIN(H * 0.64, bottom - _stickRadius - 6.0));
-    CGFloat usableW = rightW - rightClear - 4.0;
-    CGFloat r = MIN(usableW / 3.0 * 0.44, H * 0.075);
-    CGFloat step = usableW / 3.0;
+    // side controls: stick centred in the left strip, the button block centred in the right strip
+    CGFloat leftW = g.origin.x, rightX = CGRectGetMaxX(g);
+    CGFloat r = m.btnR, step = m.step;
+    _stickRadius = m.stickR;
+    _stickCenter = CGPointMake(m.leftClear + (leftW - m.leftClear) / 2.0, MIN(H * 0.60, bottom - _stickRadius - 6.0));
+    CGFloat x0 = rightX + (W - m.rightClear - rightX - step * 3.0 - r * 0.3) / 2.0 + r * 0.3;
     CGFloat cy = _stickCenter.y;
     for (int i = 0; i < 6; i++) {
         int col = i % 3, row = i / 3;
-        _buttons[i].center = CGPointMake(rightX + 4.0 + step * (col + 0.5) + (row == 1 ? -r * 0.25 : r * 0.1),
-                                         cy + (row == 0 ? -r * 1.25 : r * 1.25) - col * r * 0.22);
+        _buttons[i].center = CGPointMake(x0 + step * (col + 0.5) + (row == 1 ? -r * 0.3 : 0),
+                                         cy + (row == 0 ? -(r + 3.0) : (r + 3.0)) - col * r * 0.22);
         _buttons[i].radius = r;
         _buttons[i].tag = tags[i];
         _buttons[i].kick = (row == 1);
     }
-    CGFloat pw = 72.0, ph = 28.0;
+    CGFloat pw = m.pillW, ph = m.pillH, gap = 12.0;
     CGFloat py = CGRectGetMaxY(g) + MAX(6.0, (bottom - CGRectGetMaxY(g) - ph) / 2.0);
     CGFloat cx = CGRectGetMidX(g);
-    _menuRect = CGRectMake(cx - pw * 1.5 - 10.0, py, pw, ph);
+    _menuRect = CGRectMake(cx - pw * 1.5 - gap, py, pw, ph);
     _startRect = CGRectMake(cx - pw * 0.5, py, pw, ph);
-    _viewRect = CGRectMake(cx + pw * 0.5 + 10.0, py, pw, ph);
+    _viewRect = CGRectMake(cx + pw * 0.5 + gap, py, pw, ph);
 }
 
 #pragma mark Drawing
@@ -646,7 +747,7 @@ typedef struct {
     if (self.landscape) {
         CGContextClearRect(ctx, self.bounds);
         if (self.fullScreen) {
-            ctlAlpha = 0.55;
+            ctlAlpha = FORTouchAlpha;
         } else {
             CGContextSaveGState(ctx);
             UIBezierPath *around = [UIBezierPath bezierPathWithRect:self.bounds];
@@ -787,7 +888,7 @@ typedef struct {
     UIBezierPath *pill = [UIBezierPath bezierPathWithRoundedRect:r cornerRadius:r.size.height / 2.0];
     [(down ? [UIColor colorWithWhite:1.0 alpha:1.0] : [UIColor colorWithWhite:0.86 alpha:1.0]) setFill];
     [pill fill];
-    NSDictionary *attr = @{NSFontAttributeName: [UIFont systemFontOfSize:12.0 weight:UIFontWeightHeavy],
+    NSDictionary *attr = @{NSFontAttributeName: [UIFont systemFontOfSize:MAX(12.0, r.size.height * 0.40) weight:UIFontWeightHeavy],
                            NSForegroundColorAttributeName: [UIColor colorWithWhite:0.1 alpha:1.0]};
     CGSize ts = [title sizeWithAttributes:attr];
     [title drawAtPoint:CGPointMake(CGRectGetMidX(r) - ts.width / 2.0, CGRectGetMidY(r) - ts.height / 2.0) withAttributes:attr];
@@ -803,7 +904,7 @@ typedef struct {
         BOOL onPill = CGRectContainsPoint(CGRectInset(_startRect, -10, -10), p) || CGRectContainsPoint(CGRectInset(_menuRect, -10, -10), p) ||
                       CGRectContainsPoint(CGRectInset(_viewRect, -10, -10), p);
         BOOL stickSide = self.landscape ? (p.x < self.bounds.size.width * 0.40 && !onPill)
-                                        : (p.x < self.bounds.size.width * 0.47 && p.y > 46.0);
+                                        : (p.x < self.bounds.size.width * 0.41 && p.y > 56.0);
         if (self.stickTouch == nil && stickSide) {
             self.stickTouch = t;
         }
@@ -890,7 +991,9 @@ typedef struct {
         }
         _pressedMask = mask;
         if (anyDown) {
-            [self.tick impactOccurred];
+            if (FORTouchVibrate) {
+                [self.tick impactOccurred];
+            }
         }
         changed = YES;
     }

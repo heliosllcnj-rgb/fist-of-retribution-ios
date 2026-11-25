@@ -332,6 +332,11 @@ public class SDLActivity extends Activity implements View.OnSystemUiVisibilityCh
     private static final int FOLDER_PICKER_CODE = 42;
     private SharedPreferences mSharedPrefs;
     private static String mBasePath;
+
+    // the game folder, for the touch overlay's settings file (save/touch.cfg)
+    public static String getBasePath() {
+        return mBasePath;
+    }
     private Button mSDButton;
     private ControllerOverlay mControllerOverlay;
     private final Runnable hideRunnable = () -> {

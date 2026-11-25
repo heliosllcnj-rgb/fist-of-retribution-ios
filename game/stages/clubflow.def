@@ -24,10 +24,10 @@ cuthigh = 0
 cutlow = 0
 
 [PlayerInfo]
-p1startx = -70
+p1startx = -293
 p1starty = 0
 p1facing = 1
-p2startx = 70
+p2startx = 293
 p2starty = 0
 p2facing = -1
 leftbound = -1000

@@ -1,0 +1,43 @@
+; Faye Donovan - Fist of Retribution: Project Zero (IKEMEN GO prototype)
+; Character, story and world created and written by Scott Balcom (original story: Fist of Retribution: Project Zero).
+[Info]
+name = "Faye Donovan"
+displayname = "Faye Donovan"
+versiondate = 11,18,2026
+mugenversion = 1.1
+author = "Scott Balcom / Claude (prototype)"
+pal.defaults = 1,2,3,4,5,6
+localcoord = 320,240
+
+[Files]
+cmd = faye.cmd
+cns = faye.cns
+st = faye.cns
+stcommon = common1.cns
+sprite = faye.sff
+anim = faye.air
+sound = faye.snd
+movelist = movelist.dat
+pal1 = faye_default.act
+pal2 = faye_liberty.act
+pal3 = faye_islanders.act
+pal4 = faye_redbulls.act
+pal5 = faye_andre.act
+pal6 = faye_phantom.act
+pal7 = faye_ghost.act
+
+; Colour select as in 3rd Strike: the button that picks the fighter picks the colour.
+; LP MP HP = colours 1-3, LK MK HK = colours 4-6; LP+MK+HP together, or START held with any button, = colour 7.
+[Palette Keymap]
+x = 1
+y = 2
+z = 3
+a = 4
+b = 5
+c = 6
+x2 = 7
+y2 = 7
+z2 = 7
+a2 = 7
+b2 = 7
+c2 = 7
